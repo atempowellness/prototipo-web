@@ -1,12 +1,14 @@
 """
 Mapa del sitio de Atempo Wellness.
 
-Por ahora todas las páginas muestran solo su título y el aviso
-"Página en construcción". El contenido de cada una se define junto
-con el equipo antes de programarlo.
+Las páginas que aún no tienen contenido muestran solo su título y el
+aviso "Página en construcción". El contenido de cada una se define
+junto con el equipo antes de programarlo.
 """
 from django.urls import path
 from django.views.generic import TemplateView
+
+from . import views
 
 
 def en_construccion(titulo):
@@ -24,7 +26,7 @@ urlpatterns = [
     path('paquetes/', en_construccion('Paquetes'), name='paquetes'),
     path('bienestar/', en_construccion('Nutrición y masajes'), name='bienestar'),
     path('comunidad/', en_construccion('Comunidad'), name='comunidad'),
-    path('nosotros/', en_construccion('Sobre nosotros'), name='nosotros'),
+    path('nosotros/', views.NosotrosView.as_view(), name='nosotros'),
 
     # Páginas de la clienta
     path('cuenta/', en_construccion('Mi cuenta'), name='cuenta'),

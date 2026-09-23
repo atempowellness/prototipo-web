@@ -208,6 +208,97 @@ img { max-width: 100%; display: block; }
    --------------------------------------------------------- */
 main { min-height: 50vh; }
 .cabecera-pagina { padding: 64px 0 48px; }
+.entrada { font-size: 1.2rem; max-width: 60ch; }
+.bloque { padding: 64px 0; }
+.nota { font-size: .92rem; color: var(--apagado); margin-top: 20px; }
+.fila-botones { display: flex; flex-wrap: wrap; gap: 12px; }
+
+/* Dos columnas de texto (en celular, una debajo de otra) */
+.dos-columnas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+}
+.dos-columnas p { max-width: 60ch; }
+
+/* Tres pilares separados por líneas: Muévete, cuídate y conecta */
+.pilares {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: 24px;
+}
+.pilar { padding: 4px 28px; border-left: 1px solid var(--linea); }
+.pilar:first-child { padding-left: 0; border-left: 0; }
+.pilar h3 { font-size: 1.7rem; }
+
+/* Tres tarjetas: misión, visión y propósito */
+.tres-tarjetas {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.tarjeta {
+  background: var(--superficie);
+  border: 1px solid var(--linea);
+  border-radius: 20px;
+  padding: 28px;
+}
+.tarjeta h2 { font-size: 1.6rem; }
+.tarjeta p { margin: 0; }
+
+/* Tarjetas de personas: equipo y fundadores */
+.personas {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 24px;
+}
+.personas-cuatro { grid-template-columns: repeat(4, 1fr); }
+.persona {
+  background: var(--superficie);
+  border: 1px solid var(--linea);
+  border-radius: 20px;
+  padding: 28px 24px;
+  text-align: center;
+}
+.persona-foto {
+  width: 96px;
+  height: 96px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  background: var(--marcador);
+  color: #FFFFFF;
+  display: grid;
+  place-items: center;
+  font-family: var(--fuente-titulos);
+  font-size: 1.8rem;
+}
+.persona h3 { margin-bottom: 2px; }
+.persona-rol { font-weight: 600; color: var(--apagado); margin-bottom: 12px; }
+.persona-frase { font-size: 1rem; margin: 0; }
+
+/* Bloque de cierre con llamado a la acción */
+.cierre {
+  background: var(--resalte);
+  border-radius: 28px;
+  padding: 48px;
+  text-align: center;
+}
+.cierre p { font-size: 1.2rem; }
+.cierre .fila-botones { justify-content: center; }
+
+@media (max-width: 1000px) {
+  .personas, .personas-cuatro { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 800px) {
+  .dos-columnas, .pilares, .tres-tarjetas { grid-template-columns: 1fr; gap: 24px; }
+  .pilar, .pilar:first-child { padding: 20px 0 0; border-left: 0; border-top: 1px solid var(--linea); }
+  .cierre { padding: 32px 20px; }
+}
+@media (max-width: 560px) {
+  .personas, .personas-cuatro { grid-template-columns: 1fr; }
+  .bloque { padding: 44px 0; }
+}
 
 /* ---------------------------------------------------------
    7. FRANJA DE IMAGEN (con efecto de profundidad al hacer scroll)
@@ -223,6 +314,11 @@ main { min-height: 50vh; }
   position: absolute;
   inset: -15% 0;              /* más alta que la franja, para poder moverse */
   background-color: var(--marcador);
+  /* Patrón provisional para que se note el movimiento mientras no hay foto.
+     Cuando se indica una imagen, esta lo reemplaza. */
+  background-image:
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, .10) 0 2px, transparent 2px 28px),
+    linear-gradient(180deg, rgba(0, 0, 0, .25), rgba(255, 255, 255, .10));
   background-size: cover;
   background-position: center;
   will-change: transform;

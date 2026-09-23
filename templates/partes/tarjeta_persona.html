@@ -1,0 +1,11 @@
+{% comment %}
+Tarjeta de una persona (equipo o fundadores).
+Uso: {% include 'partes/tarjeta_persona.html' with persona=persona %}
+Mientras no haya foto, se muestra un círculo con sus iniciales.
+{% endcomment %}
+<article class="persona">
+  <div class="persona-foto" aria-hidden="true">{{ persona.iniciales }}</div>
+  <h3>{{ persona.nombre }}</h3>
+  <p class="persona-rol">{{ persona.rol }}</p>
+  <p class="persona-frase">“{{ persona.frase }}”</p>
+</article>

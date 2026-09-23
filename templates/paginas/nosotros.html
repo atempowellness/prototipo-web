@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block contenido %}
+
+{# 1. Presentación #}
+<section class="contenedor cabecera-pagina">
+  <h1>Sobre nosotros</h1>
+  <p class="entrada">
+    Atempo Wellness es un estudio boutique de bienestar en San Isidro, pensado para
+    mujeres de 40 a 59 años que quieren mantenerse activas, cuidarse y compartir
+    esta etapa con otras mujeres.
+  </p>
+</section>
+
+{# 2. Franja de imagen #}
+{% include 'partes/franja_imagen.html' with etiqueta='El estudio' %}
+
+{# 3 y 4. Nuestra historia y ¿Por qué Atempo? #}
+<section class="contenedor bloque">
+  <div class="dos-columnas">
+    <div>
+      <h2>Nuestra historia</h2>
+      <p>
+        Muchos gimnasios y estudios están pensados para un público joven y se enfocan
+        en el rendimiento o la estética. Entre los 40 y los 59 años, muchas mujeres no
+        se sienten representadas en esos espacios.
+      </p>
+      <p>
+        Atempo nace para cambiar eso: un lugar donde las clases se adaptan a tu
+        experiencia e intensidad, no a tu edad, y donde moverte también es una forma
+        de conocer gente y sentirte parte de algo.
+      </p>
+    </div>
+    <div>
+      <h2>¿Por qué Atempo?</h2>
+      <p>
+        Atempo se inspira en <em>a tempo</em>, una indicación musical que pide volver
+        al ritmo original después de un cambio. Por eso creamos un espacio para volver
+        a tu propio ritmo.
+      </p>
+    </div>
+  </div>
+</section>
+
+{# 5. Muévete, cuídate y conecta #}
+<section class="contenedor bloque">
+  <h2>Muévete, cuídate y conecta</h2>
+  <div class="pilares">
+    <div class="pilar">
+      <h3>Muévete</h3>
+      <p>Pilates, Yoga, Pesas y Zumba en grupos de máximo 12 personas, con niveles de intensidad suave, media y alta.</p>
+    </div>
+    <div class="pilar">
+      <h3>Cuídate</h3>
+      <p>Asesoría nutricional y masajes incluidos en los paquetes.</p>
+    </div>
+    <div class="pilar">
+      <h3>Conecta</h3>
+      <p>Atempo Circle, con encuentros mensuales como <em>coffee mornings</em> y charlas de bienestar.</p>
+    </div>
+  </div>
+</section>
+
+{# 6. Nuestro equipo #}
+<section class="contenedor bloque">
+  <h2>Nuestro equipo</h2>
+  <p class="apagado">Instructoras e instructores que corrigen tu técnica y adaptan cada clase a tu nivel, junto a especialistas en nutrición y masajes.</p>
+  <div class="personas">
+    {% for persona in equipo %}
+      {% include 'partes/tarjeta_persona.html' with persona=persona %}
+    {% endfor %}
+  </div>
+  <p class="nota">Perfiles de ejemplo del prototipo.</p>
+</section>
+
+{# 7. Franja de imagen #}
+{% include 'partes/franja_imagen.html' with etiqueta='La comunidad' %}
+
+{# 8. Misión, visión y propósito (textos de la tesis) #}
+<section class="contenedor bloque">
+  <div class="tres-tarjetas">
+    <div class="tarjeta">
+      <h2>Misión</h2>
+      <p>
+        Brindar a personas de 40 a 59 años experiencias integrales de movimiento y
+        bienestar, con especial atención a las necesidades e intereses de las mujeres,
+        mediante disciplinas adaptadas, servicios complementarios y espacios de conexión
+        social, en un entorno seguro, cercano y motivador.
+      </p>
+    </div>
+    <div class="tarjeta">
+      <h2>Visión</h2>
+      <p>
+        Ser la comunidad referente de bienestar integral y movimiento para personas de
+        40 a 59 años en Lima Metropolitana, reconocida por inspirar una vida activa,
+        saludable y socialmente conectada.
+      </p>
+    </div>
+    <div class="tarjeta">
+      <h2>Propósito</h2>
+      <p>
+        Acompañar a las personas a vivir esta etapa de su vida con energía, bienestar y
+        sentido de pertenencia.
+      </p>
+    </div>
+  </div>
+</section>
+
+{# 9. Fundadores #}
+<section class="contenedor bloque">
+  <h2>Quiénes fundamos Atempo</h2>
+  <div class="personas personas-cuatro">
+    {% for persona in fundadores %}
+      {% include 'partes/tarjeta_persona.html' with persona=persona %}
+    {% endfor %}
+  </div>
+</section>
+
+{# 10. Cierre #}
+<section class="contenedor bloque">
+  <div class="cierre">
+    <h2>¿Quieres conocernos?</h2>
+    <p>Ven a tu primera clase.</p>
+    <div class="fila-botones">
+      <a class="boton" href="{% url 'horarios' %}">Ver horarios</a>
+      <a class="boton boton-borde" href="{% url 'paquetes' %}">Ver paquetes</a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
