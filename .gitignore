@@ -1,0 +1,15 @@
+# Entorno virtual de Python
+.venv/
+
+# Archivos temporales de Python
+__pycache__/
+*.pyc
+
+# Base de datos local (cada quien tiene la suya)
+db.sqlite3
+
+# Claves y configuración privada
+.env
+
+# Material de la tesis: solo local, no se sube al repositorio
+referencias/
