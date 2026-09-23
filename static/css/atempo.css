@@ -1,64 +1,105 @@
 /* =========================================================
    Atempo Wellness - hoja de estilos del sitio
+   Línea visual: propuesta "Firma" (ver CLAUDE.md).
+
+   IMPORTANTE: todo el diseño sale de la sección 1 (variables).
+   Para cambiar colores, tipografías, tamaños o esquinas en todo
+   el sitio, edita SOLO esa sección. El resto del archivo usa
+   esas variables y no debería tener colores escritos a mano.
    ========================================================= */
 
+/* Tipografías de Google Fonts (Italiana y Josefin Sans) */
+@import url("https://fonts.googleapis.com/css2?family=Italiana&family=Josefin+Sans:wght@400;600&display=swap");
+
 /* ---------------------------------------------------------
-   1. PALETA Y TIPOGRAFÍAS (PROVISIONALES)
-   Para cambiar la identidad visual de todo el sitio,
-   basta con editar los valores de esta sección.
+   1. VARIABLES DE DISEÑO (el único lugar que hay que editar)
    --------------------------------------------------------- */
 :root {
-  /* Tema claro */
-  --fondo: #F7F5F2;         /* fondo general */
-  --superficie: #FFFFFF;    /* tarjetas y bloques */
-  --texto: #1F1F1F;         /* texto principal */
-  --apagado: #5C5A57;       /* texto secundario */
-  --linea: #E2DDD6;         /* bordes y separadores */
-  --acento: #2E2E2E;        /* botones y títulos */
-  --acento-texto: #FFFFFF;  /* texto sobre botones */
-  --resalte: #ECE8E2;       /* fondo al pasar el cursor */
-  --marcador: #8C8479;      /* bloques de imagen provisionales */
+  /* Paleta de la marca */
+  --marfil: #FFFDFB;
+  --negro-suave: #1B1B1B;
+  --gris-calido: #6B625B;
+  --champagne: #C9AE84;          /* solo decorativo: nunca texto sobre fondo claro */
+  --champagne-oscuro: #7D6440;   /* versión legible del champagne */
+  --nude: #EBD3CB;
+  --nude-claro: #F6ECE8;
+  --exito: #3F6B4E;
+  --error: #A33A2B;
 
-  /* Tipografías del sistema (provisionales) */
-  --fuente-titulos: Georgia, "Times New Roman", serif;
-  --fuente-texto: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+  /* Tipografías */
+  --fuente-titulos: "Italiana", "Didot", Georgia, serif;          /* solo títulos de 28 px o más */
+  --fuente-texto: "Josefin Sans", "Segoe UI", system-ui, sans-serif;
+  --peso-normal: 400;
+  --peso-enfasis: 600;
+  --texto-base: 18px;
+  --interlineado: 1.6;
+  --espaciado-etiquetas: .14em;  /* etiquetas cortas en mayúsculas */
+
+  /* Esquinas y tamaños */
+  --radio-boton: 6px;
+  --radio-tarjeta: 12px;
+  --alto-minimo: 48px;           /* zonas clicables */
+  --ancho-maximo: 1180px;
+  --ancho-logo: 200px;           /* logo en el encabezado (mínimo 140 px) */
+  --ancho-logo-celular: 150px;
+
+  /* Usos de color en el TEMA CLARO */
+  --fondo: var(--marfil);
+  --fondo-alterno: var(--nude-claro);    /* secciones alternas */
+  --superficie: var(--nude-claro);       /* tarjetas */
+  --destacado: var(--nude);              /* bloques destacados y etiquetas */
+  --texto: var(--negro-suave);
+  --texto-secundario: var(--gris-calido);
+  --texto-acento: var(--champagne-oscuro);   /* enlaces y subtítulos pequeños */
+  --texto-exito: var(--exito);               /* ahorro, mensajes de éxito */
+  --texto-error: var(--error);
+  --decorativo: var(--champagne);            /* líneas, bordes e íconos */
+  --boton-fondo: var(--negro-suave);
+  --boton-texto: var(--marfil);
+  --marcador-1: var(--champagne);            /* espacios de imagen sin foto */
+  --marcador-2: var(--gris-calido);
+  --marcador-3: #B89B8F;
+  --logo-nombre: var(--negro-suave);
+  --logo-linea: var(--champagne);
+  --logo-subtitulo: var(--champagne-oscuro);
+
+  /* Sobre fotos (igual en ambos temas) */
+  --sobre-imagen: #FFFFFF;
+  --capa-imagen: rgba(27, 27, 27, .55);
+  --capa-imagen-suave: rgba(27, 27, 27, .15);
+  --fondo-etiqueta-imagen: rgba(27, 27, 27, .45);
+  --patron-linea: rgba(255, 255, 255, .16);  /* líneas del espacio de imagen provisional */
 
   color-scheme: light;
 }
 
-/* Tema oscuro: se usa si el dispositivo lo prefiere y la persona no eligió otro */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --fondo: #161616;
-    --superficie: #202020;
-    --texto: #EDEBE8;
-    --apagado: #A9A6A1;
-    --linea: #34322F;
-    --acento: #EDEBE8;
-    --acento-texto: #161616;
-    --resalte: #2A2927;
-    --marcador: #4A4640;
-    color-scheme: dark;
-  }
-}
-
-/* Tema oscuro: elegido con el botón */
+/* Usos de color en el TEMA OSCURO (derivado de la paleta; el logo usa su versión invertida).
+   Al cargar la página se elige el tema del dispositivo o el que la persona eligió
+   con el botón (ver base.html y atempo.js). */
 :root[data-theme="dark"] {
-  --fondo: #161616;
-  --superficie: #202020;
-  --texto: #EDEBE8;
-  --apagado: #A9A6A1;
-  --linea: #34322F;
-  --acento: #EDEBE8;
-  --acento-texto: #161616;
-  --resalte: #2A2927;
-  --marcador: #4A4640;
+  --fondo: var(--negro-suave);
+  --fondo-alterno: #221F1D;
+  --superficie: #26221F;
+  --destacado: #3A2F2A;
+  --texto: var(--marfil);
+  --texto-secundario: #C9BDB2;
+  --texto-acento: var(--champagne);
+  --texto-exito: #8FC4A0;
+  --texto-error: #F08C7E;
+  --decorativo: #8A7657;
+  --boton-fondo: var(--marfil);
+  --boton-texto: var(--negro-suave);
+  --marcador-1: #5A4D3C;
+  --marcador-2: #3A3430;
+  --marcador-3: #6B5750;
+  --logo-nombre: var(--marfil);
+  --logo-linea: var(--champagne);
+  --logo-subtitulo: var(--champagne);
   color-scheme: dark;
 }
 
 /* ---------------------------------------------------------
    2. BASE
-   Texto de 18 px, buen interlineado y contraste alto.
    --------------------------------------------------------- */
 *, *::before, *::after { box-sizing: border-box; }
 
@@ -67,125 +108,156 @@ body {
   background: var(--fondo);
   color: var(--texto);
   font-family: var(--fuente-texto);
-  font-size: 18px;
-  line-height: 1.6;
+  font-weight: var(--peso-normal);
+  font-size: var(--texto-base);
+  line-height: var(--interlineado);
 }
 
-h1, h2, h3 {
+/* Títulos grandes en Italiana (una sola variante, fina: solo 28 px o más) */
+h1, h2 {
   font-family: var(--fuente-titulos);
   font-weight: 400;
-  color: var(--acento);
+  color: var(--texto);
   line-height: 1.15;
   margin: 0 0 .5em;
 }
-h1 { font-size: clamp(2.2rem, 5vw, 3.6rem); }
-h2 { font-size: clamp(1.6rem, 3vw, 2.3rem); }
-h3 { font-size: 1.35rem; }
+h1 { font-size: clamp(2.4rem, 5vw, 3.8rem); }
+h2 { font-size: clamp(1.7rem, 3vw, 2.4rem); }
+
+/* Subtítulos en Josefin Sans */
+h3 {
+  font-family: var(--fuente-texto);
+  font-weight: var(--peso-enfasis);
+  font-size: 1.25rem;
+  line-height: 1.3;
+  color: var(--texto);
+  margin: 0 0 .5em;
+}
 
 p { margin: 0 0 1em; }
-a { color: var(--acento); text-underline-offset: 3px; }
+a { color: var(--texto-acento); text-underline-offset: 3px; }
 img { max-width: 100%; display: block; }
+strong, b { font-weight: var(--peso-enfasis); }
 
-.contenedor { width: min(1180px, 100% - 32px); margin-inline: auto; }
+.contenedor { width: min(var(--ancho-maximo), 100% - 32px); margin-inline: auto; }
+.apagado { color: var(--texto-secundario); }
+
+/* Etiquetas cortas en mayúsculas con espaciado amplio */
+.etiqueta-seccion {
+  font-family: var(--fuente-texto);
+  font-weight: var(--peso-enfasis);
+  font-size: .85rem;
+  letter-spacing: var(--espaciado-etiquetas);
+  text-transform: uppercase;
+  color: var(--texto-acento);
+}
+
+/* Cifras (precios, nombres de planes con número): Italiana dibuja los números
+   con alturas irregulares y se leen mal, así que van en la tipografía de texto. */
+.cifra { font-family: var(--fuente-texto); font-weight: var(--peso-enfasis); letter-spacing: 0; }
 
 /* Nombre de la marca y de los planes dentro de los textos
-   ("Atempo", "Atempo Circle", "Atempo 5"...). Provisional: negrita.
-   Revisar cuando se definan la paleta y las tipografías. */
-.nombre-marca { font-weight: 700; }
-.apagado { color: var(--apagado); }
+   ("Atempo", "Atempo Circle", "Atempo 5"...). */
+.nombre-marca { font-weight: var(--peso-enfasis); }
 
-:focus-visible { outline: 3px solid var(--acento); outline-offset: 3px; border-radius: 6px; }
+:focus-visible { outline: 3px solid var(--texto-acento); outline-offset: 3px; border-radius: var(--radio-boton); }
 
 /* Enlace oculto para quien navega con teclado */
 .saltar { position: absolute; left: -9999px; }
-.saltar:focus { left: 16px; top: 16px; z-index: 100; background: var(--superficie); padding: 10px 16px; }
+.saltar:focus { left: 16px; top: 16px; z-index: 100; background: var(--fondo); padding: 10px 16px; }
 
 /* ---------------------------------------------------------
-   3. BOTONES
-   Grandes y fáciles de tocar (mínimo 48 px de alto).
+   3. LOGO
+   --------------------------------------------------------- */
+.logo { display: block; width: var(--ancho-logo); min-width: 140px; height: auto; }
+.logo-nombre { font-family: var(--fuente-titulos); fill: var(--logo-nombre); }
+.logo-linea { stroke: var(--logo-linea); }
+.logo-subtitulo { font-family: var(--fuente-texto); fill: var(--logo-subtitulo); }
+
+/* ---------------------------------------------------------
+   4. BOTONES
+   Principal: fondo negro suave. Secundario: solo borde.
    --------------------------------------------------------- */
 .boton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 48px;
-  padding: 10px 24px;
-  border-radius: 999px;
-  border: 1.5px solid var(--acento);
-  background: var(--acento);
-  color: var(--acento-texto);
+  min-height: var(--alto-minimo);
+  padding: 12px 26px 10px;
+  border-radius: var(--radio-boton);
+  border: 1.5px solid var(--boton-fondo);
+  background: var(--boton-fondo);
+  color: var(--boton-texto);
   font: inherit;
-  font-weight: 600;
+  font-weight: var(--peso-enfasis);
   font-size: 1rem;
   text-decoration: none;
   cursor: pointer;
   white-space: nowrap;
 }
-.boton:hover { opacity: .88; }
-.boton-borde { background: transparent; color: var(--acento); }
-.boton-borde:hover { background: var(--resalte); opacity: 1; }
+.boton:hover { opacity: .85; }
+.boton-borde { background: transparent; color: var(--texto); border-color: var(--texto); }
+.boton-borde:hover { background: var(--fondo-alterno); opacity: 1; }
+
+/* Botones sobre fotos (portada) */
+.boton-claro { background: var(--sobre-imagen); border-color: var(--sobre-imagen); color: var(--negro-suave); }
+.boton-claro-borde { background: transparent; border-color: var(--sobre-imagen); color: var(--sobre-imagen); }
+.boton-claro-borde:hover { background: var(--capa-imagen-suave); opacity: 1; }
 
 /* ---------------------------------------------------------
-   4. AVISO DE PROTOTIPO
+   5. AVISO DE PROTOTIPO
    --------------------------------------------------------- */
 .aviso-demo {
-  background: var(--acento);
-  color: var(--acento-texto);
+  background: var(--boton-fondo);
+  color: var(--boton-texto);
   font-size: .88rem;
   text-align: center;
-  padding: 7px 16px;
+  padding: 7px 16px 5px;
 }
 
 /* ---------------------------------------------------------
-   5. ENCABEZADO Y MENÚ
+   6. ENCABEZADO Y MENÚ
    --------------------------------------------------------- */
 .encabezado {
   position: sticky;
   top: 0;
   z-index: 40;
   background: var(--fondo);
-  border-bottom: 1px solid var(--linea);
+  border-bottom: 1px solid var(--decorativo);
 }
 .encabezado-fila {
   display: flex;
   align-items: center;
   gap: 16px;
-  min-height: 76px;
+  min-height: 88px;
 }
-.marca {
-  font-family: var(--fuente-titulos);
-  font-size: 1.6rem;
-  color: var(--acento);
-  text-decoration: none;
-  margin-right: auto;
-}
-.menu { display: flex; gap: 4px; }
+.marca { margin-right: auto; padding: 6px 0; text-decoration: none; }
+.menu { display: flex; gap: 2px; }
 .menu a {
   text-decoration: none;
   color: var(--texto);
-  padding: 10px 14px;
-  border-radius: 999px;
-  font-weight: 500;
+  padding: 12px 12px 10px;
+  border-radius: var(--radio-boton);
   font-size: 1rem;
 }
-.menu a:hover { background: var(--resalte); }
-.menu a[aria-current="page"] { background: var(--resalte); font-weight: 700; }
+.menu a:hover { background: var(--fondo-alterno); }
+.menu a[aria-current="page"] { background: var(--destacado); font-weight: var(--peso-enfasis); }
 
 .boton-menu { display: none; }
 
 /* En pantallas angostas (tablet y celular) el menú se despliega con un botón */
-@media (max-width: 1080px) {
+@media (max-width: 1120px) {
   .boton-menu {
     display: inline-flex;
     align-items: center;
-    min-height: 48px;
-    padding: 10px 18px;
-    border-radius: 999px;
-    border: 1.5px solid var(--linea);
+    min-height: var(--alto-minimo);
+    padding: 12px 18px 10px;
+    border-radius: var(--radio-boton);
+    border: 1.5px solid var(--decorativo);
     background: transparent;
     color: var(--texto);
     font: inherit;
-    font-weight: 600;
+    font-weight: var(--peso-enfasis);
     cursor: pointer;
   }
   .menu {
@@ -196,27 +268,28 @@ img { max-width: 100%; display: block; }
     right: 0;
     flex-direction: column;
     background: var(--fondo);
-    border-bottom: 1px solid var(--linea);
+    border-bottom: 1px solid var(--decorativo);
     padding: 8px 16px 16px;
   }
   .menu.abierto { display: flex; }
-  .menu a { padding: 14px 16px; font-size: 1.08rem; }
+  .menu a { padding: 14px 16px 12px; font-size: 1.08rem; }
 }
 @media (max-width: 480px) {
-  .encabezado-fila { gap: 8px; }
-  .marca { font-size: 1.3rem; }
-  .encabezado .boton, .boton-menu { padding: 8px 14px; font-size: .95rem; }
+  .encabezado-fila { gap: 8px; min-height: 76px; }
+  .logo { width: var(--ancho-logo-celular); }
+  .encabezado .boton, .boton-menu { padding: 10px 12px 8px; font-size: .95rem; }
 }
 
 /* ---------------------------------------------------------
-   6. CONTENIDO DE LAS PÁGINAS
+   7. BLOQUES COMUNES DE LAS PÁGINAS
    --------------------------------------------------------- */
 main { min-height: 50vh; }
 .cabecera-pagina { padding: 64px 0 48px; }
 .entrada { font-size: 1.2rem; max-width: 60ch; }
 .bloque { padding: 64px 0; }
-.nota { font-size: .92rem; color: var(--apagado); margin-top: 20px; }
+.nota { font-size: .92rem; color: var(--texto-secundario); margin-top: 20px; }
 .fila-botones { display: flex; flex-wrap: wrap; gap: 12px; }
+.enlace-mas { margin-top: 28px; font-weight: var(--peso-enfasis); }
 
 /* Dos columnas de texto (en celular, una debajo de otra) */
 .dos-columnas {
@@ -232,11 +305,11 @@ main { min-height: 50vh; }
   grid-template-columns: repeat(3, 1fr);
   margin-top: 24px;
 }
-.pilar { padding: 4px 28px; border-left: 1px solid var(--linea); }
+.pilar { padding: 4px 28px; border-left: 1px solid var(--decorativo); }
 .pilar:first-child { padding-left: 0; border-left: 0; }
-.pilar h3 { font-size: 1.7rem; }
+.pilar h3 { font-family: var(--fuente-titulos); font-weight: 400; font-size: 1.9rem; }
 
-/* Tres tarjetas: misión, visión y propósito */
+/* Tarjetas (misión, visión y propósito) */
 .tres-tarjetas {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -244,11 +317,10 @@ main { min-height: 50vh; }
 }
 .tarjeta {
   background: var(--superficie);
-  border: 1px solid var(--linea);
-  border-radius: 20px;
+  border-radius: var(--radio-tarjeta);
   padding: 28px;
 }
-.tarjeta h2 { font-size: 1.6rem; }
+.tarjeta h2 { font-size: 1.8rem; }
 .tarjeta p { margin: 0; }
 
 /* Tarjetas de personas: equipo y fundadores */
@@ -261,8 +333,7 @@ main { min-height: 50vh; }
 .personas-cuatro { grid-template-columns: repeat(4, 1fr); }
 .persona {
   background: var(--superficie);
-  border: 1px solid var(--linea);
-  border-radius: 20px;
+  border-radius: var(--radio-tarjeta);
   padding: 28px 24px;
   text-align: center;
 }
@@ -271,33 +342,51 @@ main { min-height: 50vh; }
   height: 96px;
   margin: 0 auto 16px;
   border-radius: 50%;
-  background: var(--marcador);
-  color: #FFFFFF;
+  border: 1.5px solid var(--decorativo);
+  background: var(--destacado);
+  color: var(--texto);
   display: grid;
   place-items: center;
   font-family: var(--fuente-titulos);
-  font-size: 1.8rem;
+  font-size: 2rem;
 }
 .persona h3 { margin-bottom: 2px; }
-.persona-rol { font-weight: 600; color: var(--apagado); margin-bottom: 12px; }
+.persona-rol {
+  font-size: .85rem;
+  font-weight: var(--peso-enfasis);
+  letter-spacing: var(--espaciado-etiquetas);
+  text-transform: uppercase;
+  color: var(--texto-secundario);
+  margin-bottom: 12px;
+}
 .persona-frase { font-size: 1rem; margin: 0; }
 
-/* Bloque de cierre con llamado a la acción */
+/* Bloque destacado de cierre con llamado a la acción */
 .cierre {
-  background: var(--resalte);
-  border-radius: 28px;
+  background: var(--destacado);
+  border-radius: var(--radio-tarjeta);
   padding: 48px;
   text-align: center;
 }
 .cierre p { font-size: 1.2rem; }
 .cierre .fila-botones { justify-content: center; }
 
+/* Etiquetas pequeñas (por ejemplo, niveles de intensidad) */
+.etiqueta {
+  font-size: .82rem;
+  font-weight: var(--peso-enfasis);
+  padding: 4px 12px 2px;
+  border-radius: var(--radio-boton);
+  background: var(--destacado);
+  color: var(--texto);
+}
+
 @media (max-width: 1000px) {
   .personas, .personas-cuatro { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 800px) {
   .dos-columnas, .pilares, .tres-tarjetas { grid-template-columns: 1fr; gap: 24px; }
-  .pilar, .pilar:first-child { padding: 20px 0 0; border-left: 0; border-top: 1px solid var(--linea); }
+  .pilar, .pilar:first-child { padding: 20px 0 0; border-left: 0; border-top: 1px solid var(--decorativo); }
   .cierre { padding: 32px 20px; }
 }
 @media (max-width: 560px) {
@@ -306,8 +395,22 @@ main { min-height: 50vh; }
 }
 
 /* ---------------------------------------------------------
-   7. FRANJA DE IMAGEN (con efecto de profundidad al hacer scroll)
+   8. ESPACIOS DE IMAGEN
+   Mientras no hay foto se ve un patrón provisional (líneas
+   diagonales). Cuando se indica una imagen, esta lo reemplaza.
    --------------------------------------------------------- */
+.franja-imagen-fondo,
+.marcador-imagen {
+  background-color: var(--marcador-1);
+  background-image:
+    repeating-linear-gradient(135deg, var(--patron-linea) 0 2px, transparent 2px 28px),
+    linear-gradient(180deg, var(--capa-imagen-suave), transparent);
+  background-size: cover;
+  background-position: center;
+}
+.marcador-imagen { display: grid; place-items: center; }
+
+/* Franja a todo el ancho con efecto de profundidad al hacer scroll */
 .franja-imagen {
   position: relative;
   height: clamp(260px, 45vw, 520px);
@@ -315,19 +418,6 @@ main { min-height: 50vh; }
   display: grid;
   place-items: center;
 }
-/* Espacios de imagen: mientras no hay foto se ve un patrón provisional
-   (líneas diagonales). Cuando se indica una imagen, esta lo reemplaza. */
-.franja-imagen-fondo,
-.marcador-imagen {
-  background-color: var(--marcador);
-  background-image:
-    repeating-linear-gradient(135deg, rgba(255, 255, 255, .10) 0 2px, transparent 2px 28px),
-    linear-gradient(180deg, rgba(0, 0, 0, .25), rgba(255, 255, 255, .10));
-  background-size: cover;
-  background-position: center;
-}
-.marcador-imagen { display: grid; place-items: center; }
-
 .franja-imagen-fondo {
   position: absolute;
   inset: -15% 0;              /* más alta que la franja, para poder moverse */
@@ -336,15 +426,15 @@ main { min-height: 50vh; }
 .franja-imagen-etiqueta,
 .marcador-etiqueta {
   position: relative;
-  color: #FFFFFF;
-  font-size: 1.05rem;
-  background: rgba(0, 0, 0, .35);
-  padding: 8px 18px;
-  border-radius: 999px;
+  color: var(--sobre-imagen);
+  font-size: 1rem;
+  background: var(--fondo-etiqueta-imagen);
+  padding: 8px 18px 6px;
+  border-radius: var(--radio-boton);
 }
 
 /* ---------------------------------------------------------
-   8. PÁGINA DE INICIO
+   9. PÁGINA DE INICIO
    --------------------------------------------------------- */
 
 /* Portada principal: imágenes que se funden entre sí, con el texto encima */
@@ -354,7 +444,7 @@ main { min-height: 50vh; }
   display: flex;
   align-items: center;
   overflow: hidden;
-  color: #FFFFFF;
+  color: var(--sobre-imagen);
 }
 .portada-diapo {
   position: absolute;
@@ -366,25 +456,21 @@ main { min-height: 50vh; }
 }
 .portada-diapo.activa { opacity: 1; }
 /* Cada imagen provisional con un tono distinto, para notar el cambio */
-.portada-diapo:nth-child(2) { background-color: #6F6A62; }
-.portada-diapo:nth-child(3) { background-color: #9A9186; }
+.portada-diapo:nth-child(2) { background-color: var(--marcador-2); }
+.portada-diapo:nth-child(3) { background-color: var(--marcador-3); }
 
-/* Capa oscura para que el texto blanco siempre se lea bien */
+/* Capa oscura para que el texto siempre se lea bien sobre la foto */
 .portada::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, rgba(0, 0, 0, .62) 0%, rgba(0, 0, 0, .38) 55%, rgba(0, 0, 0, .15) 100%);
+  background: linear-gradient(90deg, var(--capa-imagen) 0%, var(--capa-imagen) 45%, var(--capa-imagen-suave) 100%);
   pointer-events: none;
 }
 .portada-texto { position: relative; z-index: 1; padding: 72px 0; }
-.portada h1 { color: #FFFFFF; max-width: 14ch; }
+.portada h1 { color: var(--sobre-imagen); max-width: 14ch; }
 .portada .entrada { max-width: 46ch; }
-.portada-nota { margin-top: 20px; font-size: 1rem; opacity: .92; }
-
-.boton-claro { background: #FFFFFF; border-color: #FFFFFF; color: #1F1F1F; }
-.boton-claro-borde { background: transparent; border-color: #FFFFFF; color: #FFFFFF; }
-.boton-claro-borde:hover { background: rgba(255, 255, 255, .15); opacity: 1; }
+.portada-nota { margin-top: 20px; font-size: 1rem; }
 
 .portada-controles {
   position: absolute;
@@ -401,25 +487,23 @@ main { min-height: 50vh; }
   height: 14px;
   padding: 0;
   border-radius: 50%;
-  border: 2px solid #FFFFFF;
+  border: 2px solid var(--sobre-imagen);
   background: transparent;
   cursor: pointer;
 }
-.portada-punto[aria-current="true"] { background: #FFFFFF; }
+.portada-punto[aria-current="true"] { background: var(--sobre-imagen); }
 .portada-pausa {
   margin-left: 8px;
   min-height: 36px;
-  padding: 4px 14px;
-  border-radius: 999px;
-  border: 1.5px solid #FFFFFF;
-  background: rgba(0, 0, 0, .25);
-  color: #FFFFFF;
+  padding: 6px 14px 4px;
+  border-radius: var(--radio-boton);
+  border: 1.5px solid var(--sobre-imagen);
+  background: var(--fondo-etiqueta-imagen);
+  color: var(--sobre-imagen);
   font: inherit;
   font-size: .88rem;
   cursor: pointer;
 }
-
-.enlace-mas { margin-top: 28px; font-weight: 600; }
 
 /* Tarjetas de disciplinas */
 .disciplinas {
@@ -430,28 +514,27 @@ main { min-height: 50vh; }
 }
 .disciplina {
   background: var(--superficie);
-  border: 1px solid var(--linea);
-  border-radius: 20px;
+  border-radius: var(--radio-tarjeta);
   overflow: hidden;
   display: flex;
   flex-direction: column;
 }
 .disciplina-imagen { aspect-ratio: 4 / 3; }
 .disciplina-texto { padding: 22px; display: flex; flex-direction: column; flex: 1; }
-.disciplina-texto h3 { font-size: 1.6rem; margin-bottom: 0; }
-.disciplina-sala { font-size: .92rem; color: var(--apagado); margin-bottom: 10px; }
+.disciplina-texto h3 { font-family: var(--fuente-titulos); font-weight: 400; font-size: 1.9rem; margin-bottom: 0; }
+.disciplina-sala {
+  font-size: .82rem;
+  font-weight: var(--peso-enfasis);
+  letter-spacing: var(--espaciado-etiquetas);
+  text-transform: uppercase;
+  color: var(--texto-secundario);
+  margin-bottom: 10px;
+}
 .disciplina-texto p:nth-last-child(2) { flex: 1; }
 .niveles { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; }
-.etiqueta {
-  font-size: .82rem;
-  font-weight: 600;
-  padding: 3px 12px;
-  border-radius: 999px;
-  background: var(--resalte);
-}
 
-/* Cómo funciona: tres pasos numerados sobre un fondo suave */
-.banda { background: var(--resalte); border-radius: 28px; padding: 48px; }
+/* Cómo funciona: tres pasos numerados sobre un fondo destacado */
+.banda { background: var(--destacado); border-radius: var(--radio-tarjeta); padding: 48px; }
 .pasos {
   list-style: none;
   counter-reset: paso;
@@ -470,10 +553,11 @@ main { min-height: 50vh; }
   height: 46px;
   margin-bottom: 14px;
   border-radius: 50%;
-  border: 1.5px solid var(--acento);
-  color: var(--acento);
-  font-family: var(--fuente-titulos);
-  font-size: 1.3rem;
+  border: 1.5px solid var(--texto);
+  color: var(--texto);
+  font-weight: var(--peso-enfasis);
+  font-size: 1.15rem;
+  padding-top: 3px;
 }
 .pasos p { margin: 0; }
 
@@ -485,8 +569,8 @@ main { min-height: 50vh; }
   gap: 24px;
   align-items: center;
   justify-content: space-between;
-  border-top: 1px solid var(--linea);
-  border-bottom: 1px solid var(--linea);
+  border-top: 1px solid var(--decorativo);
+  border-bottom: 1px solid var(--decorativo);
   padding: 36px 0;
 }
 .linea-paquetes h2 { margin-bottom: .3em; }
@@ -494,17 +578,17 @@ main { min-height: 50vh; }
 
 /* Atempo Circle */
 .circle { align-items: center; }
-.circle-imagen { border-radius: 24px; aspect-ratio: 4 / 3; }
+.circle-imagen { border-radius: var(--radio-tarjeta); aspect-ratio: 4 / 3; }
 
 /* Preguntas frecuentes que se abren al hacer clic */
 .preguntas { max-width: 820px; margin-top: 20px; }
-.preguntas details { border-bottom: 1px solid var(--linea); }
+.preguntas details { border-bottom: 1px solid var(--decorativo); }
 .preguntas summary {
   cursor: pointer;
   list-style: none;
   position: relative;
-  padding: 18px 40px 18px 0;
-  font-weight: 600;
+  padding: 20px 40px 16px 0;
+  font-weight: var(--peso-enfasis);
   font-size: 1.08rem;
 }
 .preguntas summary::-webkit-details-marker { display: none; }
@@ -514,10 +598,10 @@ main { min-height: 50vh; }
   right: 8px;
   top: 12px;
   font-size: 1.6rem;
-  color: var(--apagado);
+  color: var(--texto-acento);
 }
 .preguntas details[open] summary::after { content: "−"; }
-.preguntas details p { color: var(--apagado); max-width: 66ch; }
+.preguntas details p { color: var(--texto-secundario); max-width: 66ch; }
 
 @media (max-width: 1000px) {
   .disciplinas { grid-template-columns: repeat(2, 1fr); }
@@ -525,7 +609,7 @@ main { min-height: 50vh; }
 @media (max-width: 800px) {
   .pasos { grid-template-columns: 1fr; }
   .banda { padding: 32px 22px; }
-  .portada::after { background: rgba(0, 0, 0, .5); }
+  .portada::after { background: var(--capa-imagen); }
 }
 @media (max-width: 560px) {
   .disciplinas { grid-template-columns: 1fr; }
@@ -533,18 +617,106 @@ main { min-height: 50vh; }
 }
 
 /* ---------------------------------------------------------
-   9. PIE DE PÁGINA
+   10. PÁGINA DE PAQUETES
+   --------------------------------------------------------- */
+.paquetes {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+  padding-top: 16px;              /* espacio para la etiqueta del destacado */
+  align-items: stretch;
+}
+.paquete {
+  position: relative;
+  background: var(--superficie);
+  border: 1.5px solid transparent;
+  border-radius: var(--radio-tarjeta);
+  padding: 28px 20px 22px;
+  display: flex;
+  flex-direction: column;
+}
+.paquete-destacado { border-color: var(--decorativo); background: var(--destacado); }
+.paquete-etiqueta {
+  position: absolute;
+  top: -14px;
+  left: 20px;
+  background: var(--boton-fondo);
+  color: var(--boton-texto);
+  font-size: .78rem;
+  font-weight: var(--peso-enfasis);
+  letter-spacing: var(--espaciado-etiquetas);
+  text-transform: uppercase;
+  padding: 5px 12px 3px;
+  border-radius: var(--radio-boton);
+  white-space: nowrap;
+}
+.paquete-creditos {
+  font-size: .8rem;
+  font-weight: var(--peso-enfasis);
+  letter-spacing: var(--espaciado-etiquetas);
+  text-transform: uppercase;
+  color: var(--texto-secundario);
+  margin-bottom: 6px;
+}
+.paquete h2 { font-size: 1.6rem; margin-bottom: 10px; }
+.paquete-precio { font-size: 2.1rem; line-height: 1; margin-bottom: 8px; }
+.paquete-por-clase { font-size: .95rem; color: var(--texto-secundario); margin-bottom: 4px; }
+.paquete-ahorro { font-size: .95rem; font-weight: var(--peso-enfasis); color: var(--texto-exito); min-height: 1.6em; margin-bottom: 12px; }
+.paquete-beneficios {
+  margin: 0 0 12px;
+  padding: 12px 0 0 18px;
+  border-top: 1px solid var(--decorativo);
+  font-size: .95rem;
+}
+.paquete-beneficios li { margin-bottom: 4px; }
+.paquete-detalles { font-size: .95rem; margin-bottom: 16px; }
+.paquete-detalles summary {
+  cursor: pointer;
+  color: var(--texto-acento);
+  font-weight: var(--peso-enfasis);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding: 6px 0;
+}
+.paquete-detalles p { margin: 8px 0; }
+.paquete-detalles ul { margin: 0; padding-left: 18px; }
+.paquete .boton { margin-top: auto; }
+
+/* Nota sobre un fondo suave */
+.nota-destacada {
+  background: var(--fondo-alterno);
+  border-left: 3px solid var(--decorativo);
+  border-radius: var(--radio-tarjeta);
+  padding: 20px 24px;
+  font-size: 1rem;
+}
+
+@media (max-width: 1150px) { .paquetes { grid-template-columns: repeat(3, 1fr); row-gap: 28px; } }
+@media (max-width: 760px)  { .paquetes { grid-template-columns: 1fr; } }
+
+/* ---------------------------------------------------------
+   11. PIE DE PÁGINA
    --------------------------------------------------------- */
 .pie {
   margin-top: 72px;
-  border-top: 1px solid var(--linea);
-  background: var(--superficie);
+  border-top: 1px solid var(--decorativo);
+  background: var(--fondo-alterno);
   padding: 56px 0 28px;
   font-size: 1rem;
 }
-.pie h2 { font-size: 1.3rem; }
+/* Títulos de columna como etiquetas cortas en mayúsculas */
+.pie h2 {
+  font-family: var(--fuente-texto);
+  font-weight: var(--peso-enfasis);
+  font-size: .85rem;
+  letter-spacing: var(--espaciado-etiquetas);
+  text-transform: uppercase;
+  color: var(--texto-acento);
+  margin-bottom: 14px;
+}
 .pie ul { list-style: none; margin: 0; padding: 0; }
 .pie li { margin-bottom: 6px; }
+.pie a { color: var(--texto); }
 .pie-columnas {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -556,17 +728,17 @@ main { min-height: 50vh; }
   gap: 16px;
   justify-content: space-between;
   align-items: center;
-  border-top: 1px solid var(--linea);
+  border-top: 1px solid var(--decorativo);
   margin-top: 40px;
   padding-top: 24px;
 }
-.mantra { font-family: var(--fuente-titulos); font-size: 1.2rem; color: var(--acento); }
+.mantra { font-family: var(--fuente-titulos); font-size: 1.8rem; color: var(--texto); }
 
 @media (max-width: 900px) { .pie-columnas { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 560px) { .pie-columnas { grid-template-columns: 1fr; } }
 
 /* ---------------------------------------------------------
-   10. TRANSICIÓN ENTRE PÁGINAS
+   12. TRANSICIÓN ENTRE PÁGINAS
    Al pasar de una página a otra, el encabezado queda quieto
    y el resto se funde suavemente. Funciona en Chrome, Edge
    y Safari; en otros navegadores la página cambia como siempre.

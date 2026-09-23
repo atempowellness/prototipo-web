@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load formato %}
 
 {% block contenido %}
 
@@ -23,7 +24,7 @@
       <a class="boton boton-claro" href="{% url 'horarios' %}">Ver horarios y reservar</a>
       <a class="boton boton-claro-borde" href="{% url 'paquetes' %}">Conocer los paquetes</a>
     </div>
-    <p class="portada-nota">¿Primera vez? Prueba una clase por S/ 65, sin compromiso.</p>
+    <p class="portada-nota">¿Primera vez? Prueba una clase por {{ precio_clase_suelta|soles }}, sin compromiso.</p>
   </div>
 
   <div class="portada-controles">
@@ -106,8 +107,8 @@
 <section class="contenedor bloque bloque-corto">
   <div class="linea-paquetes">
     <div>
-      <h2>Ahorra hasta S/ 15 por clase con nuestros paquetes</h2>
-      <p class="apagado">La clase suelta cuesta S/ 65. Mientras más créditos, menor precio por clase y más beneficios de bienestar.</p>
+      <h2>Ahorra hasta <span class="cifra">{{ ahorro_maximo|soles }}</span> por clase con nuestros paquetes</h2>
+      <p class="apagado">La clase suelta cuesta {{ precio_clase_suelta|soles }}. Mientras más créditos, menor precio por clase y más beneficios de bienestar.</p>
     </div>
     <a class="boton" href="{% url 'paquetes' %}">Ver paquetes</a>
   </div>
@@ -142,7 +143,7 @@
     </details>
     <details>
       <summary>¿Qué pasa si no uso todos mis créditos?</summary>
-      <p>Cada paquete tiene una vigencia: 1 mes para <strong class="nombre-marca">Atempo 1</strong> y <strong class="nombre-marca">Atempo 5</strong>, 2 meses para <strong class="nombre-marca">Atempo 10</strong>, 3 meses para <strong class="nombre-marca">Atempo 20</strong> y 4 meses para <strong class="nombre-marca">Atempo 40</strong>. Te avisamos por correo y WhatsApp antes de que venzan.</p>
+      <p>Cada paquete tiene una vigencia: {% for cantidad, nombres in vigencias %}{{ cantidad|meses }} para {% for nombre in nombres %}<strong class="nombre-marca">{{ nombre }}</strong>{% if not forloop.last %} y {% endif %}{% endfor %}{% if forloop.revcounter == 2 %} y {% elif not forloop.last %}, {% endif %}{% endfor %}. Te avisamos por correo y WhatsApp antes de que venzan.</p>
     </details>
     <details>
       <summary>¿Puedo cancelar una reserva?</summary>

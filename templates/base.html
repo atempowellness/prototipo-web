@@ -6,13 +6,16 @@
   <title>{% block titulo %}{{ titulo }}{% endblock %} | Atempo Wellness</title>
   <meta name="description" content="Atempo Wellness: estudio boutique de bienestar en San Isidro. Pilates, Yoga, Pesas y Zumba en grupos reducidos.">
   <script>
-    /* Aplica el tema guardado (claro u oscuro) antes de dibujar la página,
-       para que no parpadee al cargar. */
-    try {
-      var tema = localStorage.getItem('atempo-tema');
-      if (tema) document.documentElement.dataset.theme = tema;
-    } catch (e) {}
+    /* Elige el tema antes de dibujar la página, para que no parpadee:
+       el que la persona eligió con el botón o, si no eligió, el del dispositivo. */
+    var tema = null;
+    try { tema = localStorage.getItem('atempo-tema'); } catch (e) {}
+    if (!tema) tema = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.dataset.theme = tema;
   </script>
+  <link rel="icon" type="image/svg+xml" href="{% static 'img/logo/atempo-icono.svg' %}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="{% static 'css/atempo.css' %}?v={{ version_estaticos }}">
 </head>
 <body>

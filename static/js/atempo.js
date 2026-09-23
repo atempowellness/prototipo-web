@@ -38,7 +38,13 @@
     actualizarBoton();
   });
 
-  prefiereOscuro.addEventListener('change', actualizarBoton);
+  // Si la persona no eligió un tema, seguir los cambios del dispositivo
+  prefiereOscuro.addEventListener('change', function () {
+    var elegido = null;
+    try { elegido = localStorage.getItem('atempo-tema'); } catch (e) {}
+    if (!elegido) raiz.dataset.theme = prefiereOscuro.matches ? 'dark' : 'light';
+    actualizarBoton();
+  });
   actualizarBoton();
 })();
 

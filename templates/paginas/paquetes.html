@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load formato marca %}
+
+{% block contenido %}
+
+{# 1. Cabecera #}
+<section class="contenedor cabecera-pagina">
+  <h1>Paquetes de lanzamiento</h1>
+  <p class="entrada">
+    Un crédito equivale a una clase presencial de cualquiera de nuestras disciplinas.
+    Úsalos cuando quieras dentro de la vigencia de tu paquete.
+  </p>
+</section>
+
+{# 2. Tarjetas de paquetes (datos del panel de administración) #}
+<section class="contenedor">
+  <div class="paquetes">
+    {% for paquete in paquetes %}
+      <article class="paquete{% if paquete.etiqueta_destacado %} paquete-destacado{% endif %}">
+        {% if paquete.etiqueta_destacado %}
+          <span class="paquete-etiqueta">{{ paquete.etiqueta_destacado }}</span>
+        {% endif %}
+        <p class="paquete-creditos">{{ paquete.creditos|creditos }}</p>
+        <h2 class="cifra">{{ paquete.nombre }}</h2>
+        <p class="paquete-precio cifra">{{ paquete.precio|soles }}</p>
+        <p class="paquete-por-clase">
+          {% if paquete.creditos == 1 %}Clase suelta{% else %}{{ paquete.precio_por_clase|soles }} por clase{% endif %}
+          <br>Vigencia: {{ paquete.vigencia_meses|meses }}
+        </p>
+        <p class="paquete-ahorro">{% if paquete.ahorro %}Ahorras {{ paquete.ahorro|soles }}{% endif %}</p>
+
+        <ul class="paquete-beneficios">
+          {% for beneficio in paquete.beneficios %}<li>{{ beneficio|marca }}</li>{% endfor %}
+        </ul>
+
+        <details class="paquete-detalles">
+          <summary>Ver detalles</summary>
+          {% if paquete.frase %}<p>{{ paquete.frase|marca }}</p>{% endif %}
+          <ul>
+            <li>1 crédito = 1 clase</li>
+            <li>Duración: {{ paquete.vigencia_meses|meses }} desde la compra</li>
+            {% if paquete.costo_nutricion_adicional %}<li>Nutrición adicional: {{ paquete.costo_nutricion_adicional|creditos }}</li>{% endif %}
+            {% if paquete.costo_masaje_adicional %}<li>Masaje adicional: {{ paquete.costo_masaje_adicional|creditos }}</li>{% endif %}
+          </ul>
+        </details>
+
+        {# La compra aún no existe: por ahora lleva a iniciar sesión #}
+        <a class="boton" href="{% url 'ingresar' %}">Comprar</a>
+      </article>
+    {% endfor %}
+  </div>
+</section>
+
+{# 3. Nota final #}
+<section class="contenedor bloque">
+  <div class="nota-destacada">
+    Los paquetes desde <strong class="nombre-marca">Atempo 5</strong> incluyen las actividades de
+    <strong class="nombre-marca">Atempo Circle</strong> durante su vigencia. Las sesiones de nutrición
+    y masajes incluidas se agendan desde <a href="{% url 'bienestar' %}">Nutrición y masajes</a>.
+  </div>
+</section>
+
+{% endblock %}

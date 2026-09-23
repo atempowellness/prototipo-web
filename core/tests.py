@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 PAGINAS_EN_CONSTRUCCION = [
-    'horarios', 'paquetes', 'bienestar', 'comunidad',
+    'horarios', 'bienestar', 'comunidad',
     'cuenta', 'registro', 'ingresar',
     'privacidad', 'terminos', 'reclamaciones',
 ]
@@ -36,7 +36,7 @@ class InicioTests(TestCase):
             'Vuelve a tu propio ritmo.', 'Ver horarios y reservar',
             'Muévete, cuídate y conecta', 'Conoce nuestra historia',
             'Nuestras disciplinas', 'Pilates', 'Yoga', 'Pesas', 'Zumba', 'Activa',
-            'Cómo funciona', 'Ahorra hasta S/ 15 por clase', 'Atempo Circle',
+            'Cómo funciona', 'Ahorra hasta <span class="cifra">S/ 15</span> por clase', 'Atempo Circle',
             'Preguntas frecuentes', '¿Hay estacionamiento?',
         ]:
             self.assertContains(respuesta, texto)

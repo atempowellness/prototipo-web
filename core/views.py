@@ -2,6 +2,8 @@ from urllib.parse import quote_plus
 
 from django.views.generic import TemplateView
 
+from paquetes.models import ahorro_maximo_por_clase, paquetes_activos, precio_clase_suelta
+
 # Dirección de ejemplo del local (se actualizará cuando elijan el local).
 DIRECCION = 'Av. Petit Thouars, San Isidro, Lima'
 
@@ -72,6 +74,18 @@ class InicioView(TemplateView):
         'mapa_estacionamientos': 'https://www.google.com/maps/search/'
                                  + quote_plus('estacionamientos cerca de ' + DIRECCION),
     }
+
+    def get_context_data(self, **kwargs):
+        # Precios y vigencias salen de los paquetes del panel de administración
+        contexto = super().get_context_data(**kwargs)
+        contexto['precio_clase_suelta'] = precio_clase_suelta()
+        contexto['ahorro_maximo'] = ahorro_maximo_por_clase()
+        # Vigencias agrupadas: [(1, ['Atempo 1', 'Atempo 5']), (2, ['Atempo 10']), ...]
+        vigencias = {}
+        for paquete in paquetes_activos():
+            vigencias.setdefault(paquete.vigencia_meses, []).append(paquete.nombre)
+        contexto['vigencias'] = sorted(vigencias.items())
+        return contexto
 
 
 class NosotrosView(TemplateView):

@@ -23,7 +23,6 @@ urlpatterns = [
     # Páginas públicas
     path('', views.InicioView.as_view(), name='inicio'),
     path('horarios/', en_construccion('Clases y horarios'), name='horarios'),
-    path('paquetes/', en_construccion('Paquetes'), name='paquetes'),
     path('bienestar/', en_construccion('Nutrición y masajes'), name='bienestar'),
     path('comunidad/', en_construccion('Comunidad'), name='comunidad'),
     path('nosotros/', views.NosotrosView.as_view(), name='nosotros'),

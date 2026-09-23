@@ -1,7 +1,7 @@
 {% with actual=request.resolver_match.url_name %}
 <header class="encabezado">
   <div class="contenedor encabezado-fila">
-    <a class="marca" href="{% url 'inicio' %}">Atempo Wellness</a>
+    <a class="marca" href="{% url 'inicio' %}">{% include 'partes/logo.html' %}</a>
 
     <button class="boton-menu" type="button" aria-expanded="false" aria-controls="menu-principal">Menú</button>
 
