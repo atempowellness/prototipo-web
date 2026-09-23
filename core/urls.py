@@ -21,7 +21,7 @@ def en_construccion(titulo):
 
 urlpatterns = [
     # Páginas públicas
-    path('', en_construccion('Inicio'), name='inicio'),
+    path('', views.InicioView.as_view(), name='inicio'),
     path('horarios/', en_construccion('Clases y horarios'), name='horarios'),
     path('paquetes/', en_construccion('Paquetes'), name='paquetes'),
     path('bienestar/', en_construccion('Nutrición y masajes'), name='bienestar'),

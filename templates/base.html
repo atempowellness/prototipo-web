@@ -13,7 +13,7 @@
       if (tema) document.documentElement.dataset.theme = tema;
     } catch (e) {}
   </script>
-  <link rel="stylesheet" href="{% static 'css/atempo.css' %}">
+  <link rel="stylesheet" href="{% static 'css/atempo.css' %}?v={{ version_estaticos }}">
 </head>
 <body>
   <a class="saltar" href="#contenido">Saltar al contenido</a>
@@ -30,6 +30,6 @@
 
   {% include 'partes/pie.html' %}
 
-  <script src="{% static 'js/atempo.js' %}"></script>
+  <script src="{% static 'js/atempo.js' %}?v={{ version_estaticos }}"></script>
 </body>
 </html>

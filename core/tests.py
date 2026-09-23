@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 PAGINAS_EN_CONSTRUCCION = [
-    'inicio', 'horarios', 'paquetes', 'bienestar', 'comunidad',
+    'horarios', 'paquetes', 'bienestar', 'comunidad',
     'cuenta', 'registro', 'ingresar',
     'privacidad', 'terminos', 'reclamaciones',
 ]
@@ -28,6 +28,32 @@ class MarcoComunTests(TestCase):
         self.assertContains(respuesta, 'href="/paquetes/" aria-current="page"')
 
 
+class InicioTests(TestCase):
+    def test_muestra_todos_los_bloques(self):
+        respuesta = self.client.get(reverse('inicio'))
+        self.assertEqual(respuesta.status_code, 200)
+        for texto in [
+            'Vuelve a tu propio ritmo.', 'Ver horarios y reservar',
+            'Muévete, cuídate y conecta', 'Conoce nuestra historia',
+            'Nuestras disciplinas', 'Pilates', 'Yoga', 'Pesas', 'Zumba', 'Activa',
+            'Cómo funciona', 'Ahorra hasta S/ 15 por clase', 'Atempo Circle',
+            'Preguntas frecuentes', '¿Hay estacionamiento?',
+        ]:
+            self.assertContains(respuesta, texto)
+        self.assertNotContains(respuesta, 'Página en construcción')
+
+    def test_no_menciona_el_aforo(self):
+        respuesta = self.client.get(reverse('inicio'))
+        self.assertNotContains(respuesta, '12 personas')
+
+    def test_enlace_a_estacionamientos_en_google_maps(self):
+        respuesta = self.client.get(reverse('inicio'))
+        self.assertContains(
+            respuesta,
+            'https://www.google.com/maps/search/estacionamientos+cerca+de+Av.+Petit+Thouars%2C+San+Isidro%2C+Lima',
+        )
+
+
 class NosotrosTests(TestCase):
     def test_muestra_todos_los_bloques(self):
         respuesta = self.client.get(reverse('nosotros'))
@@ -39,6 +65,13 @@ class NosotrosTests(TestCase):
         ]:
             self.assertContains(respuesta, texto)
         self.assertNotContains(respuesta, 'Página en construcción')
+
+    def test_resalta_el_nombre_de_la_marca_en_las_frases(self):
+        respuesta = self.client.get(reverse('nosotros'))
+        self.assertContains(
+            respuesta,
+            'que cada mujer que entre a <strong class="nombre-marca">Atempo</strong> se sienta',
+        )
 
     def test_muestra_equipo_y_fundadores_con_iniciales(self):
         respuesta = self.client.get(reverse('nosotros'))

@@ -1,4 +1,9 @@
+from urllib.parse import quote_plus
+
 from django.views.generic import TemplateView
+
+# Dirección de ejemplo del local (se actualizará cuando elijan el local).
+DIRECCION = 'Av. Petit Thouars, San Isidro, Lima'
 
 
 def iniciales(nombre):
@@ -37,6 +42,36 @@ FUNDADORES = [
 
 for persona in EQUIPO + FUNDADORES:
     persona['iniciales'] = iniciales(persona['nombre'])
+
+
+# Disciplinas del estudio. Se reutilizarán en la página de horarios.
+DISCIPLINAS = [
+    {'nombre': 'Pilates', 'sala': 'Sala Calma',
+     'frase': 'Postura, fuerza de centro y flexibilidad, con movimientos controlados.'},
+    {'nombre': 'Yoga', 'sala': 'Sala Calma',
+     'frase': 'Equilibrio, respiración y movilidad para soltar el estrés del día.'},
+    {'nombre': 'Pesas', 'sala': 'Sala Fuerza',
+     'frase': 'Fuerza y masa muscular con progresión guiada, clave para la salud ósea.'},
+    {'nombre': 'Zumba', 'sala': 'Sala Ritmo',
+     'frase': 'Baile y cardio con música que reconoces, sin coreografías imposibles.'},
+]
+
+NIVELES = ['Suave', 'Media', 'Activa']
+
+# Imágenes de la portada principal, que cambian solas.
+PORTADA = ['Clase de Pilates', 'Encuentro de Atempo Circle', 'El estudio']
+
+
+class InicioView(TemplateView):
+    template_name = 'paginas/inicio.html'
+    extra_context = {
+        'titulo': 'Estudio boutique de bienestar en San Isidro',
+        'portada': PORTADA,
+        'disciplinas': DISCIPLINAS,
+        'niveles': NIVELES,
+        'mapa_estacionamientos': 'https://www.google.com/maps/search/'
+                                 + quote_plus('estacionamientos cerca de ' + DIRECCION),
+    }
 
 
 class NosotrosView(TemplateView):

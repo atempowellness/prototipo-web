@@ -42,6 +42,54 @@
   actualizarBoton();
 })();
 
+/* ---------- Portada: imágenes que cambian solas ----------
+   Cambian cada 6 segundos con un fundido. Los puntos permiten elegir
+   una imagen y el botón "Pausar" detiene el cambio. Si la persona pidió
+   "reducir movimiento", las imágenes no cambian solas. */
+(function () {
+  var diapos = document.querySelectorAll('.portada-diapo');
+  var puntos = document.querySelectorAll('.portada-punto');
+  var pausa = document.querySelector('.portada-pausa');
+  if (diapos.length < 2) return;
+
+  var actual = 0;
+  var temporizador = null;
+  var reducirMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function mostrar(n) {
+    diapos[actual].classList.remove('activa');
+    puntos[actual].removeAttribute('aria-current');
+    actual = (n + diapos.length) % diapos.length;
+    diapos[actual].classList.add('activa');
+    puntos[actual].setAttribute('aria-current', 'true');
+  }
+
+  function iniciar() {
+    detener();
+    temporizador = setInterval(function () { mostrar(actual + 1); }, 6000);
+    pausa.textContent = 'Pausar';
+  }
+
+  function detener() {
+    clearInterval(temporizador);
+    temporizador = null;
+    pausa.textContent = 'Reanudar';
+  }
+
+  puntos.forEach(function (punto, i) {
+    punto.addEventListener('click', function () {
+      mostrar(i);
+      if (temporizador) iniciar();   // reinicia la cuenta de 6 segundos
+    });
+  });
+
+  pausa.addEventListener('click', function () {
+    if (temporizador) detener(); else iniciar();
+  });
+
+  if (reducirMovimiento) detener(); else iniciar();
+})();
+
 /* ---------- Franjas de imagen con efecto de profundidad ----------
    La imagen se desplaza más lento que la página al hacer scroll.
    Se desactiva si la persona pidió "reducir movimiento". */

@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+
+{% block contenido %}
+
+{# 1. Portada principal: imágenes que cambian solas, con el texto encima #}
+<section class="portada" aria-label="Presentación">
+  <div class="portada-diapos">
+    {% for etiqueta in portada %}
+      <div class="portada-diapo marcador-imagen{% if forloop.first %} activa{% endif %}" role="img" aria-label="{{ etiqueta }}">
+        <span class="marcador-etiqueta">Imagen: {{ etiqueta }}</span>
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="contenedor portada-texto">
+    <h1>Vuelve a tu propio ritmo.</h1>
+    <p class="entrada">
+      Un estudio boutique en San Isidro para mujeres de 40 a 59 años. Pilates, Yoga,
+      Pesas y Zumba en grupos reducidos, con nutrición, masajes y una comunidad que
+      vive tu misma etapa.
+    </p>
+    <div class="fila-botones">
+      <a class="boton boton-claro" href="{% url 'horarios' %}">Ver horarios y reservar</a>
+      <a class="boton boton-claro-borde" href="{% url 'paquetes' %}">Conocer los paquetes</a>
+    </div>
+    <p class="portada-nota">¿Primera vez? Prueba una clase por S/ 65, sin compromiso.</p>
+  </div>
+
+  <div class="portada-controles">
+    {% for etiqueta in portada %}
+      <button class="portada-punto" type="button" aria-label="Ver imagen {{ forloop.counter }}: {{ etiqueta }}"{% if forloop.first %} aria-current="true"{% endif %}></button>
+    {% endfor %}
+    <button class="portada-pausa" type="button">Pausar</button>
+  </div>
+</section>
+
+{# 2. Muévete, cuídate y conecta #}
+<section class="contenedor bloque">
+  <h2>Muévete, cuídate y conecta</h2>
+  <div class="pilares">
+    <div class="pilar">
+      <h3>Muévete</h3>
+      <p>Cuatro disciplinas para ganar fuerza, movilidad y energía. Todas se adaptan a tu nivel, desde tu primera clase.</p>
+    </div>
+    <div class="pilar">
+      <h3>Cuídate</h3>
+      <p>Asesoría nutricional y masajes de descarga incluidos en los paquetes, para que el bienestar no termine al salir de clase.</p>
+    </div>
+    <div class="pilar">
+      <h3>Conecta</h3>
+      <p>Encuentros mensuales de <strong class="nombre-marca">Atempo Circle</strong>: cafés, charlas y caminatas con mujeres que comparten tu etapa de vida.</p>
+    </div>
+  </div>
+  <p class="enlace-mas"><a href="{% url 'nosotros' %}">Conoce nuestra historia →</a></p>
+</section>
+
+{# 3. Nuestras disciplinas #}
+<section class="contenedor bloque">
+  <h2>Nuestras disciplinas</h2>
+  <p class="apagado">Grupos reducidos y profesionales que corrigen tu técnica. Cada clase indica su intensidad para que elijas cómo quieres moverte hoy.</p>
+  <div class="disciplinas">
+    {% for disciplina in disciplinas %}
+      <article class="disciplina">
+        <div class="disciplina-imagen marcador-imagen" role="img" aria-label="{{ disciplina.nombre }}">
+          <span class="marcador-etiqueta">Imagen: {{ disciplina.nombre }}</span>
+        </div>
+        <div class="disciplina-texto">
+          <h3>{{ disciplina.nombre }}</h3>
+          <p class="disciplina-sala">{{ disciplina.sala }}</p>
+          <p>{{ disciplina.frase }}</p>
+          <p class="niveles" aria-label="Niveles de intensidad">
+            {% for nivel in niveles %}<span class="etiqueta">{{ nivel }}</span>{% endfor %}
+          </p>
+        </div>
+      </article>
+    {% endfor %}
+  </div>
+  <p class="enlace-mas"><a href="{% url 'horarios' %}">Ver horarios de todas las disciplinas →</a></p>
+</section>
+
+{# 4. Franja de imagen #}
+{% include 'partes/franja_imagen.html' with etiqueta='Una clase en grupo' %}
+
+{# 5. Cómo funciona #}
+<section class="contenedor bloque">
+  <div class="banda">
+    <h2>Cómo funciona</h2>
+    <ol class="pasos">
+      <li>
+        <h3>Elige tu paquete</h3>
+        <p>Compra créditos en línea. Un crédito equivale a una clase de cualquier disciplina.</p>
+      </li>
+      <li>
+        <h3>Reserva tu clase</h3>
+        <p>Escoge día, horario y disciplina desde la web. Puedes cancelar hasta 12 horas antes y recuperar tu crédito.</p>
+      </li>
+      <li>
+        <h3>Llega y quédate</h3>
+        <p>Entrena en un grupo pequeño y quédate a conversar en nuestra zona social después de clase.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+{# 6. Paquetes #}
+<section class="contenedor bloque bloque-corto">
+  <div class="linea-paquetes">
+    <div>
+      <h2>Ahorra hasta S/ 15 por clase con nuestros paquetes</h2>
+      <p class="apagado">La clase suelta cuesta S/ 65. Mientras más créditos, menor precio por clase y más beneficios de bienestar.</p>
+    </div>
+    <a class="boton" href="{% url 'paquetes' %}">Ver paquetes</a>
+  </div>
+</section>
+
+{# 7. Atempo Circle #}
+<section class="contenedor bloque">
+  <div class="dos-columnas circle">
+    <div class="circle-imagen marcador-imagen" role="img" aria-label="Encuentro de Atempo Circle">
+      <span class="marcador-etiqueta">Imagen: Encuentro de Atempo Circle</span>
+    </div>
+    <div>
+      <h2>Atempo Circle</h2>
+      <p class="entrada">Más que un estudio, una comunidad.</p>
+      <p>
+        Cada mes organizamos cafés, charlas y caminatas para que conozcas a otras mujeres
+        que viven tu misma etapa. Las actividades están incluidas en los paquetes desde
+        <strong class="nombre-marca">Atempo 5</strong>.
+      </p>
+      <a class="boton boton-borde" href="{% url 'comunidad' %}">Conoce la comunidad</a>
+    </div>
+  </div>
+</section>
+
+{# 8. Preguntas frecuentes #}
+<section class="contenedor bloque">
+  <h2>Preguntas frecuentes</h2>
+  <div class="preguntas">
+    <details>
+      <summary>¿Necesito experiencia previa?</summary>
+      <p>No. Cada clase indica su intensidad (suave, media o activa) y quien la dicta adapta los ejercicios a tu nivel. Si estás empezando, te recomendamos una clase suave de Pilates o Yoga.</p>
+    </details>
+    <details>
+      <summary>¿Qué pasa si no uso todos mis créditos?</summary>
+      <p>Cada paquete tiene una vigencia: 1 mes para <strong class="nombre-marca">Atempo 1</strong> y <strong class="nombre-marca">Atempo 5</strong>, 2 meses para <strong class="nombre-marca">Atempo 10</strong>, 3 meses para <strong class="nombre-marca">Atempo 20</strong> y 4 meses para <strong class="nombre-marca">Atempo 40</strong>. Te avisamos por correo y WhatsApp antes de que venzan.</p>
+    </details>
+    <details>
+      <summary>¿Puedo cancelar una reserva?</summary>
+      <p>Sí. Si cancelas con al menos 12 horas de anticipación, el crédito regresa a tu cuenta. Con menos tiempo, el crédito se descuenta.</p>
+    </details>
+    <details>
+      <summary>¿Hay estacionamiento?</summary>
+      <p>Contamos con estacionamiento limitado en el local. También te recomendamos opciones cercanas:</p>
+      <p><a class="boton boton-borde" href="{{ mapa_estacionamientos }}" target="_blank" rel="noopener">Ver estacionamientos cercanos</a></p>
+    </details>
+    <details>
+      <summary>¿Solo pueden asistir mujeres?</summary>
+      <p><strong class="nombre-marca">Atempo</strong> está pensado para mujeres de 40 a 59 años, pero cualquier persona que se identifique con la propuesta es bienvenida.</p>
+    </details>
+  </div>
+</section>
+
+{% endblock %}
