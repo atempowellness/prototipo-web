@@ -1,0 +1,14 @@
+{% comment %}
+Franja de imagen a todo el ancho, con efecto de profundidad (parallax)
+al hacer scroll. Se usa dentro de las páginas así:
+
+  {% include 'partes/franja_imagen.html' with etiqueta='Clase de Pilates' %}
+  {% include 'partes/franja_imagen.html' with etiqueta='Clase de Pilates' imagen='img/pilates.jpg' %}
+
+Si todavía no hay foto (sin "imagen"), se muestra un bloque de color con la etiqueta.
+{% endcomment %}
+{% load static %}
+<div class="franja-imagen" role="img" aria-label="{{ etiqueta }}">
+  <div class="franja-imagen-fondo"{% if imagen %} style="background-image:url('{% static imagen %}')"{% endif %}></div>
+  {% if not imagen %}<span class="franja-imagen-etiqueta">Imagen: {{ etiqueta }}</span>{% endif %}
+</div>

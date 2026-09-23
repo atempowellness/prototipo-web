@@ -1,0 +1,42 @@
+<footer class="pie">
+  <div class="contenedor">
+    <div class="pie-columnas">
+      <div>
+        <h2>Contacto</h2>
+        <p>Av. Petit Thouars, San Isidro, Lima<br><span class="apagado">(dirección de ejemplo)</span></p>
+        <p>WhatsApp: +51 900 000 000<br>hola@atempo.pe</p>
+      </div>
+      <div>
+        <h2>Horario del estudio</h2>
+        <ul>
+          <li>Lunes a viernes: 6:00 a 21:00</li>
+          <li>Sábados: 7:00 a 19:00</li>
+          <li>Domingos: 8:00 a 13:00</li>
+        </ul>
+      </div>
+      <div>
+        <h2>Explora</h2>
+        <ul>
+          <li><a href="{% url 'horarios' %}">Clases y horarios</a></li>
+          <li><a href="{% url 'paquetes' %}">Paquetes</a></li>
+          <li><a href="{% url 'bienestar' %}">Nutrición y masajes</a></li>
+          <li><a href="{% url 'comunidad' %}">Comunidad</a></li>
+          <li><a href="{% url 'nosotros' %}">Sobre nosotros</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Información</h2>
+        <ul>
+          <li><a href="{% url 'privacidad' %}">Política de privacidad</a></li>
+          <li><a href="{% url 'terminos' %}">Términos y condiciones</a></li>
+          <li><a href="{% url 'reclamaciones' %}">Libro de reclamaciones</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pie-base">
+      <span class="mantra">Muévete, cuídate y conecta.</span>
+      <button class="boton boton-borde boton-tema" type="button">Cambiar a tema oscuro</button>
+    </div>
+  </div>
+</footer>

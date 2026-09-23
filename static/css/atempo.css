@@ -1,0 +1,291 @@
+/* =========================================================
+   Atempo Wellness - hoja de estilos del sitio
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   1. PALETA Y TIPOGRAFÍAS (PROVISIONALES)
+   Para cambiar la identidad visual de todo el sitio,
+   basta con editar los valores de esta sección.
+   --------------------------------------------------------- */
+:root {
+  /* Tema claro */
+  --fondo: #F7F5F2;         /* fondo general */
+  --superficie: #FFFFFF;    /* tarjetas y bloques */
+  --texto: #1F1F1F;         /* texto principal */
+  --apagado: #5C5A57;       /* texto secundario */
+  --linea: #E2DDD6;         /* bordes y separadores */
+  --acento: #2E2E2E;        /* botones y títulos */
+  --acento-texto: #FFFFFF;  /* texto sobre botones */
+  --resalte: #ECE8E2;       /* fondo al pasar el cursor */
+  --marcador: #8C8479;      /* bloques de imagen provisionales */
+
+  /* Tipografías del sistema (provisionales) */
+  --fuente-titulos: Georgia, "Times New Roman", serif;
+  --fuente-texto: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+
+  color-scheme: light;
+}
+
+/* Tema oscuro: se usa si el dispositivo lo prefiere y la persona no eligió otro */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --fondo: #161616;
+    --superficie: #202020;
+    --texto: #EDEBE8;
+    --apagado: #A9A6A1;
+    --linea: #34322F;
+    --acento: #EDEBE8;
+    --acento-texto: #161616;
+    --resalte: #2A2927;
+    --marcador: #4A4640;
+    color-scheme: dark;
+  }
+}
+
+/* Tema oscuro: elegido con el botón */
+:root[data-theme="dark"] {
+  --fondo: #161616;
+  --superficie: #202020;
+  --texto: #EDEBE8;
+  --apagado: #A9A6A1;
+  --linea: #34322F;
+  --acento: #EDEBE8;
+  --acento-texto: #161616;
+  --resalte: #2A2927;
+  --marcador: #4A4640;
+  color-scheme: dark;
+}
+
+/* ---------------------------------------------------------
+   2. BASE
+   Texto de 18 px, buen interlineado y contraste alto.
+   --------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--fondo);
+  color: var(--texto);
+  font-family: var(--fuente-texto);
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+h1, h2, h3 {
+  font-family: var(--fuente-titulos);
+  font-weight: 400;
+  color: var(--acento);
+  line-height: 1.15;
+  margin: 0 0 .5em;
+}
+h1 { font-size: clamp(2.2rem, 5vw, 3.6rem); }
+h2 { font-size: clamp(1.6rem, 3vw, 2.3rem); }
+h3 { font-size: 1.35rem; }
+
+p { margin: 0 0 1em; }
+a { color: var(--acento); text-underline-offset: 3px; }
+img { max-width: 100%; display: block; }
+
+.contenedor { width: min(1180px, 100% - 32px); margin-inline: auto; }
+.apagado { color: var(--apagado); }
+
+:focus-visible { outline: 3px solid var(--acento); outline-offset: 3px; border-radius: 6px; }
+
+/* Enlace oculto para quien navega con teclado */
+.saltar { position: absolute; left: -9999px; }
+.saltar:focus { left: 16px; top: 16px; z-index: 100; background: var(--superficie); padding: 10px 16px; }
+
+/* ---------------------------------------------------------
+   3. BOTONES
+   Grandes y fáciles de tocar (mínimo 48 px de alto).
+   --------------------------------------------------------- */
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 10px 24px;
+  border-radius: 999px;
+  border: 1.5px solid var(--acento);
+  background: var(--acento);
+  color: var(--acento-texto);
+  font: inherit;
+  font-weight: 600;
+  font-size: 1rem;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.boton:hover { opacity: .88; }
+.boton-borde { background: transparent; color: var(--acento); }
+.boton-borde:hover { background: var(--resalte); opacity: 1; }
+
+/* ---------------------------------------------------------
+   4. AVISO DE PROTOTIPO
+   --------------------------------------------------------- */
+.aviso-demo {
+  background: var(--acento);
+  color: var(--acento-texto);
+  font-size: .88rem;
+  text-align: center;
+  padding: 7px 16px;
+}
+
+/* ---------------------------------------------------------
+   5. ENCABEZADO Y MENÚ
+   --------------------------------------------------------- */
+.encabezado {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: var(--fondo);
+  border-bottom: 1px solid var(--linea);
+}
+.encabezado-fila {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 76px;
+}
+.marca {
+  font-family: var(--fuente-titulos);
+  font-size: 1.6rem;
+  color: var(--acento);
+  text-decoration: none;
+  margin-right: auto;
+}
+.menu { display: flex; gap: 4px; }
+.menu a {
+  text-decoration: none;
+  color: var(--texto);
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-weight: 500;
+  font-size: 1rem;
+}
+.menu a:hover { background: var(--resalte); }
+.menu a[aria-current="page"] { background: var(--resalte); font-weight: 700; }
+
+.boton-menu { display: none; }
+
+/* En pantallas angostas (tablet y celular) el menú se despliega con un botón */
+@media (max-width: 1080px) {
+  .boton-menu {
+    display: inline-flex;
+    align-items: center;
+    min-height: 48px;
+    padding: 10px 18px;
+    border-radius: 999px;
+    border: 1.5px solid var(--linea);
+    background: transparent;
+    color: var(--texto);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    background: var(--fondo);
+    border-bottom: 1px solid var(--linea);
+    padding: 8px 16px 16px;
+  }
+  .menu.abierto { display: flex; }
+  .menu a { padding: 14px 16px; font-size: 1.08rem; }
+}
+@media (max-width: 480px) {
+  .encabezado-fila { gap: 8px; }
+  .marca { font-size: 1.3rem; }
+  .encabezado .boton, .boton-menu { padding: 8px 14px; font-size: .95rem; }
+}
+
+/* ---------------------------------------------------------
+   6. CONTENIDO DE LAS PÁGINAS
+   --------------------------------------------------------- */
+main { min-height: 50vh; }
+.cabecera-pagina { padding: 64px 0 48px; }
+
+/* ---------------------------------------------------------
+   7. FRANJA DE IMAGEN (con efecto de profundidad al hacer scroll)
+   --------------------------------------------------------- */
+.franja-imagen {
+  position: relative;
+  height: clamp(260px, 45vw, 520px);
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+.franja-imagen-fondo {
+  position: absolute;
+  inset: -15% 0;              /* más alta que la franja, para poder moverse */
+  background-color: var(--marcador);
+  background-size: cover;
+  background-position: center;
+  will-change: transform;
+}
+.franja-imagen-etiqueta {
+  position: relative;
+  color: #FFFFFF;
+  font-size: 1.05rem;
+  background: rgba(0, 0, 0, .35);
+  padding: 8px 18px;
+  border-radius: 999px;
+}
+
+/* ---------------------------------------------------------
+   8. PIE DE PÁGINA
+   --------------------------------------------------------- */
+.pie {
+  margin-top: 72px;
+  border-top: 1px solid var(--linea);
+  background: var(--superficie);
+  padding: 56px 0 28px;
+  font-size: 1rem;
+}
+.pie h2 { font-size: 1.3rem; }
+.pie ul { list-style: none; margin: 0; padding: 0; }
+.pie li { margin-bottom: 6px; }
+.pie-columnas {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+}
+.pie-base {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--linea);
+  margin-top: 40px;
+  padding-top: 24px;
+}
+.mantra { font-family: var(--fuente-titulos); font-size: 1.2rem; color: var(--acento); }
+
+@media (max-width: 900px) { .pie-columnas { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 560px) { .pie-columnas { grid-template-columns: 1fr; } }
+
+/* ---------------------------------------------------------
+   9. TRANSICIÓN ENTRE PÁGINAS
+   Al pasar de una página a otra, el encabezado queda quieto
+   y el resto se funde suavemente. Funciona en Chrome, Edge
+   y Safari; en otros navegadores la página cambia como siempre.
+   --------------------------------------------------------- */
+@view-transition { navigation: auto; }
+
+.encabezado { view-transition-name: encabezado; }
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: .35s;
+  animation-timing-function: ease;
+}
+
+/* Sin animación si la persona pidió "reducir movimiento" */
+@media (prefers-reduced-motion: reduce) {
+  @view-transition { navigation: none; }
+}

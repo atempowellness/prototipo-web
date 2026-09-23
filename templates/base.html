@@ -1,0 +1,35 @@
+{% load static %}<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}{{ titulo }}{% endblock %} | Atempo Wellness</title>
+  <meta name="description" content="Atempo Wellness: estudio boutique de bienestar en San Isidro. Pilates, Yoga, Pesas y Zumba en grupos reducidos.">
+  <script>
+    /* Aplica el tema guardado (claro u oscuro) antes de dibujar la página,
+       para que no parpadee al cargar. */
+    try {
+      var tema = localStorage.getItem('atempo-tema');
+      if (tema) document.documentElement.dataset.theme = tema;
+    } catch (e) {}
+  </script>
+  <link rel="stylesheet" href="{% static 'css/atempo.css' %}">
+</head>
+<body>
+  <a class="saltar" href="#contenido">Saltar al contenido</a>
+
+  <div class="aviso-demo" role="note">
+    Prototipo de demostración: los datos son de ejemplo y ningún pago es real.
+  </div>
+
+  {% include 'partes/encabezado.html' %}
+
+  <main id="contenido">
+    {% block contenido %}{% endblock %}
+  </main>
+
+  {% include 'partes/pie.html' %}
+
+  <script src="{% static 'js/atempo.js' %}"></script>
+</body>
+</html>
