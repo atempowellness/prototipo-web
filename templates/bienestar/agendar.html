@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% comment %}Versión en página propia de la confirmación de cita (sin JavaScript o con errores en la ficha).{% endcomment %}
+{% block contenido %}
+<section class="contenedor cabecera-pagina formulario-pagina">
+  <p class="etiqueta-seccion"><a href="{{ next }}">← Volver a la agenda</a></p>
+  <div class="tarjeta formulario">{% include 'bienestar/_confirmar_cita.html' %}</div>
+</section>
+{% endblock %}

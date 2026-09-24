@@ -89,8 +89,10 @@ class MiCuentaView(LoginRequiredMixin, TemplateView):
         mensaje = (f'Te invito a Atempo Wellness, un estudio boutique de bienestar en San Isidro. '
                    f'Usa mi código {usuario.codigo_referida} al comprar tu primer paquete desde Atempo 5 '
                    f'y las dos recibimos 1 clase extra: {enlace}')
+        from bienestar.servicios import proximas_citas
         from clases.servicios import proximas_reservas
         contexto['proximas_reservas'] = proximas_reservas(usuario)
+        contexto['proximas_citas'] = proximas_citas(usuario)
 
         regalos_mes = regalos_del_mes(usuario).count()
         contexto.update({

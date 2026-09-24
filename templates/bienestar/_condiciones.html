@@ -1,0 +1,14 @@
+{% comment %}Qué paquetes incluyen el servicio, costo de la sesión adicional y cuántas incluidas le quedan.{% endcomment %}
+<div class="servicio-condiciones">
+  <p>
+    {% if s.incluido_desde %}Incluida en los paquetes desde <strong class="nombre-marca">{{ s.incluido_desde }}</strong>.{% endif %}
+    {% if s.costo_adicional %}Sesión adicional: {{ s.costo_adicional }} crédito{{ s.costo_adicional|pluralize }} (desde <strong class="nombre-marca">{{ s.adicional_desde }}</strong>).{% endif %}
+  </p>
+  {% if user.is_authenticated %}
+    <p class="servicio-mias">
+      {% if s.incluidas == 1 %}Tienes <strong>1 sesión incluida</strong> disponible.
+      {% elif s.incluidas %}Tienes <strong>{{ s.incluidas }} sesiones incluidas</strong> disponibles.
+      {% else %}No tienes sesiones incluidas disponibles.{% endif %}
+    </p>
+  {% endif %}
+</div>

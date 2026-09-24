@@ -103,6 +103,43 @@ def ajuste_de_creditos(usuario, cantidad, motivo=''):
     notificar(usuario, Notificacion.AJUSTE_CREDITOS, texto, reverse('cuenta'))
 
 
+def _cita_texto(cita):
+    local = timezone.localtime(cita.inicio)
+    return f'{cita.tipo.nombre} con {cita.profesional.nombre}, el {date_format(local, "l j \\d\\e F")} a las {local:%H:%M}'
+
+
+def cita_confirmada(cita):
+    como = ('Se usó 1 sesión incluida en tu paquete.' if cita.forma == 'incluida'
+            else f'Se usaron {len(cita.compras_creditos)} créditos.' if len(cita.compras_creditos) != 1
+            else 'Se usó 1 crédito.')
+    notificar(cita.usuario, Notificacion.CITA_CONFIRMADA,
+              f'Cita confirmada: {_cita_texto(cita)}. {como}', reverse('cuenta'), cita=cita)
+
+
+def cita_cancelada(cita, devuelta):
+    texto = f'El estudio canceló tu cita: {_cita_texto(cita)}.'
+    if devuelta:
+        texto += ' Te devolvimos la sesión.' if cita.forma == 'incluida' else ' Te devolvimos los créditos.'
+    notificar(cita.usuario, Notificacion.CITA_CANCELADA, texto, reverse('bienestar'), cita=cita)
+
+
+def revisar_recordatorios_de_citas(usuario):
+    """Recuerda cada cita cuando faltan 24 horas o menos (una sola vez por cita)."""
+    ahora = timezone.now()
+    ya_avisadas = set(usuario.notificaciones.filter(tipo=Notificacion.CITA_RECORDATORIO)
+                      .values_list('cita_id', flat=True))
+    citas = (usuario.citas.filter(cancelada=False, inicio__gt=ahora, inicio__lte=ahora + datetime.timedelta(hours=24))
+             .select_related('tipo', 'profesional'))
+    for cita in citas:
+        if cita.pk in ya_avisadas:
+            continue
+        dia = 'Hoy' if timezone.localtime(cita.inicio).date() == timezone.localdate() else 'Mañana'
+        local = timezone.localtime(cita.inicio)
+        notificar(usuario, Notificacion.CITA_RECORDATORIO,
+                  f'{dia} tienes tu cita de {cita.tipo.nombre.lower()} con {cita.profesional.nombre} '
+                  f'a las {local:%H:%M}. ¡Te esperamos!', reverse('cuenta'), cita=cita)
+
+
 def clase_cancelada(reserva, credito_devuelto):
     clase = reserva.clase
     dia = date_format(timezone.localtime(clase.inicio), 'l j \\d\\e F')

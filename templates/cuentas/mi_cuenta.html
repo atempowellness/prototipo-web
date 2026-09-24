@@ -165,10 +165,27 @@
     </div>
 
     {# Lo que vendrá #}
-    <div class="tarjeta-pronto">
-      <p class="etiqueta-seccion">Próximamente</p>
+    <div class="tarjeta">
       <h2>Citas y encuentros</h2>
-      <p>Tus citas de nutrición y masajes, y los eventos de <strong class="nombre-marca">Atempo Circle</strong> a los que te apuntaste.</p>
+      {% if proximas_citas %}
+        <ul class="proximas-lista">
+          {% for c in proximas_citas %}
+            <li class="proxima proxima-compacta">
+              <span class="proxima-texto">
+                <strong>{{ c.tipo.nombre }}</strong>
+                <span class="apagado">{{ c.inicio|date:"D j \d\e F"|capfirst }}, {{ c.inicio|date:"H:i" }} · con {{ c.profesional.nombre }}</span>
+              </span>
+              {% if not c.empezo %}
+                <a class="boton boton-borde boton-chico" href="{% url 'bienestar_cancelar' c.pk %}?next={{ request.get_full_path|urlencode }}" data-dialogo>Cancelar</a>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>No tienes citas de nutrición ni masajes.</p>
+      {% endif %}
+      <a class="boton" href="{% url 'bienestar' %}">Agendar nutrición o masajes</a>
+      <p class="nota">Los encuentros de <strong class="nombre-marca">Atempo Circle</strong> aparecerán aquí próximamente.</p>
     </div>
 
 

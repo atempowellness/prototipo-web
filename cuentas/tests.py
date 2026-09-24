@@ -101,7 +101,7 @@ class MiCuentaTests(TestCase):
         self.client.force_login(crear_maria())
         respuesta = self.client.get(reverse('cuenta'))
         for texto in ['¡Hola, María!', 'maria@correo.pe', '987654321', '45678912',
-                      'Créditos disponibles', 'Próximamente', 'Cerrar sesión']:
+                      'Créditos disponibles', 'Próximas clases', 'Citas y encuentros', 'Cerrar sesión']:
             self.assertContains(respuesta, texto)
         # El encabezado ya dice "Mi cuenta" en lugar de "Ingresar"
         self.assertContains(respuesta, 'class="texto-cuenta">Mi cuenta</span>')

@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'compras',
     'notificaciones',
     'clases',
+    'bienestar',
 ]
 
 # Cuentas: modelo propio de Atempo; se ingresa con correo o celular

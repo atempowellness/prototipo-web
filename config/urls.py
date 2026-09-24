@@ -19,4 +19,5 @@ urlpatterns = [
     path('', include('compras.urls')),
     path('', include('notificaciones.urls')),
     path('', include('clases.urls')),
+    path('', include('bienestar.urls')),
 ]

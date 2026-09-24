@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block contenido %}
+<section class="contenedor cabecera-pagina">
+  <h1>Bienestar</h1>
+  <p class="entrada">Complementa tu entrenamiento con acompañamiento profesional. Usa primero las sesiones incluidas en tu paquete; después, puedes agendar más con tus créditos.</p>
+</section>
+
+<section class="contenedor">
+  <div class="servicios">
+    {% for s in servicios %}
+      <article class="servicio-tarjeta">
+        <div class="servicio-imagen marcador-imagen" role="img" aria-label="{{ s.imagen }}">
+          <span class="marcador-etiqueta">Imagen: {{ s.imagen }}</span>
+        </div>
+        <div class="servicio-texto">
+          <h2>{{ s.titulo }}</h2>
+          <p class="servicio-quien">Con {% for p in s.profesionales %}{{ p.nombre }}{% if not forloop.last %}{% if forloop.revcounter == 2 %} y {% else %}, {% endif %}{% endif %}{% endfor %}</p>
+          <p>{{ s.descripcion }}</p>
+          {% include 'bienestar/_condiciones.html' %}
+          <a class="boton" href="{% url 'bienestar_servicio' s.clave %}">Ver {{ s.titulo|lower }} y agendar</a>
+        </div>
+      </article>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

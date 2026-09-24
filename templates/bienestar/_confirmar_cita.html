@@ -1,0 +1,70 @@
+{% comment %}
+Confirmación de una cita de nutrición o masajes (ventana sobre la página, o página propia).
+Si el tipo de sesión pide ficha, incluye el formulario breve de nutrición.
+{% endcomment %}
+<div class="confirmacion">
+  {% if plan.modo == 'incluida' or plan.modo == 'creditos' %}
+    <h2 id="dialogo-titulo">Confirma tu cita</h2>
+  {% else %}
+    <h2 id="dialogo-titulo">No se puede agendar</h2>
+  {% endif %}
+
+  <dl class="lista-datos">
+    <dt>Sesión</dt><dd>{{ tipo.nombre }} · {{ tipo.duracion_minutos }} min</dd>
+    <dt>Cuándo</dt><dd>{{ inicio|date:"l j \d\e F"|capfirst }}, {{ inicio|date:"H:i" }}</dd>
+    <dt>Con</dt><dd>{{ profesional.nombre }}</dd>
+  </dl>
+
+  {% if plan.modo == 'no_habilitado' %}
+    <p class="aviso-error">No tienes sesiones incluidas disponibles.{% if plan.paquete_minimo %} Las sesiones adicionales se habilitan desde <strong class="nombre-marca">{{ plan.paquete_minimo }}</strong>.{% endif %}</p>
+    <div class="fila-botones">
+      <a class="boton" href="{% url 'paquetes' %}">Ver paquetes</a>
+      <button type="button" class="boton boton-borde" data-cerrar-dialogo>Volver</button>
+    </div>
+  {% elif plan.modo == 'sin_creditos' %}
+    <p class="aviso-error">No te quedan sesiones incluidas y la sesión adicional cuesta {{ plan.costo }} crédito{{ plan.costo|pluralize }}, pero no tienes suficientes.</p>
+    <div class="fila-botones">
+      <a class="boton" href="{% url 'paquetes' %}">Ver paquetes</a>
+      <button type="button" class="boton boton-borde" data-cerrar-dialogo>Volver</button>
+    </div>
+  {% else %}
+    {% if plan.modo == 'incluida' %}
+      <p>Se usará 1 sesión incluida en {% if plan.compra.tipo == 'compra' %}tu <strong class="nombre-marca">{{ plan.compra.nombre_paquete }}</strong>{% else %}tus beneficios{% endif %} (vence el {{ plan.compra.vence|date:"d/m/Y" }}).</p>
+    {% else %}
+      <p>Ya no te quedan sesiones incluidas: esta será una <strong>sesión adicional</strong> y se usarán <strong>{{ plan.costo }} crédito{{ plan.costo|pluralize }}</strong>.</p>
+    {% endif %}
+
+    {% if sin_devolucion %}
+      <p class="aviso-advertencia" role="alert"><strong>Importante:</strong> esta cita empieza en menos de {{ horas_para_cancelar }} horas. Si la agendas y luego cancelas, <strong>no se devuelve</strong> la sesión ni los créditos.</p>
+    {% else %}
+      <p class="nota">Puedes cancelar sin perder la sesión ni los créditos hasta {{ horas_para_cancelar }} horas antes.</p>
+    {% endif %}
+
+    <form method="post" action="{% url 'bienestar_agendar' servicio %}" novalidate>
+      {% csrf_token %}
+      <input type="hidden" name="tipo" value="{{ tipo.pk }}">
+      <input type="hidden" name="profesional" value="{{ profesional.pk }}">
+      <input type="hidden" name="inicio" value="{{ inicio_valor }}">
+      <input type="hidden" name="next" value="{{ next }}">
+
+      {% if ficha %}
+        <div class="ficha">
+          <h3>Antes de tu evaluación</h3>
+          <p class="nota">Tres preguntas breves para que la nutricionista prepare tu cita. El resto lo conversan juntas en la sesión.</p>
+          {% include 'partes/campo.html' with campo=ficha.objetivo %}
+          {% include 'partes/campo.html' with campo=ficha.alergias %}
+          {% include 'partes/campo.html' with campo=ficha.condiciones %}
+          <div class="campo{% if ficha.consentimiento.errors %} campo-con-error{% endif %}">
+            <label class="casilla">{{ ficha.consentimiento }} <span>{{ ficha.consentimiento.label }} Solo los verán el equipo de nutrición y la administración del estudio (Ley N.° 29733).</span></label>
+            {% for error in ficha.consentimiento.errors %}<p class="campo-error" role="alert">{{ error }}</p>{% endfor %}
+          </div>
+        </div>
+      {% endif %}
+
+      <div class="fila-botones">
+        <button type="submit" class="boton">Confirmar cita</button>
+        <button type="button" class="boton boton-borde" data-cerrar-dialogo>Volver</button>
+      </div>
+    </form>
+  {% endif %}
+</div>

@@ -9,7 +9,16 @@
       <a href="{% url 'inicio' %}" {% if actual == 'inicio' %}aria-current="page"{% endif %}>Inicio</a>
       <a href="{% url 'horarios' %}" {% if actual == 'horarios' %}aria-current="page"{% endif %}>Clases y horarios</a>
       <a href="{% url 'paquetes' %}" {% if actual == 'paquetes' %}aria-current="page"{% endif %}>Paquetes</a>
-      <a href="{% url 'bienestar' %}" {% if actual == 'bienestar' %}aria-current="page"{% endif %}>Nutrición y masajes</a>
+      {# "Bienestar" con submenú: al pasar el mouse (o con el teclado) muestra Nutrición y Masajes #}
+      {% with servicio=request.resolver_match.kwargs.servicio %}
+      <div class="menu-grupo">
+        <a href="{% url 'bienestar' %}" {% if actual|slice:':9' == 'bienestar' %}aria-current="page"{% endif %}>Bienestar <span class="menu-flecha" aria-hidden="true">▾</span></a>
+        <div class="submenu" aria-label="Bienestar">
+          <a href="{% url 'bienestar_servicio' 'nutricion' %}" {% if servicio == 'nutricion' %}aria-current="page"{% endif %}>Nutrición</a>
+          <a href="{% url 'bienestar_servicio' 'masajes' %}" {% if servicio == 'masajes' %}aria-current="page"{% endif %}>Masajes</a>
+        </div>
+      </div>
+      {% endwith %}
       <a href="{% url 'comunidad' %}" {% if actual == 'comunidad' %}aria-current="page"{% endif %}>Comunidad</a>
       <a href="{% url 'nosotros' %}" {% if actual == 'nosotros' %}aria-current="page"{% endif %}>Nosotros</a>
     </nav>

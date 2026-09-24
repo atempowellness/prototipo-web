@@ -1,0 +1,21 @@
+{% comment %}Confirmación para cancelar una cita (ventana o página propia).{% endcomment %}
+<div class="confirmacion">
+  <h2 id="dialogo-titulo">¿Cancelar tu cita?</h2>
+  <dl class="lista-datos">
+    <dt>Sesión</dt><dd>{{ cita.tipo.nombre }}</dd>
+    <dt>Cuándo</dt><dd>{{ inicio|date:"l j \d\e F"|capfirst }}, {{ inicio|date:"H:i" }}</dd>
+    <dt>Con</dt><dd>{{ cita.profesional.nombre }}</dd>
+  </dl>
+  {% if se_devuelve %}
+    <p>Faltan más de {{ horas_para_cancelar }} horas: <strong>recuperas {% if cita.forma == 'incluida' %}tu sesión incluida{% else %}tus créditos{% endif %}</strong> al cancelar.</p>
+  {% else %}
+    <p class="aviso-error">Faltan menos de {{ horas_para_cancelar }} horas: si cancelas, liberas la hora, pero <strong>no se devuelve</strong> {% if cita.forma == 'incluida' %}la sesión{% else %}los créditos{% endif %}.</p>
+  {% endif %}
+  <form method="post" action="{% url 'bienestar_cancelar' cita.pk %}">
+    {% csrf_token %}<input type="hidden" name="next" value="{{ next }}">
+    <div class="fila-botones">
+      <button type="submit" class="boton">Sí, cancelar</button>
+      <button type="button" class="boton boton-borde" data-cerrar-dialogo>No, mantener mi cita</button>
+    </div>
+  </form>
+</div>
