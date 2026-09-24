@@ -71,8 +71,8 @@ class CreditosTests(TestCase):
 
     def test_boleta_igv(self):
         compra = registrar_compra(self.maria, paquete('Atempo 20'), 'tarjeta', '')
-        self.assertEqual(compra.subtotal, Decimal('915.25'))
-        self.assertEqual(compra.igv, Decimal('164.75'))
+        self.assertEqual(compra.subtotal, Decimal('898.31'))
+        self.assertEqual(compra.igv, Decimal('161.69'))
         self.assertEqual(compra.numero_boleta, f'B001-{compra.pk:08d}')
 
 
@@ -162,7 +162,7 @@ class MiCuentaConComprasTests(TestCase):
         registrar_compra(self.maria, paquete('Atempo 20'), 'tarjeta', 'Tarjeta terminada en 1111')
         respuesta = self.client.get(reverse('cuenta'))
         for texto in ['Créditos disponibles', '20 créditos de', 'Nutrición: <strong>2</strong>',
-                      'Masajes: <strong>1</strong>', 'activo', 'Historial de compras', 'S/ 1,080', 'Ver boleta']:
+                      'Masajes: <strong>1</strong>', 'activo', 'Historial de compras', 'S/ 1,060', 'Ver boleta']:
             self.assertContains(respuesta, texto)
 
     def test_sin_compras(self):

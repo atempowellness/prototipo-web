@@ -14,7 +14,7 @@ class CalculosTests(TestCase):
             'Atempo 1': (Decimal(65), Decimal(0)),
             'Atempo 5': (Decimal(60), Decimal(25)),
             'Atempo 10': (Decimal(57), Decimal(80)),
-            'Atempo 20': (Decimal(54), Decimal(220)),
+            'Atempo 20': (Decimal(53), Decimal(240)),
             'Atempo 40': (Decimal(50), Decimal(600)),
         }
         for nombre, (por_clase, ahorro) in esperado.items():
@@ -36,8 +36,8 @@ class PaginaPaquetesTests(TestCase):
     def test_muestra_los_cinco_paquetes(self):
         respuesta = self.client.get(reverse('paquetes'))
         self.assertEqual(respuesta.status_code, 200)
-        for texto in ['Paquetes de lanzamiento', 'Atempo 1', 'Atempo 40', 'S/ 1,080',
-                      'S/ 54 por clase', 'Ahorras S/ 600', 'Más popular', 'Clase suelta',
+        for texto in ['Paquetes de lanzamiento', 'Atempo 1', 'Atempo 40', 'S/ 1,060',
+                      'S/ 53 por clase', 'Ahorras S/ 600', 'Más popular', 'Clase suelta',
                       'Masaje adicional: 2 créditos']:
             self.assertContains(respuesta, texto)
 

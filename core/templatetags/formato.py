@@ -3,7 +3,7 @@ Filtros de formato para las plantillas.
 
 Uso:
   {% load formato %}
-  {{ paquete.precio|soles }}   ->  S/ 1,080
+  {{ paquete.precio|soles }}   ->  S/ 1,060
 """
 from decimal import Decimal, ROUND_HALF_UP
 

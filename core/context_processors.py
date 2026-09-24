@@ -6,6 +6,12 @@ from django.conf import settings
 ARCHIVOS_COMPARTIDOS = ['css/atempo.css', 'js/atempo.js']
 
 
+def datos_estudio(request):
+    """Datos del local que se muestran en varias páginas (pie de página, boleta)."""
+    from .views import DIRECCION
+    return {'direccion_estudio': DIRECCION}
+
+
 def version_estaticos(request):
     """
     Número de versión de la hoja de estilos y del script, basado en la fecha

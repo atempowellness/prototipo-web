@@ -4,8 +4,9 @@ from django.views.generic import TemplateView
 
 from paquetes.models import ahorro_maximo_por_clase, paquetes_activos, precio_clase_suelta
 
-# Dirección de ejemplo del local (se actualizará cuando elijan el local).
-DIRECCION = 'Av. Petit Thouars, San Isidro, Lima'
+# Dirección de ejemplo del local (referencia del Plan de operaciones del Excel).
+# Es el único lugar donde está escrita: la usan el pie de página, la boleta y el mapa.
+DIRECCION = 'Av. Vía Principal 140, San Isidro, Lima'
 
 
 def iniciales(nombre):

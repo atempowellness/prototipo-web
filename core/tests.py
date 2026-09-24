@@ -41,6 +41,9 @@ class InicioTests(TestCase):
             self.assertContains(respuesta, texto)
         self.assertNotContains(respuesta, 'Página en construcción')
 
+    def test_direccion_en_el_pie_de_pagina(self):
+        self.assertContains(self.client.get(reverse('inicio')), 'Av. Vía Principal 140, San Isidro, Lima')
+
     def test_no_menciona_el_aforo(self):
         respuesta = self.client.get(reverse('inicio'))
         self.assertNotContains(respuesta, '12 personas')
@@ -49,7 +52,7 @@ class InicioTests(TestCase):
         respuesta = self.client.get(reverse('inicio'))
         self.assertContains(
             respuesta,
-            'https://www.google.com/maps/search/estacionamientos+cerca+de+Av.+Petit+Thouars%2C+San+Isidro%2C+Lima',
+            'https://www.google.com/maps/search/estacionamientos+cerca+de+Av.+V%C3%ADa+Principal+140%2C+San+Isidro%2C+Lima',
         )
 
 
