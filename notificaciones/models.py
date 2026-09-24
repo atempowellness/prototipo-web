@@ -16,7 +16,15 @@ class Notificacion(models.Model):
     VENCIMIENTO = 'vencimiento'
     CREDITOS_ACTIVADOS = 'creditos_activados'
     CREDITO_EXTRA = 'credito_extra'
+    RECORDATORIO = 'recordatorio'
+    CLASE_CANCELADA = 'clase_cancelada'
+    RESERVA_CONFIRMADA = 'reserva_confirmada'
+    AJUSTE_CREDITOS = 'ajuste_creditos'
     TIPOS = [
+        (RESERVA_CONFIRMADA, 'Reserva confirmada'),
+        (AJUSTE_CREDITOS, 'Ajuste de créditos hecho por el estudio'),
+        (RECORDATORIO, 'Recordatorio de clase'),
+        (CLASE_CANCELADA, 'Clase cancelada por el estudio'),
         (BIENVENIDA, 'Bienvenida'),
         (REFERIDA_REGISTRO, 'Una amiga se registró con su código'),
         (REFERIDA_COMPRA, 'Una amiga compró con su código'),
@@ -33,6 +41,8 @@ class Notificacion(models.Model):
     leida = models.BooleanField(default=False)
     compra = models.ForeignKey('compras.Compra', null=True, blank=True, on_delete=models.CASCADE,
                                help_text='En los avisos de vencimiento: la compra que vence (se avisa una sola vez).')
+    reserva = models.ForeignKey('clases.Reserva', null=True, blank=True, on_delete=models.CASCADE,
+                                help_text='En los recordatorios: la reserva (se recuerda una sola vez).')
 
     class Meta:
         ordering = ['-creada']
@@ -44,5 +54,6 @@ class Notificacion(models.Model):
         return f'{self.usuario.nombre}: {self.texto}'
 
 
-def notificar(usuario, tipo, texto, enlace='', compra=None):
-    return Notificacion.objects.create(usuario=usuario, tipo=tipo, texto=texto, enlace=enlace, compra=compra)
+def notificar(usuario, tipo, texto, enlace='', compra=None, reserva=None):
+    return Notificacion.objects.create(usuario=usuario, tipo=tipo, texto=texto, enlace=enlace,
+                                       compra=compra, reserva=reserva)

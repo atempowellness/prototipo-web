@@ -166,6 +166,39 @@ document.querySelectorAll('.boton-mostrar').forEach(function (boton) {
   });
 })();
 
+/* ---------- Ventana de confirmación (reservar y cancelar clases) ----------
+   Los enlaces con data-dialogo cargan su confirmación dentro de una ventana sobre
+   la página. Sin JavaScript (o si algo falla), el enlace abre la página de siempre. */
+(function () {
+  var dialogo = document.querySelector('[data-dialogo-contenedor]');
+  if (!dialogo || typeof dialogo.showModal !== 'function') return;
+  var cuerpo = dialogo.querySelector('[data-dialogo-cuerpo]');
+
+  document.addEventListener('click', function (e) {
+    var enlace = e.target.closest('a[data-dialogo]');
+    if (enlace) {
+      e.preventDefault();
+      var url = enlace.href + (enlace.href.indexOf('?') === -1 ? '?' : '&') + 'parcial=1';
+      fetch(url, { credentials: 'same-origin' }).then(function (r) {
+        // Si pide iniciar sesión (u otra redirección), se va a la página normal
+        if (r.redirected || !r.ok) { window.location.href = enlace.href; return null; }
+        return r.text();
+      }).then(function (html) {
+        if (html === null || html === undefined) return;
+        cuerpo.innerHTML = html;
+        dialogo.showModal();
+      }).catch(function () { window.location.href = enlace.href; });
+      return;
+    }
+    if (e.target.closest('[data-cerrar-dialogo]')) dialogo.close();
+  });
+
+  // Cerrar al tocar fuera de la ventana
+  dialogo.addEventListener('click', function (e) {
+    if (e.target === dialogo) dialogo.close();
+  });
+})();
+
 /* ---------- Botones "Copiar" (por ejemplo, el código de referida) ---------- */
 document.querySelectorAll('[data-copiar]').forEach(function (boton) {
   var textoOriginal = boton.textContent;

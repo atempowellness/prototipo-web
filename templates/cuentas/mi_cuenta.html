@@ -13,7 +13,7 @@
     <div class="aviso-vencimiento" role="status">
       <p>
         <strong>{% if uno == "1" %}Tu crédito está por vencer.{% else %}Tus créditos están por vencer.{% endif %}</strong>
-        {% if uno == "1" %}Te queda{% else %}Te quedan{% endif %} {{ compra.creditos_disponibles|creditos }} de {% if compra.es_regalo %}regalo por referida{% else %}tu <strong class="nombre-marca">{{ compra.nombre_paquete }}</strong>{% endif %},
+        {% if uno == "1" %}Te queda{% else %}Te quedan{% endif %} {{ compra.creditos_disponibles|creditos }} {% if compra.tipo == 'compra' %}de tu <strong class="nombre-marca">{{ compra.nombre_paquete }}</strong>{% else %}{{ compra.origen }}{% endif %},
         que vence{% if compra.dias_para_vencer == 0 %} hoy{% else %} el {{ compra.vence|date:"j \d\e F" }}{% endif %}.
         <a href="{% url 'horarios' %}">{% if uno == "1" %}Reserva tu clase{% else %}Reserva tus clases{% endif %}</a> para no {% if uno == "1" %}perderlo{% else %}perderlos{% endif %}.
       </p>
@@ -24,7 +24,7 @@
           <div class="correo-simulado-cuerpo">
             <p class="correo-simulado-asunto"><strong>Asunto:</strong> {% if uno == "1" %}Tu crédito de Atempo vence pronto{% else %}Tus créditos de Atempo vencen pronto{% endif %}</p>
             <p>Hola, {{ u.nombre }}:</p>
-            <p>{% if uno == "1" %}Te queda{% else %}Te quedan{% endif %} <strong>{{ compra.creditos_disponibles|creditos }}</strong> de {% if compra.es_regalo %}regalo por referida{% else %}tu {{ compra.nombre_paquete }}{% endif %}, que vence el {{ compra.vence|date:"j \d\e F \d\e Y" }}. ¡Todavía estás a tiempo de {% if uno == "1" %}usarlo{% else %}usarlos{% endif %}!</p>
+            <p>{% if uno == "1" %}Te queda{% else %}Te quedan{% endif %} <strong>{{ compra.creditos_disponibles|creditos }}</strong> {{ compra.origen }}, que vence el {{ compra.vence|date:"j \d\e F \d\e Y" }}. ¡Todavía estás a tiempo de {% if uno == "1" %}usarlo{% else %}usarlos{% endif %}!</p>
             <p><a class="boton" href="{% url 'horarios' %}">Reservar una clase</a></p>
             <p class="apagado">Con cariño,<br>el equipo de <strong class="nombre-marca">Atempo</strong></p>
           </div>
@@ -60,8 +60,8 @@
       {% if compras_vigentes %}
         <ul class="lista-simple">
           {% for compra in compras_vigentes %}{% if compra.creditos_disponibles %}
-            {% if compra.es_regalo %}
-              <li>{{ compra.creditos_disponibles|creditos }} de regalo por referida, vence el {{ compra.vence|date:"d/m/Y" }}</li>
+            {% if compra.tipo != 'compra' %}
+              <li>{{ compra.creditos_disponibles|creditos }} {{ compra.origen }}, vence el {{ compra.vence|date:"d/m/Y" }}</li>
             {% else %}
               <li>{{ compra.creditos_disponibles|creditos }} de <strong class="nombre-marca">{{ compra.nombre_paquete }}</strong>, vence el {{ compra.vence|date:"d/m/Y" }}</li>
             {% endif %}
@@ -137,12 +137,34 @@
       </p>
     </div>
 
-    {# Lo que vendrá #}
-    <div class="tarjeta-pronto">
-      <p class="etiqueta-seccion">Próximamente</p>
+    {# Próximas clases reservadas #}
+    <div class="tarjeta cuenta-ancha">
       <h2>Próximas clases</h2>
-      <p>Las clases que reservaste, con la opción de cancelarlas hasta 12 horas antes.</p>
+      {% if proximas_reservas %}
+        <ul class="proximas-lista">
+          {% for r in proximas_reservas %}
+            <li class="proxima">
+              <span class="proxima-hora cifra">{{ r.clase.inicio|date:"H:i" }}</span>
+              <span class="proxima-texto">
+                <strong>{{ r.clase.disciplina.nombre }}</strong> · {{ r.clase.get_nivel_display }}
+                <span class="apagado">{{ r.clase.inicio|date:"l j \d\e F"|capfirst }} · {{ r.clase.sala.nombre }} · con {{ r.clase.instructor.nombre }}</span>
+              </span>
+              {% if r.clase.empezo %}
+                <span class="clase-estado">En curso</span>
+              {% else %}
+                <a class="boton boton-borde boton-chico" href="{% url 'cancelar_reserva' r.pk %}?next={{ request.get_full_path|urlencode }}" data-dialogo>Cancelar</a>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+        <p class="nota">Puedes cancelar sin perder el crédito hasta 12 horas antes de cada clase.</p>
+      {% else %}
+        <p>Aún no tienes clases reservadas.</p>
+      {% endif %}
+      <a class="boton" href="{% url 'horarios' %}">Ver horarios y reservar</a>
     </div>
+
+    {# Lo que vendrá #}
     <div class="tarjeta-pronto">
       <p class="etiqueta-seccion">Próximamente</p>
       <h2>Citas y encuentros</h2>

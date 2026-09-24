@@ -1,0 +1,13 @@
+{% extends "admin/submit_line.html" %}
+{% comment %}
+Barra de botones de los formularios del panel (en todas las secciones).
+Agrega "Salir sin guardar": vuelve a la lista sin guardar los cambios.
+{% endcomment %}
+{% load i18n admin_urls %}
+{% block submit-row %}
+{{ block.super }}
+{% if show_save or show_save_and_continue %}
+  {% url opts|admin_urlname:'changelist' as changelist_url %}
+  <a href="{% add_preserved_filters changelist_url %}" class="closelink">Salir sin guardar</a>
+{% endif %}
+{% endblock %}

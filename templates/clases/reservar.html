@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% comment %}Versión en página propia (sin JavaScript) de la confirmación de reserva.{% endcomment %}
+{% block contenido %}
+<section class="contenedor cabecera-pagina formulario-pagina">
+  <p class="etiqueta-seccion"><a href="{{ next }}">← Volver al horario</a></p>
+  <div class="tarjeta formulario">{% include 'clases/_confirmar_reserva.html' %}</div>
+</section>
+{% endblock %}

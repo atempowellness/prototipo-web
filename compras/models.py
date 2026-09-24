@@ -35,8 +35,9 @@ class Compra(models.Model):
     """
     TARJETA, YAPE, PLIN = 'tarjeta', 'yape', 'plin'
     METODOS = [(TARJETA, 'Tarjeta'), (YAPE, 'Yape'), (PLIN, 'Plin')]
-    COMPRA, REGALO = 'compra', 'regalo'
-    TIPOS = [(COMPRA, 'Compra'), (REGALO, 'Crédito de regalo por referida')]
+    COMPRA, REGALO, AJUSTE = 'compra', 'regalo', 'ajuste'
+    TIPOS = [(COMPRA, 'Compra'), (REGALO, 'Crédito de regalo por referida'),
+             (AJUSTE, 'Ajuste manual del estudio')]
 
     tipo = models.CharField(max_length=10, choices=TIPOS, default=COMPRA)
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='compras')
@@ -79,6 +80,19 @@ class Compra(models.Model):
     @property
     def es_regalo(self):
         return self.tipo == self.REGALO
+
+    @property
+    def es_ajuste(self):
+        return self.tipo == self.AJUSTE
+
+    @property
+    def origen(self):
+        """De dónde vienen los créditos, para los textos: 'de tu Atempo 5', 'de regalo por referida'…"""
+        if self.es_regalo:
+            return 'de regalo por referida'
+        if self.es_ajuste:
+            return 'agregados por el estudio'
+        return f'de tu {self.nombre_paquete}'
 
     # --- Créditos y beneficios ---
     @property
@@ -137,21 +151,60 @@ def tiene_atempo_circle(usuario):
     return compras_vigentes(usuario).filter(incluye_circle=True).exists()
 
 
-def usar_credito(usuario):
+def compra_para_usar(usuario, para_fecha=None):
+    """
+    La compra de la que saldría el próximo crédito: la que vence antes entre las que
+    tienen créditos y siguen vigentes el día `para_fecha` (el día de la clase).
+    """
+    dia = max(para_fecha or timezone.localdate(), timezone.localdate())
+    return (usuario.compras.filter(vence__gte=dia, creditos_usados__lt=F('creditos'))
+            .order_by('vence', 'fecha').first())
+
+
+def usar_credito(usuario, para_fecha=None):
     """
     Descuenta 1 crédito de la compra vigente que vence antes (para no perder créditos).
-    Los créditos vencidos no se pueden usar. Devuelve la compra usada o None si no tiene.
-    La usarán las reservas de clases.
+    Los créditos vencidos no se pueden usar, ni los que vencen antes del día de la clase.
+    Devuelve la compra usada o None si no tiene.
     """
     with transaction.atomic():
-        compra = (compras_vigentes(usuario).select_for_update()
-                  .filter(creditos_usados__lt=F('creditos')).first())
+        compra = compra_para_usar(usuario, para_fecha)
         if compra is None:
             return None
+        compra = Compra.objects.select_for_update().get(pk=compra.pk)
         compra.creditos_usados = F('creditos_usados') + 1
         compra.save(update_fields=['creditos_usados'])
         compra.refresh_from_db()
         return compra
+
+
+def devolver_credito(compra):
+    """Devuelve 1 crédito a su compra, si esa compra sigue vigente. Devuelve True si se devolvió."""
+    if compra is None or not compra.vigente or compra.creditos_usados == 0:
+        return False
+    Compra.objects.filter(pk=compra.pk).update(creditos_usados=F('creditos_usados') - 1)
+    return True
+
+
+def ajustar_creditos(usuario, cantidad, vence=None, motivo=''):
+    """
+    Ajuste manual desde el panel. cantidad > 0: agrega créditos (registro "Ajuste del estudio"
+    con la vigencia indicada, por defecto 1 mes). cantidad < 0: descuenta créditos, empezando
+    por los que vencen antes. Devuelve cuántos créditos se ajustaron realmente.
+    """
+    if cantidad > 0:
+        Compra.objects.create(
+            tipo=Compra.AJUSTE, usuario=usuario, creditos=cantidad, precio_pagado=0,
+            vence=vence or sumar_meses(timezone.localdate(), 1),
+            nombre_paquete='Ajuste del estudio', detalle_pago=motivo[:60],
+        )
+        return cantidad
+    quitados = 0
+    for _ in range(-cantidad):
+        if usar_credito(usuario) is None:
+            break
+        quitados += 1
+    return -quitados
 
 
 def compras_pagadas(usuario):

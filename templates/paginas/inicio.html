@@ -35,6 +35,30 @@
   </div>
 </section>
 
+{# 1b. Próximas clases con cupos (hoy y mañana) #}
+{% if proximas_clases %}
+<section class="contenedor bloque">
+  <div class="proximas">
+    <div class="proximas-cabecera">
+      <h2>Próximas clases con cupos</h2>
+      <a class="enlace-mas" href="{% url 'horarios' %}">Ver todo el horario →</a>
+    </div>
+    <ul class="proximas-lista">
+      {% for c in proximas_clases %}
+        <li class="proxima">
+          <span class="proxima-hora cifra">{{ c.inicio|date:"H:i" }}</span>
+          <span class="proxima-texto">
+            <strong>{{ c.disciplina.nombre }}</strong> · {{ c.get_nivel_display }}
+            <span class="apagado">{% if c.fecha == hoy %}Hoy{% else %}{{ c.inicio|date:"l"|capfirst }}{% endif %} · {{ c.sala.nombre }} · con {{ c.instructor.nombre }}</span>
+          </span>
+          <a class="boton boton-chico" href="{% url 'reservar' c.pk %}?next={{ request.get_full_path|urlencode }}" data-dialogo>Reservar</a>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+{% endif %}
+
 {# 2. Muévete, cuídate y conecta #}
 <section class="contenedor bloque">
   <h2>Muévete, cuídate y conecta</h2>

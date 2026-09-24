@@ -1,37 +1,27 @@
+import datetime
 from urllib.parse import quote_plus
 
+from django.utils import timezone
 from django.views.generic import TemplateView
 
+from clases.models import NIVELES, Clase, Disciplina, Profesional
 from paquetes.models import ahorro_maximo_por_clase, paquetes_activos, precio_clase_suelta
 
 # Dirección de ejemplo del local (referencia del Plan de operaciones del Excel).
 # Es el único lugar donde está escrita: la usan el pie de página, la boleta y el mapa.
 DIRECCION = 'Av. Vía Principal 140, San Isidro, Lima'
 
+PROXIMAS_CLASES_EN_INICIO = 6
+
 
 def iniciales(nombre):
-    """'Lic. Andrea Ríos' -> 'AR'. Ignora títulos como 'Lic.'."""
+    """'Sebastián Alfaro' -> 'SA'. Ignora títulos como 'Lic.'."""
     palabras = [p for p in nombre.split() if not p.endswith('.')]
     return (palabras[0][0] + palabras[-1][0]).upper()
 
 
-# Perfiles de ejemplo del prototipo (personas ficticias).
-EQUIPO = [
-    {'nombre': 'Carla Mendoza', 'rol': 'Pilates',
-     'frase': 'Te ayudo a ganar fuerza de centro y una mejor postura, a tu ritmo.'},
-    {'nombre': 'Mariana Solís', 'rol': 'Yoga',
-     'frase': 'Respiración, equilibrio y movilidad para soltar el estrés del día.'},
-    {'nombre': 'Diego Salas', 'rol': 'Pesas',
-     'frase': 'La fuerza es tu mejor aliada para cuidar tus huesos y tu energía.'},
-    {'nombre': 'Vanessa Luna', 'rol': 'Zumba',
-     'frase': 'Baile y cardio con música que conoces, sin coreografías imposibles.'},
-    {'nombre': 'Lic. Andrea Ríos', 'rol': 'Nutrición',
-     'frase': 'Planes realistas que se adaptan a tu vida, no al revés.'},
-    {'nombre': 'Rosa Quispe', 'rol': 'Masajes',
-     'frase': 'Descarga muscular y relajación para recuperarte mejor.'},
-]
-
 # Integrantes del proyecto de tesis. Las áreas son provisionales.
+# (El equipo del estudio se edita en el panel: Clases y horarios → Profesionales).
 FUNDADORES = [
     {'nombre': 'Grecia Ballesteros', 'rol': 'Marketing',
      'frase': 'Quiero que cada mujer que entre a Atempo se sienta vista y representada.'},
@@ -43,26 +33,19 @@ FUNDADORES = [
      'frase': 'Busco personas que enseñen con cercanía, porque el equipo es el corazón de la experiencia.'},
 ]
 
-for persona in EQUIPO + FUNDADORES:
+for persona in FUNDADORES:
     persona['iniciales'] = iniciales(persona['nombre'])
-
-
-# Disciplinas del estudio. Se reutilizarán en la página de horarios.
-DISCIPLINAS = [
-    {'nombre': 'Pilates', 'sala': 'Sala Calma',
-     'frase': 'Postura, fuerza de centro y flexibilidad, con movimientos controlados.'},
-    {'nombre': 'Yoga', 'sala': 'Sala Calma',
-     'frase': 'Equilibrio, respiración y movilidad para soltar el estrés del día.'},
-    {'nombre': 'Pesas', 'sala': 'Sala Fuerza',
-     'frase': 'Fuerza y masa muscular con progresión guiada, clave para la salud ósea.'},
-    {'nombre': 'Zumba', 'sala': 'Sala Ritmo',
-     'frase': 'Baile y cardio con música que reconoces, sin coreografías imposibles.'},
-]
-
-NIVELES = ['Suave', 'Media', 'Activa']
 
 # Imágenes de la portada principal, que cambian solas.
 PORTADA = ['Clase de Pilates', 'Encuentro de Atempo Circle', 'El estudio']
+
+
+def proximas_clases_con_cupo(cantidad=PROXIMAS_CLASES_EN_INICIO):
+    """Las siguientes clases (hoy y mañana) que todavía tienen cupo real."""
+    ahora = timezone.now()
+    clases = (Clase.objects.filter(inicio__gt=ahora, inicio__lt=ahora + datetime.timedelta(days=2), cancelada=False)
+              .select_related('sala', 'disciplina', 'instructor'))
+    return [c for c in clases if c.cupos() > 0][:cantidad]
 
 
 class InicioView(TemplateView):
@@ -70,15 +53,15 @@ class InicioView(TemplateView):
     extra_context = {
         'titulo': 'Estudio boutique de bienestar en San Isidro',
         'portada': PORTADA,
-        'disciplinas': DISCIPLINAS,
-        'niveles': NIVELES,
         'mapa_estacionamientos': 'https://www.google.com/maps/search/'
                                  + quote_plus('estacionamientos cerca de ' + DIRECCION),
     }
 
     def get_context_data(self, **kwargs):
-        # Precios y vigencias salen de los paquetes del panel de administración
+        from clases.views import asegurar_clases
+
         contexto = super().get_context_data(**kwargs)
+        # Precios y vigencias salen de los paquetes del panel de administración
         contexto['precio_clase_suelta'] = precio_clase_suelta()
         contexto['ahorro_maximo'] = ahorro_maximo_por_clase()
         # Vigencias agrupadas: [(1, ['Atempo 1', 'Atempo 5']), (2, ['Atempo 10']), ...]
@@ -86,13 +69,21 @@ class InicioView(TemplateView):
         for paquete in paquetes_activos():
             vigencias.setdefault(paquete.vigencia_meses, []).append(paquete.nombre)
         contexto['vigencias'] = sorted(vigencias.items())
+        # Disciplinas y próximas clases salen del panel (Clases y horarios)
+        asegurar_clases()
+        contexto['disciplinas'] = Disciplina.objects.select_related('sala')
+        contexto['niveles'] = [nombre for _, nombre in NIVELES]
+        contexto['proximas_clases'] = proximas_clases_con_cupo()
+        contexto['hoy'] = timezone.localdate()
         return contexto
 
 
 class NosotrosView(TemplateView):
     template_name = 'paginas/nosotros.html'
-    extra_context = {
-        'titulo': 'Sobre nosotros',
-        'equipo': EQUIPO,
-        'fundadores': FUNDADORES,
-    }
+
+    def get_context_data(self, **kwargs):
+        contexto = super().get_context_data(**kwargs)
+        contexto['titulo'] = 'Sobre nosotros'
+        contexto['equipo'] = Profesional.objects.filter(activo=True)
+        contexto['fundadores'] = FUNDADORES
+        return contexto

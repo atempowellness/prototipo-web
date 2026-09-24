@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block contenido %}
+<section class="contenedor cabecera-pagina">
+  <h1>Clases y horarios</h1>
+  <p class="entrada">Elige el día, filtra por disciplina o por horario y reserva con un crédito. Puedes reservar con hasta {{ dias_para_reservar }} días de anticipación.</p>
+</section>
+
+<section class="contenedor">
+  {# Días #}
+  <nav class="dias" aria-label="Día">
+    {% for d, etiqueta in dias %}
+      <a class="dia{% if d == dia %} dia-activo{% endif %}" href="?dia={{ d|date:'Y-m-d' }}{% if disciplina %}&disciplina={{ disciplina }}{% endif %}{% if franja %}&franja={{ franja }}{% endif %}"{% if d == dia %} aria-current="date"{% endif %}>
+        <span class="dia-nombre">{{ etiqueta }}</span>
+        <span class="dia-numero cifra">{{ d|date:'d' }}</span>
+      </a>
+    {% endfor %}
+  </nav>
+
+  {# Filtros #}
+  <div class="filtros">
+    <div class="filtro" role="group" aria-label="Disciplina">
+      <span class="etiqueta-seccion">Disciplina</span>
+      <a class="pastilla{% if not disciplina %} pastilla-activa{% endif %}" href="?dia={{ dia|date:'Y-m-d' }}{% if franja %}&franja={{ franja }}{% endif %}">Todas</a>
+      {% for d in disciplinas %}
+        <a class="pastilla{% if disciplina == d.slug %} pastilla-activa{% endif %}" href="?dia={{ dia|date:'Y-m-d' }}&disciplina={{ d.slug }}{% if franja %}&franja={{ franja }}{% endif %}">{{ d.nombre }}</a>
+      {% endfor %}
+    </div>
+    <div class="filtro" role="group" aria-label="Horario">
+      <span class="etiqueta-seccion">Horario</span>
+      <a class="pastilla{% if not franja %} pastilla-activa{% endif %}" href="?dia={{ dia|date:'Y-m-d' }}{% if disciplina %}&disciplina={{ disciplina }}{% endif %}">Todo el día</a>
+      {% for clave, nombre in franjas %}
+        <a class="pastilla{% if franja == clave %} pastilla-activa{% endif %}" href="?dia={{ dia|date:'Y-m-d' }}{% if disciplina %}&disciplina={{ disciplina }}{% endif %}&franja={{ clave }}">{{ nombre }}</a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <p class="nota">Intensidad: <span class="etiqueta">Suave</span> movimientos controlados, ideal para empezar · <span class="etiqueta">Media</span> ritmo constante · <span class="etiqueta">Activa</span> más carga o velocidad, siempre con alternativas.</p>
+
+  {# Clases del día, agrupadas por hora #}
+  <h2 class="horario-dia">{{ dia_largo|capfirst }}</h2>
+  {% for hora, estados in por_hora %}
+    <div class="franja-horaria">
+      <p class="franja-hora cifra">{{ hora }}</p>
+      <div class="clases">
+        {% for e in estados %}
+          {% with c=e.clase %}
+          <article class="clase{% if e.mi_reserva %} clase-mia{% endif %}{% if c.empezo or c.cancelada %} clase-pasada{% endif %}">
+            <div class="clase-cabecera">
+              <h3>{{ c.disciplina.nombre }}</h3>
+              <span class="etiqueta">{{ c.get_nivel_display }}</span>
+            </div>
+            <p class="clase-detalle">{{ c.sala.nombre }} · con {{ c.instructor.nombre }}</p>
+            <div class="clase-pie">
+              {% if c.cancelada %}
+                <span class="clase-estado">Cancelada por el estudio</span>
+              {% elif c.empezo %}
+                <span class="clase-estado">{% if e.mi_reserva %}Tu clase · {% endif %}Ya empezó</span>
+              {% elif e.mi_reserva %}
+                <span class="clase-estado clase-estado-mia">✓ Tu reserva</span>
+                <a class="boton boton-borde boton-chico" href="{% url 'cancelar_reserva' e.mi_reserva.pk %}?next={{ request.get_full_path|urlencode }}" data-dialogo>Cancelar</a>
+              {% elif e.llena %}
+                <span class="clase-estado">Llena</span>
+              {% else %}
+                <span class="clase-estado{% if e.pocos_cupos %} clase-estado-pocos{% endif %}">{% if e.pocos_cupos %}{% if e.cupos == 1 %}Queda 1 cupo{% else %}Quedan {{ e.cupos }} cupos{% endif %}{% else %}Hay cupos{% endif %}</span>
+                <a class="boton boton-chico" href="{% url 'reservar' c.pk %}?next={{ request.get_full_path|urlencode }}" data-dialogo>Reservar</a>
+              {% endif %}
+            </div>
+          </article>
+          {% endwith %}
+        {% endfor %}
+      </div>
+    </div>
+  {% empty %}
+    <p class="vacio">No hay clases con esos filtros. Prueba con otro día u horario.</p>
+  {% endfor %}
+
+  {# Modo simulación (para la demostración del prototipo) #}
+  <form method="post" action="{% url 'simular_ocupacion' %}" class="simulacion">
+    {% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
+    <p class="nota">
+      <strong>Modo demostración:</strong>
+      {% if simular %}se está simulando la ocupación de otras personas en cada clase.{% else %}solo se cuentan las reservas reales.{% endif %}
+      <button type="submit" class="campanita-accion">{% if simular %}Dejar de simular{% else %}Simular ocupación{% endif %}</button>
+    </p>
+  </form>
+</section>
+{% endblock %}

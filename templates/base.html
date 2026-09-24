@@ -38,6 +38,12 @@
 
   {% include 'partes/pie.html' %}
 
+  {# Ventana de confirmación (reservar, cancelar). Los enlaces con data-dialogo se abren aquí. #}
+  <dialog class="dialogo" data-dialogo-contenedor aria-labelledby="dialogo-titulo">
+    <button type="button" class="dialogo-cerrar" data-cerrar-dialogo aria-label="Cerrar">✕</button>
+    <div data-dialogo-cuerpo></div>
+  </dialog>
+
   <script src="{% static 'js/atempo.js' %}?v={{ version_estaticos }}"></script>
 </body>
 </html>

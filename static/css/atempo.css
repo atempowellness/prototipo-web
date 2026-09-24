@@ -863,6 +863,13 @@ main { min-height: 50vh; }
   padding: 12px 16px 10px;
   color: var(--texto);
 }
+.aviso-advertencia {
+  border-left: 4px solid var(--texto-acento);
+  background: var(--destacado);
+  border-radius: var(--radio-boton);
+  padding: 12px 16px 10px;
+  color: var(--texto);
+}
 .mensajes { padding-top: 24px; }
 .mensaje {
   margin: 0 0 8px;
@@ -1048,7 +1055,142 @@ main { min-height: 50vh; }
 }
 
 /* ---------------------------------------------------------
-   13. PIE DE PÁGINA
+   13. CLASES Y HORARIOS
+   --------------------------------------------------------- */
+.boton-chico { min-height: 44px; padding: 8px 16px 6px; font-size: .95rem; }
+
+/* Días: botones grandes que se desplazan de lado en celular */
+.dias { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 12px; }
+.dia {
+  flex: 0 0 auto;
+  min-width: 88px;
+  min-height: 68px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px 6px;
+  border: 1.5px solid var(--texto-secundario);
+  border-radius: var(--radio-tarjeta);
+  background: var(--fondo);
+  color: var(--texto);
+  text-decoration: none;
+}
+.dia:hover { background: var(--fondo-alterno); }
+.dia-nombre { font-size: .85rem; }
+.dia-numero { font-size: 1.4rem; line-height: 1.1; }
+.dia-activo { background: var(--boton-fondo); border-color: var(--boton-fondo); color: var(--boton-texto); }
+.dia-activo:hover { background: var(--boton-fondo); }
+
+/* Filtros como pastillas */
+.filtros { display: flex; flex-wrap: wrap; gap: 12px 32px; margin: 12px 0 8px; }
+.filtro { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.filtro .etiqueta-seccion { margin-right: 4px; }
+.pastilla {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 8px 16px 6px;
+  border: 1.5px solid var(--decorativo);
+  border-radius: var(--radio-boton);
+  color: var(--texto);
+  text-decoration: none;
+  font-size: .95rem;
+}
+.pastilla:hover { background: var(--fondo-alterno); }
+.pastilla-activa { background: var(--destacado); border-color: var(--texto); font-weight: var(--peso-enfasis); }
+
+/* Clases del día agrupadas por hora */
+.horario-dia {                     /* lleva el número del día: va en la tipografía de texto */
+  margin-top: 28px;
+  font-family: var(--fuente-texto);
+  font-weight: var(--peso-enfasis);
+  font-size: 1.5rem;
+}
+.franja-horaria {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 20px;
+  padding: 20px 0;
+  border-top: 1px solid var(--decorativo);
+}
+.franja-hora { font-size: 1.5rem; margin: 6px 0 0; }
+.clases { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.clase {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 18px;
+  background: var(--superficie);
+  border: 1.5px solid transparent;
+  border-radius: var(--radio-tarjeta);
+}
+.clase-mia { border-color: var(--texto); background: var(--destacado); }
+.clase-mia .etiqueta { background: var(--fondo); }
+.clase-pasada { opacity: .6; }
+.clase-cabecera { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.clase h3 { margin: 0; font-size: 1.3rem; }
+.clase-detalle { margin: 0; font-size: .95rem; color: var(--texto-secundario); }
+.clase-pie { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 6px; flex-wrap: wrap; }
+.clase-estado { font-size: .92rem; font-weight: var(--peso-enfasis); color: var(--texto-secundario); }
+.clase-estado-pocos { color: var(--texto-acento); }
+.clase-estado-mia { color: var(--texto); }
+.vacio { padding: 32px 0; color: var(--texto-secundario); }
+.simulacion { margin-top: 32px; border-top: 1px solid var(--decorativo); padding-top: 12px; }
+.simulacion .campanita-accion { margin-left: 6px; }
+
+@media (max-width: 600px) {
+  .franja-horaria { grid-template-columns: 1fr; gap: 8px; }
+}
+
+/* Ventana de confirmación (reservar, cancelar) */
+.dialogo {
+  width: min(560px, calc(100% - 32px));
+  padding: 32px 28px 28px;
+  border: 1px solid var(--decorativo);
+  border-radius: var(--radio-tarjeta);
+  background: var(--fondo);
+  color: var(--texto);
+  box-shadow: var(--sombra-menu);
+}
+.dialogo::backdrop { background: var(--capa-imagen); }
+.dialogo-cerrar {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: transparent;
+  color: var(--texto-secundario);
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+.confirmacion h2 { font-size: 1.9rem; padding-right: 32px; }
+
+/* Inicio: próximas clases con cupos */
+.proximas { background: var(--superficie); border-radius: var(--radio-tarjeta); padding: 28px 28px 12px; }
+.proximas-cabecera { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px 24px; }
+.proximas-cabecera .enlace-mas { margin: 0; }
+.proximas-lista { list-style: none; margin: 8px 0 0; padding: 0; }
+.proxima {
+  display: grid;
+  grid-template-columns: 70px 1fr auto;
+  gap: 16px;
+  align-items: center;
+  padding: 14px 0;
+  border-top: 1px solid var(--decorativo);
+}
+.proxima-hora { font-size: 1.3rem; }
+.proxima-texto .apagado { display: block; font-size: .92rem; }
+@media (max-width: 560px) {
+  .proxima { grid-template-columns: 60px 1fr; }
+  .proxima .boton { grid-column: 1 / -1; }
+}
+.confirmacion .fila-botones { margin-top: 20px; }
+
+/* ---------------------------------------------------------
+   14. PIE DE PÁGINA
    --------------------------------------------------------- */
 .pie {
   margin-top: 72px;
@@ -1091,7 +1233,7 @@ main { min-height: 50vh; }
 @media (max-width: 560px) { .pie-columnas { grid-template-columns: 1fr; } }
 
 /* ---------------------------------------------------------
-   14. TRANSICIÓN ENTRE PÁGINAS
+   15. TRANSICIÓN ENTRE PÁGINAS
    Al pasar de una página a otra, el encabezado queda quieto
    y el resto se funde suavemente. Funciona en Chrome, Edge
    y Safari; en otros navegadores la página cambia como siempre.

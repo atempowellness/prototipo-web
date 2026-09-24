@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 PAGINAS_EN_CONSTRUCCION = [
-    'horarios', 'bienestar', 'comunidad',
+    'bienestar', 'comunidad',
     'privacidad', 'terminos', 'reclamaciones',
 ]
 
@@ -77,7 +77,7 @@ class NosotrosTests(TestCase):
 
     def test_muestra_equipo_y_fundadores_con_iniciales(self):
         respuesta = self.client.get(reverse('nosotros'))
-        self.assertContains(respuesta, 'Lic. Andrea Ríos')
-        self.assertContains(respuesta, '>AR<')
+        self.assertContains(respuesta, 'Lic. María Becerra')
+        self.assertContains(respuesta, '>MB<')
         self.assertContains(respuesta, 'Sebastián Alfaro')
         self.assertContains(respuesta, 'Operaciones')

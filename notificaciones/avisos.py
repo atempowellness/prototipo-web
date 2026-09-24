@@ -1,7 +1,10 @@
 """
 Textos de cada notificación, en un solo lugar para editarlos fácilmente.
 """
+import datetime
+
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.formats import date_format
 
 from .models import Notificacion, notificar
@@ -53,6 +56,61 @@ def amiga_compro(invitadora, amiga, regalo):
     notificar(invitadora, Notificacion.REFERIDA_COMPRA, texto, reverse('cuenta'))
 
 
+def _clase_texto(clase):
+    local = timezone.localtime(clase.inicio)
+    return f'{clase.disciplina.nombre} a las {local:%H:%M} en {clase.sala.nombre}'
+
+
+def revisar_recordatorios(usuario):
+    """
+    Recuerda cada clase reservada cuando faltan 24 horas o menos (una sola vez por reserva).
+    Se revisa al cargar cualquier página; en la versión real sería una tarea automática.
+    """
+    ahora = timezone.now()
+    ya_avisadas = set(usuario.notificaciones.filter(tipo=Notificacion.RECORDATORIO)
+                      .values_list('reserva_id', flat=True))
+    reservas = (usuario.reservas.filter(cancelada=False, clase__inicio__gt=ahora,
+                                        clase__inicio__lte=ahora + datetime.timedelta(hours=24))
+                .select_related('clase__disciplina', 'clase__sala'))
+    for reserva in reservas:
+        if reserva.pk in ya_avisadas:
+            continue
+        dia = 'Hoy' if reserva.clase.fecha == timezone.localdate() else 'Mañana'
+        notificar(usuario, Notificacion.RECORDATORIO,
+                  f'{dia} tienes {_clase_texto(reserva.clase)}. ¡Te esperamos!',
+                  reverse('cuenta'), reserva=reserva)
+
+
+def reserva_confirmada(reserva):
+    clase = reserva.clase
+    dia = date_format(timezone.localtime(clase.inicio), 'l j \\d\\e F')
+    notificar(reserva.usuario, Notificacion.RESERVA_CONFIRMADA,
+              f'Reserva confirmada: {_clase_texto(clase)}, el {dia}. '
+              f'Puedes cancelar sin perder el crédito hasta 12 horas antes.',
+              reverse('cuenta'), reserva=reserva)
+
+
+def ajuste_de_creditos(usuario, cantidad, motivo=''):
+    """El estudio sumó (cantidad > 0) o quitó (cantidad < 0) créditos desde el panel."""
+    n = abs(cantidad)
+    creditos = 'crédito' if n == 1 else 'créditos'
+    if cantidad > 0:
+        texto = f'El estudio agregó {n} {creditos} a tu cuenta.'
+    else:
+        texto = f'El estudio descontó {n} {creditos} de tu cuenta.'
+    if motivo:
+        texto += f' Motivo: {motivo}.'
+    notificar(usuario, Notificacion.AJUSTE_CREDITOS, texto, reverse('cuenta'))
+
+
+def clase_cancelada(reserva, credito_devuelto):
+    clase = reserva.clase
+    dia = date_format(timezone.localtime(clase.inicio), 'l j \\d\\e F')
+    texto = f'El estudio canceló la clase de {_clase_texto(clase)} del {dia}.'
+    texto += ' Te devolvimos tu crédito.' if credito_devuelto else ''
+    notificar(reserva.usuario, Notificacion.CLASE_CANCELADA, texto, reverse('horarios'), reserva=reserva)
+
+
 def revisar_vencimientos(usuario):
     """
     Crea el aviso de créditos por vencer (7 días o menos) una sola vez por compra.
@@ -64,7 +122,7 @@ def revisar_vencimientos(usuario):
                       .values_list('compra_id', flat=True))
     for compra in compras_vigentes(usuario):
         if compra.vence_pronto and compra.pk not in ya_avisadas:
-            origen = 'de regalo por referida' if compra.es_regalo else f'de tu {compra.nombre_paquete}'
+            origen = compra.origen
             fecha = _fecha(compra.vence)
             if compra.creditos_disponibles == 1:
                 texto = f'Te queda 1 crédito {origen} y vence el {fecha}. ¡Reserva tu clase!'
