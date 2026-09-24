@@ -7,7 +7,7 @@
 
     <nav class="menu" id="menu-principal" aria-label="Principal">
       <a href="{% url 'inicio' %}" {% if actual == 'inicio' %}aria-current="page"{% endif %}>Inicio</a>
-      <a href="{% url 'horarios' %}" {% if actual == 'horarios' %}aria-current="page"{% endif %}>Clases y horarios</a>
+      <a href="{% url 'horarios' %}" {% if actual == 'horarios' %}aria-current="page"{% endif %}>Clases</a>
       <a href="{% url 'paquetes' %}" {% if actual == 'paquetes' %}aria-current="page"{% endif %}>Paquetes</a>
       {# "Bienestar" con submenú: al pasar el mouse (o con el teclado) muestra Nutrición y Masajes #}
       {% with servicio=request.resolver_match.kwargs.servicio %}

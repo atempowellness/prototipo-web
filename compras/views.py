@@ -33,7 +33,7 @@ class ComprarView(LoginRequiredMixin, FormView):
         # Si ya puso un código al registrarse y esta compra lo activa, se le avisa
         if activara_beneficio(self.request.user, self.paquete):
             contexto['beneficio_referida'] = self.request.user.referida_por
-        # Si compra Atempo 1, se le recuerda que el crédito extra se activa desde Atempo 5
+        # Si compra Atempo 1, se le recuerda que el punto extra se activa desde Atempo 5
         contexto['aviso_paquete_menor'] = aviso_paquete_menor(self.request.user, self.paquete)
         contexto['paquete_minimo'] = paquetes_activos().filter(creditos__gte=CREDITOS_MINIMOS).first()
         return contexto
@@ -51,7 +51,7 @@ class ComprarView(LoginRequiredMixin, FormView):
         resultado = aplicar_beneficio(compra)
         if resultado:
             amiga = resultado['invitadora'].nombre
-            texto = f'¡Recibiste 1 crédito de regalo por venir invitada por {amiga}!'
+            texto = f'¡Recibiste 1 punto de regalo por venir invitada por {amiga}!'
             if resultado['invitadora_recibe']:
                 texto += f' {amiga} también recibe el suyo.'
             messages.success(self.request, texto)

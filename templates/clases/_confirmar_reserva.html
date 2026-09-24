@@ -14,7 +14,7 @@ Contenido de la confirmación de reserva. Se muestra dentro de la ventana sobre 
   </dl>
 
   {% if motivo == 'SIN_CREDITOS' %}
-    <p class="aviso-error">Necesitas un crédito vigente para esa fecha. Con un paquete puedes reservar cualquier clase.</p>
+    <p class="aviso-error">Necesitas un punto vigente para esa fecha. Con un paquete puedes reservar cualquier clase.</p>
     <div class="fila-botones">
       <a class="boton" href="{% url 'paquetes' %}">Ver paquetes</a>
       <button type="button" class="boton boton-borde" data-cerrar-dialogo>Volver</button>
@@ -24,17 +24,17 @@ Contenido de la confirmación de reserva. Se muestra dentro de la ventana sobre 
     <div class="fila-botones"><button type="button" class="boton boton-borde" data-cerrar-dialogo>Volver</button></div>
   {% else %}
     <p>
-      Se usará 1 crédito de
-      {% if compra.es_regalo %}tu crédito de regalo por referida{% elif compra.es_ajuste %}los créditos agregados por el estudio{% else %}tu <strong class="nombre-marca">{{ compra.nombre_paquete }}</strong>{% endif %}
+      Se usará 1 punto de
+      {% if compra.es_regalo %}tu punto de regalo por referida{% elif compra.es_ajuste %}los puntos agregados por el estudio{% else %}tu <strong class="nombre-marca">{{ compra.nombre_paquete }}</strong>{% endif %}
       (vence el {{ compra.vence|date:"d/m/Y" }}).
     </p>
     {% if sin_devolucion %}
       <p class="aviso-advertencia" role="alert">
         <strong>Importante:</strong> esta clase empieza en menos de {{ horas_para_cancelar }} horas.
-        Si la reservas y luego cancelas, <strong>no recuperarás el crédito</strong>.
+        Si la reservas y luego cancelas, <strong>no recuperarás el punto</strong>.
       </p>
     {% else %}
-      <p class="nota">Puedes cancelar sin perder el crédito hasta {{ horas_para_cancelar }} horas antes de la clase.</p>
+      <p class="nota">Puedes cancelar sin perder el punto hasta {{ horas_para_cancelar }} horas antes de la clase.</p>
     {% endif %}
     <form method="post" action="{% url 'reservar' clase.pk %}">
       {% csrf_token %}<input type="hidden" name="next" value="{{ next }}">

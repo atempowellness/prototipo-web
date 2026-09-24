@@ -2,11 +2,12 @@
 
 {% block contenido %}
 <section class="contenedor cabecera-pagina">
-  <h1>Clases y horarios</h1>
-  <p class="entrada">Elige el día, filtra por disciplina o por horario y reserva con un crédito. Puedes reservar con hasta {{ dias_para_reservar }} días de anticipación.</p>
+  <h1>Clases</h1>
+  <p class="entrada">Elige el día, filtra por disciplina o por horario y reserva con un punto. Puedes reservar con hasta {{ dias_para_reservar }} días de anticipación.</p>
 </section>
 
-<section class="contenedor">
+{# Zona que se actualiza sin recargar la página al cambiar de día o filtro (ver atempo.js) #}
+<section class="contenedor" id="zona-horario" data-zona>
   {# Días #}
   <nav class="dias" aria-label="Día">
     {% for d, etiqueta in dias %}

@@ -50,7 +50,7 @@ class PagoForm(forms.Form):
         if usuario is not None and puede_ingresar_codigo_al_pagar(usuario, paquete):
             self.fields['codigo_referida'] = forms.CharField(
                 label='¿Te invitó una amiga? Escribe su código (opcional)', required=False, max_length=20,
-                help_text='Con esta compra, las dos recibirán 1 crédito extra.',
+                help_text='Con esta compra, las dos recibirán 1 punto extra.',
                 widget=forms.TextInput(attrs={'placeholder': 'Por ejemplo: MARIA-7K3Q',
                                               'autocapitalize': 'characters'}),
             )

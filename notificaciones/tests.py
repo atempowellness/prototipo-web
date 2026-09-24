@@ -36,9 +36,9 @@ class CuandoSeCreanTests(TestCase):
         ana = cuenta('Ana', 2, referida_por=maria)
         aplicar_beneficio(registrar_compra(ana, Paquete.objects.get(slug='atempo-5'), 'yape', ''))
         aviso = maria.notificaciones.get(tipo=Notificacion.REFERIDA_COMPRA)
-        self.assertIn('Se activó tu crédito de regalo: puedes usarlo hasta el', aviso.texto)
+        self.assertIn('Se activó tu punto de regalo: puedes usarlo hasta el', aviso.texto)
         extra = ana.notificaciones.get(tipo=Notificacion.CREDITO_EXTRA)
-        self.assertIn('Se activó tu crédito extra por venir invitada por María', extra.texto)
+        self.assertIn('Se activó tu punto extra por venir invitada por María', extra.texto)
 
     def test_activacion_de_creditos_al_comprar(self):
         ana = cuenta('Ana', 2)
@@ -46,10 +46,10 @@ class CuandoSeCreanTests(TestCase):
         self.client.post(reverse('comprar', args=['atempo-10']),
                          {'metodo': 'yape', 'celular': '912345678', 'codigo_yape': '123456'})
         aviso = ana.notificaciones.get(tipo=Notificacion.CREDITOS_ACTIVADOS)
-        self.assertIn('Se activaron tus 10 créditos de Atempo 10. Puedes usarlos hasta el', aviso.texto)
+        self.assertIn('Se activaron tus 10 puntos de Atempo 10. Puedes usarlos hasta el', aviso.texto)
         self.client.post(reverse('comprar', args=['atempo-1']),
                          {'metodo': 'yape', 'celular': '912345678', 'codigo_yape': '123456'})
-        self.assertTrue(ana.notificaciones.filter(texto__startswith='Se activó tu crédito de Atempo 1. Puedes usarlo').exists())
+        self.assertTrue(ana.notificaciones.filter(texto__startswith='Se activó tu punto de Atempo 1. Puedes usarlo').exists())
 
     def test_vencimiento_en_singular(self):
         ana = cuenta('Ana', 2)
@@ -58,8 +58,8 @@ class CuandoSeCreanTests(TestCase):
         self.client.force_login(ana)
         respuesta = self.client.get(reverse('cuenta'))
         aviso = ana.notificaciones.get(tipo=Notificacion.VENCIMIENTO)
-        self.assertTrue(aviso.texto.startswith('Te queda 1 crédito de tu Atempo 1 y vence el'))
-        self.assertContains(respuesta, 'Tu crédito está por vencer.')
+        self.assertTrue(aviso.texto.startswith('Te queda 1 punto de tu Atempo 1 y vence el'))
+        self.assertContains(respuesta, 'Tu punto está por vencer.')
         self.assertNotContains(respuesta, 'Te quedan 1')
 
     def test_aviso_de_tope_mensual(self):

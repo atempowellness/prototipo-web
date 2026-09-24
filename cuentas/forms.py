@@ -33,7 +33,7 @@ class RegistroForm(forms.ModelForm):
     )
     codigo_referida = forms.CharField(
         label='¿Te invitó una amiga? Escribe su código (opcional)', required=False, max_length=20,
-        help_text='Cuando compres tu primer paquete desde Atempo 5, las dos recibirán 1 crédito extra.',
+        help_text='Cuando compres tu primer paquete desde Atempo 5, las dos recibirán 1 punto extra.',
         widget=forms.TextInput(attrs={'placeholder': 'Por ejemplo: MARIA-7K3Q', 'autocapitalize': 'characters'}),
     )
     acepto_privacidad = forms.BooleanField(

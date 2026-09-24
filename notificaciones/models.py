@@ -28,15 +28,15 @@ class Notificacion(models.Model):
         (CITA_RECORDATORIO, 'Recordatorio de cita'),
         (CITA_CANCELADA, 'Cita cancelada por el estudio'),
         (RESERVA_CONFIRMADA, 'Reserva confirmada'),
-        (AJUSTE_CREDITOS, 'Ajuste de créditos hecho por el estudio'),
+        (AJUSTE_CREDITOS, 'Ajuste de puntos hecho por el estudio'),
         (RECORDATORIO, 'Recordatorio de clase'),
         (CLASE_CANCELADA, 'Clase cancelada por el estudio'),
         (BIENVENIDA, 'Bienvenida'),
         (REFERIDA_REGISTRO, 'Una amiga se registró con su código'),
         (REFERIDA_COMPRA, 'Una amiga compró con su código'),
-        (VENCIMIENTO, 'Créditos por vencer'),
-        (CREDITOS_ACTIVADOS, 'Créditos activados (compra)'),
-        (CREDITO_EXTRA, 'Crédito extra activado (referida)'),
+        (VENCIMIENTO, 'Puntos por vencer'),
+        (CREDITOS_ACTIVADOS, 'Puntos activados (compra)'),
+        (CREDITO_EXTRA, 'Punto extra activado (referida)'),
     ]
 
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notificaciones')

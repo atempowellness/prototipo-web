@@ -4,9 +4,9 @@ Reglas de nutrición y masajes, en un solo lugar.
 Cómo se paga una cita (según la tesis):
 1. Primero, una sesión incluida en un paquete vigente el día de la cita (la del que vence antes).
    Nutrición viene incluida desde Atempo 5; masajes, en Atempo 20 y 40.
-2. Si no le quedan incluidas, una sesión adicional con créditos, solo si tiene un paquete vigente
-   que la habilite: nutrición 1 crédito (desde Atempo 10), masaje 2 créditos (desde Atempo 20).
-Cancelar con 12 horas o más devuelve la sesión o los créditos; con menos, no.
+2. Si no le quedan incluidas, una sesión adicional con puntos, solo si tiene un paquete vigente
+   que la habilite: nutrición 1 punto (desde Atempo 10), masaje 2 puntos (desde Atempo 20).
+Cancelar con 12 horas o más devuelve la sesión o los puntos; con menos, no.
 """
 import datetime
 from dataclasses import dataclass
@@ -116,7 +116,7 @@ def horas_libres(servicio, tipo, dia, profesional=None, usuario=None):
 
 
 def agendar(usuario, profesional, tipo, inicio, ficha=None):
-    """Crea la cita y descuenta la sesión incluida o los créditos."""
+    """Crea la cita y descuenta la sesión incluida o los puntos."""
     fin = inicio + datetime.timedelta(minutes=tipo.duracion_minutos)
     fecha = timezone.localtime(inicio).date()
     if inicio <= timezone.now():
@@ -155,7 +155,7 @@ def _devolver(cita):
 
 
 def cancelar_cita(cita, por_el_estudio=False):
-    """Cancela la cita. Devuelve True si se devolvió la sesión o los créditos."""
+    """Cancela la cita. Devuelve True si se devolvió la sesión o los puntos."""
     if cita.cancelada or (cita.empezo and not por_el_estudio):
         return False
     devuelta = (por_el_estudio or cita.se_devuelve_si_cancela) and _devolver(cita)

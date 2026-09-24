@@ -1,7 +1,7 @@
 """
-Compras de paquetes. Cada compra es una "bolsa" de créditos con su propia vigencia,
+Compras de paquetes. Cada compra es una "bolsa" de puntos con su propia vigencia,
 que empieza el día de la compra. Se guarda una copia de los datos del paquete
-(nombre, créditos, precio...) para que el historial no cambie si luego se edita
+(nombre, puntos, precio...) para que el historial no cambie si luego se edita
 el paquete en el panel.
 """
 import calendar
@@ -29,14 +29,14 @@ def sumar_meses(fecha, meses):
 
 class Compra(models.Model):
     """
-    Una "bolsa" de créditos con su vigencia. Normalmente es una compra pagada; también
-    puede ser un crédito de regalo del programa de referidas (tipo REGALO, precio S/ 0,
+    Una "bolsa" de puntos con su vigencia. Normalmente es una compra pagada; también
+    puede ser un punto de regalo del programa de referidas (tipo REGALO, precio S/ 0,
     sin paquete ni boleta), que sigue las mismas reglas de vigencia y uso.
     """
     TARJETA, YAPE, PLIN = 'tarjeta', 'yape', 'plin'
     METODOS = [(TARJETA, 'Tarjeta'), (YAPE, 'Yape'), (PLIN, 'Plin')]
     COMPRA, REGALO, AJUSTE = 'compra', 'regalo', 'ajuste'
-    TIPOS = [(COMPRA, 'Compra'), (REGALO, 'Crédito de regalo por referida'),
+    TIPOS = [(COMPRA, 'Compra'), (REGALO, 'Punto de regalo por referida'),
              (AJUSTE, 'Ajuste manual del estudio')]
 
     tipo = models.CharField(max_length=10, choices=TIPOS, default=COMPRA)
@@ -46,20 +46,20 @@ class Compra(models.Model):
     referida = models.ForeignKey(
         settings.AUTH_USER_MODEL, verbose_name='por la referida de', on_delete=models.SET_NULL,
         null=True, blank=True, related_name='regalos_generados',
-        help_text='En los créditos de regalo: la amiga cuya primera compra generó este crédito.')
+        help_text='En los puntos de regalo: la amiga cuya primera compra generó este punto.')
     fecha = models.DateTimeField('fecha de compra', default=timezone.now)
-    vence = models.DateField('vence el', help_text='Los créditos se pueden usar hasta este día, inclusive.')
+    vence = models.DateField('vence el', help_text='Los puntos se pueden usar hasta este día, inclusive.')
 
     # Copia de los datos del paquete al momento de la compra
     nombre_paquete = models.CharField('paquete comprado', max_length=40)
-    creditos = models.PositiveSmallIntegerField('créditos')
+    creditos = models.PositiveSmallIntegerField('puntos')
     precio_pagado = models.DecimalField('precio pagado (S/)', max_digits=8, decimal_places=2)
     sesiones_nutricion = models.PositiveSmallIntegerField('nutrición incluida', default=0)
     sesiones_masaje = models.PositiveSmallIntegerField('masajes incluidos', default=0)
     incluye_circle = models.BooleanField('incluye Atempo Circle', default=False)
 
     # Uso
-    creditos_usados = models.PositiveSmallIntegerField('créditos usados', default=0)
+    creditos_usados = models.PositiveSmallIntegerField('puntos usados', default=0)
     nutricion_usada = models.PositiveSmallIntegerField('nutrición usada', default=0)
     masaje_usado = models.PositiveSmallIntegerField('masajes usados', default=0)
 
@@ -87,14 +87,14 @@ class Compra(models.Model):
 
     @property
     def origen(self):
-        """De dónde vienen los créditos, para los textos: 'de tu Atempo 5', 'de regalo por referida'…"""
+        """De dónde vienen los puntos, para los textos: 'de tu Atempo 5', 'de regalo por referida'…"""
         if self.es_regalo:
             return 'de regalo por referida'
         if self.es_ajuste:
             return 'agregados por el estudio'
         return f'de tu {self.nombre_paquete}'
 
-    # --- Créditos y beneficios ---
+    # --- Puntos y beneficios ---
     @property
     def creditos_disponibles(self):
         return self.creditos - self.creditos_usados
@@ -117,7 +117,7 @@ class Compra(models.Model):
 
     @property
     def vence_pronto(self):
-        """Le quedan créditos y vence en 7 días o menos."""
+        """Le quedan puntos y vence en 7 días o menos."""
         return self.vigente and self.creditos_disponibles > 0 and self.dias_para_vencer <= DIAS_AVISO_VENCIMIENTO
 
     # --- Boleta (simulada) ---
@@ -153,8 +153,8 @@ def tiene_atempo_circle(usuario):
 
 def compra_para_usar(usuario, para_fecha=None):
     """
-    La compra de la que saldría el próximo crédito: la que vence antes entre las que
-    tienen créditos y siguen vigentes el día `para_fecha` (el día de la clase).
+    La compra de la que saldría el próximo punto: la que vence antes entre las que
+    tienen puntos y siguen vigentes el día `para_fecha` (el día de la clase).
     """
     dia = max(para_fecha or timezone.localdate(), timezone.localdate())
     return (usuario.compras.filter(vence__gte=dia, creditos_usados__lt=F('creditos'))
@@ -163,8 +163,8 @@ def compra_para_usar(usuario, para_fecha=None):
 
 def usar_credito(usuario, para_fecha=None):
     """
-    Descuenta 1 crédito de la compra vigente que vence antes (para no perder créditos).
-    Los créditos vencidos no se pueden usar, ni los que vencen antes del día de la clase.
+    Descuenta 1 punto de la compra vigente que vence antes (para no perder puntos).
+    Los puntos vencidos no se pueden usar, ni los que vencen antes del día de la clase.
     Devuelve la compra usada o None si no tiene.
     """
     with transaction.atomic():
@@ -179,7 +179,7 @@ def usar_credito(usuario, para_fecha=None):
 
 
 def devolver_credito(compra):
-    """Devuelve 1 crédito a su compra, si esa compra sigue vigente. Devuelve True si se devolvió."""
+    """Devuelve 1 punto a su compra, si esa compra sigue vigente. Devuelve True si se devolvió."""
     if compra is None or not compra.vigente or compra.creditos_usados == 0:
         return False
     Compra.objects.filter(pk=compra.pk).update(creditos_usados=F('creditos_usados') - 1)
@@ -188,9 +188,9 @@ def devolver_credito(compra):
 
 def ajustar_creditos(usuario, cantidad, vence=None, motivo=''):
     """
-    Ajuste manual desde el panel. cantidad > 0: agrega créditos (registro "Ajuste del estudio"
-    con la vigencia indicada, por defecto 1 mes). cantidad < 0: descuenta créditos, empezando
-    por los que vencen antes. Devuelve cuántos créditos se ajustaron realmente.
+    Ajuste manual desde el panel. cantidad > 0: agrega puntos (registro "Ajuste del estudio"
+    con la vigencia indicada, por defecto 1 mes). cantidad < 0: descuenta puntos, empezando
+    por los que vencen antes. Devuelve cuántos puntos se ajustaron realmente.
     """
     if cantidad > 0:
         Compra.objects.create(
@@ -208,7 +208,7 @@ def ajustar_creditos(usuario, cantidad, vence=None, motivo=''):
 
 
 def compras_pagadas(usuario):
-    """Solo las compras pagadas (sin créditos de regalo): para el historial y las boletas."""
+    """Solo las compras pagadas (sin puntos de regalo): para el historial y las boletas."""
     return usuario.compras.filter(tipo=Compra.COMPRA)
 
 

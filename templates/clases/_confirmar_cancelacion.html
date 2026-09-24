@@ -9,9 +9,9 @@ Contenido de la confirmación para cancelar una reserva (ventana o página propi
     <dt>Dónde</dt><dd>{{ clase.sala.nombre }}</dd>
   </dl>
   {% if se_devuelve %}
-    <p>Faltan más de {{ horas_para_cancelar }} horas: <strong>recuperas tu crédito</strong> al cancelar.</p>
+    <p>Faltan más de {{ horas_para_cancelar }} horas: <strong>recuperas tu punto</strong> al cancelar.</p>
   {% else %}
-    <p class="aviso-error">Faltan menos de {{ horas_para_cancelar }} horas: si cancelas, liberas tu cupo para otra persona, pero <strong>no recuperas el crédito</strong>.</p>
+    <p class="aviso-error">Faltan menos de {{ horas_para_cancelar }} horas: si cancelas, liberas tu cupo para otra persona, pero <strong>no recuperas el punto</strong>.</p>
   {% endif %}
   <form method="post" action="{% url 'cancelar_reserva' reserva.pk %}">
     {% csrf_token %}<input type="hidden" name="next" value="{{ next }}">

@@ -2,17 +2,17 @@
 Reglas de clases y reservas, en un solo lugar.
 
 - Las clases se crean solas a partir del horario base, para los próximos días.
-- Reservar: con sesión, con un crédito vigente el día de la clase, sin repetir la clase
+- Reservar: con sesión, con un punto vigente el día de la clase, sin repetir la clase
   ni reservar dos a la misma hora, con cupo, y como máximo DIAS_PARA_RESERVAR días antes.
-- Cancelar: con 12 horas o más de anticipación se devuelve el crédito; con menos, se libera
-  el cupo pero el crédito no vuelve. Si el estudio cancela una clase, siempre se devuelve.
+- Cancelar: con 12 horas o más de anticipación se devuelve el punto; con menos, se libera
+  el cupo pero el punto no vuelve. Si el estudio cancela una clase, siempre se devuelve.
 """
 import datetime
 
 from django.db import transaction
 from django.utils import timezone
 
-from compras.models import compra_para_usar, devolver_credito, usar_credito
+from compras.models import Compra, compra_para_usar, devolver_credito, usar_credito
 
 from .models import (DIAS_PARA_RESERVAR, Clase, HorarioBase, Reserva, numero_simulado)
 
@@ -112,20 +112,27 @@ def reservar(usuario, clase, simular=False):
         return Reserva.objects.create(usuario=usuario, clase=clase, compra=compra)
 
 
-def cancelar_reserva(reserva):
-    """Cancela la reserva de la clienta. Devuelve True si el crédito se devolvió."""
-    if reserva.cancelada or reserva.clase.empezo:
+def cancelar_reserva(reserva, por_el_estudio=False):
+    """
+    Cancela una reserva. Devuelve True si el punto se devolvió.
+    Si la cancela el estudio (desde el panel), siempre se devuelve y se avisa a la clienta.
+    """
+    if reserva.cancelada or (reserva.clase.empezo and not por_el_estudio):
         return False
-    devuelto = reserva.se_devuelve_si_cancela and devolver_credito(reserva.compra)
+    compra = Compra.objects.filter(pk=reserva.compra_id).first()   # dato actualizado
+    devuelto = (por_el_estudio or reserva.se_devuelve_si_cancela) and devolver_credito(compra)
     reserva.cancelada = True
     reserva.cancelada_en = timezone.now()
     reserva.credito_devuelto = devuelto
     reserva.save(update_fields=['cancelada', 'cancelada_en', 'credito_devuelto'])
+    if por_el_estudio:
+        from notificaciones import avisos
+        avisos.reserva_cancelada_por_estudio(reserva, devuelto)
     return devuelto
 
 
 def cancelar_clase_por_estudio(clase, motivo=''):
-    """El estudio cancela una clase: todas las reservas recuperan su crédito y se les avisa."""
+    """El estudio cancela una clase: todas las reservas recuperan su punto y se les avisa."""
     from notificaciones import avisos
 
     if clase.cancelada:

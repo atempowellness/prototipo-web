@@ -1,0 +1,38 @@
+{% extends "admin/base_site.html" %}
+{% comment %}Confirmación antes de reiniciar cuentas de prueba (ver cuentas/admin.py).{% endcomment %}
+{% load admin_urls %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">Inicio</a>
+  &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+  &rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+  &rsaquo; Reiniciar cuenta de prueba
+</div>
+{% endblock %}
+
+{% block content %}
+<p><strong>Solo para pruebas.</strong> Se {% if resumen|length == 1 %}dejará la cuenta{% else %}dejarán estas cuentas{% endif %} como recién {% if resumen|length == 1 %}creada{% else %}creadas{% endif %}: se borrarán sus pagos (incluidos los puntos de regalo y los ajustes), sus reservas de clases, sus citas y sus avisos. <strong>No se puede deshacer.</strong></p>
+<p>Se mantienen los datos personales, la contraseña, el código de referida y quién la invitó.</p>
+
+<table>
+  <thead><tr><th>Cuenta</th><th>Puntos disponibles</th><th>Pagos</th><th>Reservas</th><th>Citas</th><th>Avisos</th></tr></thead>
+  <tbody>
+    {% for r in resumen %}
+      <tr>
+        <td>{{ r.usuario.get_full_name }} ({{ r.usuario.email }})</td>
+        <td>{{ r.puntos }}</td><td>{{ r.pagos }}</td><td>{{ r.reservas }}</td><td>{{ r.citas }}</td><td>{{ r.avisos }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<br>
+<form method="post">
+  {% csrf_token %}
+  <input type="hidden" name="ids" value="{{ ids }}">
+  <input type="hidden" name="confirmar" value="1">
+  <input type="submit" value="Sí, reiniciar">
+  <a href="{{ volver }}" class="button cancel-link">No, volver</a>
+</form>
+{% endblock %}

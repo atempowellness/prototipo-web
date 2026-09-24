@@ -2,7 +2,9 @@ from django.contrib import admin, messages
 from django.utils import timezone
 
 from .models import Clase, Disciplina, HorarioBase, Profesional, Reserva, Sala
-from .servicios import cancelar_clase_por_estudio, generar_clases
+from core.admin import EliminarSoloPruebasMixin
+
+from .servicios import cancelar_clase_por_estudio, cancelar_reserva, generar_clases
 
 
 @admin.register(Sala)
@@ -34,14 +36,14 @@ class HorarioBaseAdmin(admin.ModelAdmin):
     list_filter = ['dia_semana', 'sala', 'disciplina', 'instructor']
 
 
-@admin.action(description='Cancelar las clases seleccionadas (devuelve los créditos y avisa a las clientas)')
+@admin.action(description='Cancelar las clases seleccionadas (devuelve los puntos y avisa a las clientas)')
 def cancelar_por_estudio(modeladmin, request, queryset):
     total_clases, total_reservas = 0, 0
     for clase in queryset.filter(cancelada=False, inicio__gt=timezone.now()):
         total_reservas += cancelar_clase_por_estudio(clase, 'Cancelada por el estudio')
         total_clases += 1
     modeladmin.message_user(
-        request, f'Clases canceladas: {total_clases}. Reservas afectadas (con crédito devuelto y aviso): {total_reservas}.',
+        request, f'Clases canceladas: {total_clases}. Reservas afectadas (con punto devuelto y aviso): {total_reservas}.',
         messages.SUCCESS)
 
 
@@ -72,8 +74,19 @@ class ClaseAdmin(admin.ModelAdmin):
         return clase.reservas_activas().count()
 
 
+@admin.action(description='Cancelar las reservas seleccionadas (devuelve el punto y avisa a la clienta)')
+def cancelar_reservas_por_estudio(modeladmin, request, queryset):
+    total = 0
+    for reserva in queryset.filter(cancelada=False).select_related('clase', 'usuario'):
+        cancelar_reserva(reserva, por_el_estudio=True)
+        total += 1
+    texto = '1 reserva cancelada' if total == 1 else f'{total} reservas canceladas'
+    modeladmin.message_user(request, f'{texto}, con el punto devuelto y aviso a la clienta.', messages.SUCCESS)
+
+
 @admin.register(Reserva)
-class ReservaAdmin(admin.ModelAdmin):
+class ReservaAdmin(EliminarSoloPruebasMixin, admin.ModelAdmin):
+    actions = [cancelar_reservas_por_estudio]
     list_display = ['clase', 'usuario', 'creada', 'cancelada', 'credito_devuelto']
     list_filter = ['cancelada', 'clase__disciplina']
     search_fields = ['usuario__email', 'usuario__nombre', 'usuario__apellido']

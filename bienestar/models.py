@@ -53,7 +53,7 @@ class HorarioAtencion(models.Model):
 
 class Cita(models.Model):
     INCLUIDA, CREDITOS = 'incluida', 'creditos'
-    FORMAS = [(INCLUIDA, 'Sesión incluida en el paquete'), (CREDITOS, 'Sesión adicional con créditos')]
+    FORMAS = [(INCLUIDA, 'Sesión incluida en el paquete'), (CREDITOS, 'Sesión adicional con puntos')]
     OBJETIVOS = [
         ('energia', 'Tener más energía en el día a día'),
         ('peso', 'Controlar mi peso'),
@@ -71,12 +71,12 @@ class Cita(models.Model):
     forma = models.CharField('cómo se pagó', max_length=10, choices=FORMAS)
     compra = models.ForeignKey('compras.Compra', null=True, blank=True, on_delete=models.SET_NULL,
                                related_name='citas', help_text='Si fue incluida: el paquete del que salió la sesión.')
-    compras_creditos = models.JSONField('créditos usados (compras)', default=list, blank=True,
-                                        help_text='Si fue adicional: de qué compras salieron los créditos.')
+    compras_creditos = models.JSONField('puntos usados (compras)', default=list, blank=True,
+                                        help_text='Si fue adicional: de qué compras salieron los puntos.')
     creada = models.DateTimeField(default=timezone.now)
     cancelada = models.BooleanField(default=False)
     cancelada_en = models.DateTimeField(null=True, blank=True)
-    devuelta = models.BooleanField('sesión o créditos devueltos', default=False)
+    devuelta = models.BooleanField('sesión o puntos devueltos', default=False)
 
     # Ficha breve de nutrición (datos de salud: requieren consentimiento expreso, Ley N.° 29733)
     objetivo = models.CharField(max_length=20, choices=OBJETIVOS, blank=True)
@@ -87,7 +87,8 @@ class Cita(models.Model):
 
     class Meta:
         ordering = ['inicio']
-        verbose_name, verbose_name_plural = 'turno de bienestar', 'turnos de bienestar'
+        # Mismo nombre que las reservas de clases, para que el panel se lea igual en ambas secciones
+        verbose_name, verbose_name_plural = 'cupo reservado', 'cupos reservados'
 
     def __str__(self):
         return f'{self.tipo.nombre} · {self.usuario.nombre_corto} · {timezone.localtime(self.inicio):%d/%m %H:%M}'

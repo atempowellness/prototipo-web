@@ -1,6 +1,8 @@
 from django.contrib import admin, messages
 from django.utils import timezone
 
+from core.admin import EliminarSoloPruebasMixin
+
 from .models import Cita, HorarioAtencion, TipoSesion
 from .servicios import cancelar_cita
 
@@ -19,17 +21,19 @@ class HorarioAtencionAdmin(admin.ModelAdmin):
     list_filter = ['profesional', 'dia_semana']
 
 
-@admin.action(description='Cancelar los turnos seleccionados (devuelve la sesión o los créditos y avisa a la clienta)')
+@admin.action(description='Cancelar las citas seleccionadas (devuelve la sesión o los puntos y avisa a la clienta)')
 def cancelar_por_estudio(modeladmin, request, queryset):
     total = 0
-    for cita in queryset.filter(cancelada=False, inicio__gt=timezone.now()):
+    for cita in queryset.filter(cancelada=False):
         cancelar_cita(cita, por_el_estudio=True)
         total += 1
-    modeladmin.message_user(request, f'Turnos cancelados: {total}.', messages.SUCCESS)
+    texto = '1 cita cancelada' if total == 1 else f'{total} citas canceladas'
+    modeladmin.message_user(request, f'{texto}, con la sesión o los puntos devueltos y aviso a la clienta.',
+                            messages.SUCCESS)
 
 
 @admin.register(Cita)
-class CitaAdmin(admin.ModelAdmin):
+class CitaAdmin(EliminarSoloPruebasMixin, admin.ModelAdmin):
     list_display = ['inicio', 'tipo', 'profesional', 'usuario', 'forma', 'cancelada']
     list_filter = ['tipo__servicio', 'profesional', 'forma', 'cancelada']
     search_fields = ['usuario__email', 'usuario__nombre', 'usuario__apellido']

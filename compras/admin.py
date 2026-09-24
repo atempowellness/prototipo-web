@@ -16,7 +16,7 @@ class CompraAdmin(admin.ModelAdmin):
     fieldsets = [
         ('Compra', {'fields': ['tipo', 'usuario', 'paquete', 'referida', 'fecha', 'vence',
                                'nombre_paquete', 'precio_pagado']}),
-        ('Créditos y beneficios', {'fields': [
+        ('Puntos y beneficios', {'fields': [
             'creditos', 'creditos_usados', 'sesiones_nutricion', 'nutricion_usada',
             'sesiones_masaje', 'masaje_usado', 'incluye_circle']}),
         ('Pago (simulado)', {'fields': ['metodo', 'detalle_pago', 'numero_operacion']}),

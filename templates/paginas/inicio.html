@@ -113,11 +113,11 @@
     <ol class="pasos">
       <li>
         <h3>Elige tu paquete</h3>
-        <p>Compra créditos en línea. Un crédito equivale a una clase de cualquier disciplina.</p>
+        <p>Compra puntos en línea. Un punto equivale a una clase de cualquier disciplina.</p>
       </li>
       <li>
         <h3>Reserva tu clase</h3>
-        <p>Escoge día, horario y disciplina desde la web. Puedes cancelar hasta 12 horas antes y recuperar tu crédito.</p>
+        <p>Escoge día, horario y disciplina desde la web. Puedes cancelar hasta 12 horas antes y recuperar tu punto.</p>
       </li>
       <li>
         <h3>Llega y quédate</h3>
@@ -127,12 +127,12 @@
   </div>
 </section>
 
-{# 6. Paquetes #}
+{# 6. Paquetes (enfocado en beneficios, no en ahorro: sugerencia de la asesora) #}
 <section class="contenedor bloque bloque-corto">
   <div class="linea-paquetes">
     <div>
-      <h2>Ahorra hasta <span class="cifra">{{ ahorro_maximo|soles }}</span> por clase con nuestros paquetes</h2>
-      <p class="apagado">La clase suelta cuesta {{ precio_clase_suelta|soles }}. Mientras más créditos, menor precio por clase y más beneficios de bienestar.</p>
+      <h2>Paquetes que acompañan tu ritmo</h2>
+      <p class="apagado">Mientras más clases elijas, más beneficios de bienestar sumas: asesoría nutricional, masajes y los encuentros de <strong class="nombre-marca">Atempo Circle</strong>.</p>
     </div>
     <a class="boton" href="{% url 'paquetes' %}">Ver paquetes</a>
   </div>
@@ -166,12 +166,12 @@
       <p>No. Cada clase indica su intensidad (suave, media o activa) y quien la dicta adapta los ejercicios a tu nivel. Si estás empezando, te recomendamos una clase suave de Pilates o Yoga.</p>
     </details>
     <details>
-      <summary>¿Qué pasa si no uso todos mis créditos?</summary>
+      <summary>¿Qué pasa si no uso todos mis puntos?</summary>
       <p>Cada paquete tiene una vigencia: {% for cantidad, nombres in vigencias %}{{ cantidad|meses }} para {% for nombre in nombres %}<strong class="nombre-marca">{{ nombre }}</strong>{% if not forloop.last %} y {% endif %}{% endfor %}{% if forloop.revcounter == 2 %} y {% elif not forloop.last %}, {% endif %}{% endfor %}. Te avisamos por correo y WhatsApp antes de que venzan.</p>
     </details>
     <details>
       <summary>¿Puedo cancelar una reserva?</summary>
-      <p>Sí. Si cancelas con al menos 12 horas de anticipación, el crédito regresa a tu cuenta. Con menos tiempo, el crédito se descuenta.</p>
+      <p>Sí. Si cancelas con al menos 12 horas de anticipación, el punto regresa a tu cuenta. Con menos tiempo, el punto se descuenta.</p>
     </details>
     <details>
       <summary>¿Hay estacionamiento?</summary>

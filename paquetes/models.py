@@ -5,7 +5,7 @@ from django.db import models
 
 class Paquete(models.Model):
     """
-    Un paquete de créditos (Atempo 1, Atempo 5...). 1 crédito = 1 clase.
+    Un paquete de puntos (Atempo 1, Atempo 5...). 1 punto = 1 clase.
     Se editan desde el panel de administración (/admin/).
     """
     nombre = models.CharField(max_length=40, unique=True)
@@ -13,7 +13,7 @@ class Paquete(models.Model):
         'dirección web', max_length=40, unique=True,
         help_text='Se usa en la dirección de compra, por ejemplo "atempo-10" → /paquetes/atempo-10/comprar/.',
     )
-    creditos = models.PositiveSmallIntegerField('créditos')
+    creditos = models.PositiveSmallIntegerField('puntos')
     vigencia_meses = models.PositiveSmallIntegerField('vigencia (meses)')
     precio = models.DecimalField('precio (S/)', max_digits=8, decimal_places=2)
 
@@ -21,11 +21,11 @@ class Paquete(models.Model):
     sesiones_masaje = models.PositiveSmallIntegerField('sesiones de masaje incluidas', default=0)
     incluye_circle = models.BooleanField('incluye actividades de Atempo Circle', default=False)
     costo_nutricion_adicional = models.PositiveSmallIntegerField(
-        'nutrición adicional (créditos)', null=True, blank=True,
+        'nutrición adicional (puntos)', null=True, blank=True,
         help_text='Déjalo vacío si este paquete no permite agendar nutrición adicional.',
     )
     costo_masaje_adicional = models.PositiveSmallIntegerField(
-        'masaje adicional (créditos)', null=True, blank=True,
+        'masaje adicional (puntos)', null=True, blank=True,
         help_text='Déjalo vacío si este paquete no permite agendar masajes adicionales.',
     )
 
@@ -76,7 +76,7 @@ def paquetes_activos():
 
 
 def precio_clase_suelta():
-    """El precio de la clase suelta es el del paquete de 1 crédito (Atempo 1)."""
+    """El precio de la clase suelta es el del paquete de 1 punto (Atempo 1)."""
     suelta = Paquete.objects.filter(activo=True, creditos=1).first()
     return suelta.precio if suelta else Decimal(65)
 

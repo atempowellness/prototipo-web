@@ -199,6 +199,43 @@ document.querySelectorAll('.boton-mostrar').forEach(function (boton) {
   });
 })();
 
+/* ---------- Filtros y días sin recargar la página ----------
+   Dentro de una zona marcada con data-zona (el horario de clases, la agenda de
+   nutrición y masajes), los enlaces que solo cambian los filtros ("?dia=…")
+   actualizan esa zona sin mover la posición de la pantalla. La dirección de la
+   página se actualiza igual, así funcionan el botón "atrás" y los enlaces compartidos.
+   Si algo falla, se abre la página de la forma normal. */
+(function () {
+  function actualizarZona(url, id, guardarEnHistorial) {
+    var zona = document.getElementById(id);
+    if (!zona) { window.location.href = url; return; }
+    zona.classList.add('zona-cargando');
+    fetch(url, { credentials: 'same-origin' })
+      .then(function (r) { if (!r.ok) throw new Error(); return r.text(); })
+      .then(function (html) {
+        var nueva = new DOMParser().parseFromString(html, 'text/html').getElementById(id);
+        if (!nueva) throw new Error();
+        zona.replaceWith(nueva);
+        if (guardarEnHistorial) history.pushState({ zona: id }, '', url);
+      })
+      .catch(function () { window.location.href = url; });
+  }
+
+  document.addEventListener('click', function (e) {
+    var enlace = e.target.closest('[data-zona] a[href^="?"]');
+    if (!enlace || e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return;
+    e.preventDefault();
+    actualizarZona(enlace.href, enlace.closest('[data-zona]').id, true);
+  });
+
+  // Botón "atrás" / "adelante" del navegador
+  window.addEventListener('popstate', function (e) {
+    if (e.state && e.state.zona) actualizarZona(window.location.href, e.state.zona, false);
+  });
+  var zona = document.querySelector('[data-zona]');
+  if (zona) history.replaceState({ zona: zona.id }, '', window.location.href);
+})();
+
 /* ---------- Botones "Copiar" (por ejemplo, el código de referida) ---------- */
 document.querySelectorAll('[data-copiar]').forEach(function (boton) {
   var textoOriginal = boton.textContent;

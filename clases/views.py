@@ -85,7 +85,7 @@ class HorariosView(TemplateView):
                     groupby(estados, key=lambda e: timezone.localtime(e['clase'].inicio).strftime('%H:%M'))]
 
         contexto.update({
-            'titulo': 'Clases y horarios',
+            'titulo': 'Clases',
             'dias': [(d, etiqueta_dia(d)) for d in dias],
             'dia': dia,
             'dia_largo': date_format(dia, 'l j \\d\\e F'),
@@ -129,17 +129,17 @@ class ReservarView(LoginRequiredMixin, View):
         except NoSePuedeReservar as error:
             texto = str(error)
             if texto == 'SIN_CREDITOS':
-                texto = 'Necesitas un crédito vigente para esa fecha. Puedes comprar un paquete en Paquetes.'
+                texto = 'Necesitas un punto vigente para esa fecha. Puedes comprar un paquete en Paquetes.'
             messages.error(request, texto)
             return redirect(destino)
         from notificaciones import avisos
         avisos.reserva_confirmada(reserva)
 
         inicio = timezone.localtime(clase.inicio)
-        origen = reserva.compra.origen if reserva.compra else 'de tus créditos'
+        origen = reserva.compra.origen if reserva.compra else 'de tus puntos'
         messages.success(request, f'¡Listo! Reservaste {clase.disciplina.nombre} el '
                                   f'{date_format(inicio, "l j \\d\\e F")} a las {inicio:%H:%M} en {clase.sala.nombre}. '
-                                  f'Se usó 1 crédito {origen}.')
+                                  f'Se usó 1 punto {origen}.')
         return redirect(destino)
 
 
@@ -169,10 +169,10 @@ class CancelarView(LoginRequiredMixin, View):
             return redirect(destino)
         devuelto = cancelar_reserva(reserva)
         if devuelto:
-            messages.success(request, 'Cancelaste tu reserva. Tu crédito ya está de vuelta en tu cuenta.')
+            messages.success(request, 'Cancelaste tu reserva. Tu punto ya está de vuelta en tu cuenta.')
         else:
             messages.info(request, 'Cancelaste tu reserva y liberaste el cupo. Como faltaban menos de '
-                                   f'{HORAS_PARA_CANCELAR} horas, el crédito no se devuelve.')
+                                   f'{HORAS_PARA_CANCELAR} horas, el punto no se devuelve.')
         return redirect(destino)
 
 

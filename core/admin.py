@@ -59,6 +59,21 @@ def eliminar_seleccionados(modeladmin, request, queryset):
     return TemplateResponse(request, 'admin/delete_selected_confirmation.html', contexto)
 
 
+class EliminarSoloPruebasMixin:
+    """
+    Para reservas de clases y citas: "Eliminar" borra el registro sin devolver puntos ni
+    avisar a la clienta, así que se rotula como opción para pruebas. Para anular algo de
+    verdad se usa la acción "Cancelar…" de cada sección.
+    """
+    def get_actions(self, request):
+        acciones = super().get_actions(request)
+        if 'delete_selected' in acciones:
+            funcion, nombre, _ = acciones['delete_selected']
+            acciones['delete_selected'] = (funcion, nombre,
+                                           'Eliminar sin devolver ni avisar (solo para pruebas)')
+        return acciones
+
+
 # Reemplaza la acción original en todas las secciones del panel
 admin.site.disable_action('delete_selected')
 admin.site.add_action(eliminar_seleccionados, 'delete_selected')

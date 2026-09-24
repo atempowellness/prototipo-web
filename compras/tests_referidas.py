@@ -99,7 +99,7 @@ class BeneficioTests(TestCase):
         self.comprar(self.ana, 'atempo-5')
         self.client.force_login(self.maria)
         respuesta = self.client.get(reverse('cuenta'))
-        self.assertContains(respuesta, '1 crédito de regalo por referida')
+        self.assertContains(respuesta, '1 punto de regalo por referida')
         self.assertContains(respuesta, 'Todavía no has comprado paquetes.')
         regalo = self.maria.compras.get(tipo=Compra.REGALO)
         self.assertEqual(self.client.get(reverse('compra', args=[regalo.pk])).status_code, 404)
@@ -131,7 +131,7 @@ class CodigoAlPagarTests(TestCase):
         self.ana.referida_por = self.maria
         self.ana.save()
         respuesta = self.client.get(reverse('comprar', args=['atempo-1']))
-        self.assertContains(respuesta, 'Tu crédito extra se activa desde Atempo 5.')
+        self.assertContains(respuesta, 'Tu punto extra se activa desde Atempo 5.')
         self.assertContains(respuesta, 'Te registraste con el código de María')
 
     def test_sin_aviso_si_ya_compro_desde_atempo_5(self):
@@ -152,7 +152,7 @@ class CodigoAlPagarTests(TestCase):
     def test_usar_el_codigo_al_pagar(self):
         respuesta = self.client.post(reverse('comprar', args=['atempo-5']),
                                      {**YAPE, 'codigo_referida': self.maria.codigo_referida.lower()}, follow=True)
-        self.assertContains(respuesta, '¡Recibiste 1 crédito de regalo por venir invitada por María!')
+        self.assertContains(respuesta, '¡Recibiste 1 punto de regalo por venir invitada por María!')
         self.ana.refresh_from_db()
         self.assertEqual(self.ana.referida_por, self.maria)
         self.assertEqual(creditos_disponibles(self.maria), 1)
@@ -178,6 +178,6 @@ class MiCuentaReferidasTests(TestCase):
         self.client.force_login(maria)
         respuesta = self.client.get(reverse('cuenta'))
         for texto in [maria.codigo_referida, 'Copiar código', 'Compartir por WhatsApp', 'https://wa.me/?text=',
-                      'Ana P.', 'recibiste 1 crédito', 'Rosa P.', 'esperando su primera compra',
+                      'Ana P.', 'recibiste 1 punto', 'Rosa P.', 'esperando su primera compra',
                       'Este mes: 1 de 5']:
             self.assertContains(respuesta, texto)

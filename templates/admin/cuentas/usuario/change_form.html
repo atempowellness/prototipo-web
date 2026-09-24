@@ -1,0 +1,8 @@
+{% extends "admin/change_form.html" %}
+{% comment %}Ficha de usuario: agrega el botón "Reiniciar cuenta de prueba" arriba a la derecha.{% endcomment %}
+{% block object-tools-items %}
+  {% if original %}
+    <li><a href="{% url 'admin:cuentas_usuario_reiniciar' %}?ids={{ original.pk }}&volver={{ request.path|urlencode }}">Reiniciar cuenta de prueba</a></li>
+  {% endif %}
+  {{ block.super }}
+{% endblock %}

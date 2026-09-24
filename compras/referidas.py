@@ -5,8 +5,8 @@ Reglas acordadas:
 - Cada cuenta puede usar un solo código de referida en toda su historia (ni el suyo propio).
 - El beneficio se activa con la primera compra de un paquete desde Atempo 5
   (aunque antes haya comprado Atempo 1 para probar).
-- La amiga nueva recibe 1 crédito de regalo con la misma vigencia de esa compra.
-- Quien invitó recibe 1 crédito de regalo válido por 1 mes desde ese día,
+- La amiga nueva recibe 1 punto de regalo con la misma vigencia de esa compra.
+- Quien invitó recibe 1 punto de regalo válido por 1 mes desde ese día,
   con un tope de 5 por mes calendario. Si llegó al tope, la amiga igual recibe el suyo.
 - Los códigos no distinguen mayúsculas de minúsculas.
 """
@@ -71,14 +71,14 @@ def regalos_del_mes(invitadora):
 def _regalo(usuario, vence, referida):
     return Compra.objects.create(
         tipo=Compra.REGALO, usuario=usuario, referida=referida, vence=vence,
-        nombre_paquete='Crédito de regalo por referida', creditos=1, precio_pagado=0,
+        nombre_paquete='Punto de regalo por referida', creditos=1, precio_pagado=0,
     )
 
 
 def aplicar_beneficio(compra):
     """
     Se llama después de registrar una compra pagada. Si corresponde, entrega los
-    créditos de regalo. Devuelve un dict con lo que pasó (para los mensajes) o None.
+    puntos de regalo. Devuelve un dict con lo que pasó (para los mensajes) o None.
     """
     usuaria = compra.usuario
     invitadora = usuaria.referida_por
@@ -88,9 +88,9 @@ def aplicar_beneficio(compra):
         return None
 
     with transaction.atomic():
-        # Crédito de la amiga nueva: con la misma vigencia de su compra
+        # Punto de la amiga nueva: con la misma vigencia de su compra
         regalo_amiga = _regalo(usuaria, compra.vence, referida=usuaria)
-        # Crédito de quien invitó: 1 mes desde hoy, con tope mensual
+        # Punto de quien invitó: 1 mes desde hoy, con tope mensual
         regalo_invitadora = None
         if regalos_del_mes(invitadora).count() < TOPE_MENSUAL:
             regalo_invitadora = _regalo(invitadora, sumar_meses(timezone.localdate(), VIGENCIA_REGALO_MESES),

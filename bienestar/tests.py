@@ -66,7 +66,7 @@ class PlanDePagoTests(TestCase):
         cita = agendar(self.maria, nutri, self.evaluacion, inicio)
         self.assertEqual(cita.forma, Cita.INCLUIDA)
         self.assertEqual(sesiones_incluidas_disponibles(self.maria, NUTRICION), 0)
-        self.assertEqual(creditos_disponibles(self.maria), 5)   # no toca los créditos
+        self.assertEqual(creditos_disponibles(self.maria), 5)   # no toca los puntos
 
     def test_atempo_5_no_permite_nutricion_adicional(self):
         comprar(self.maria, 'atempo-5')
@@ -76,7 +76,7 @@ class PlanDePagoTests(TestCase):
 
     def test_adicional_con_creditos_desde_atempo_10(self):
         comprar(self.maria, 'atempo-10')
-        for _ in range(2):   # la 1.ª incluida, la 2.ª adicional (1 crédito)
+        for _ in range(2):   # la 1.ª incluida, la 2.ª adicional (1 punto)
             inicio, nutri = primera_hora(NUTRICION, self.evaluacion, self.dia, self.maria)
             cita = agendar(self.maria, nutri, self.evaluacion, inicio)
         self.assertEqual(cita.forma, Cita.CREDITOS)
@@ -163,7 +163,7 @@ class PaginasTests(TestCase):
     def test_bienestar_y_submenu(self):
         respuesta = self.client.get(reverse('bienestar'))
         for texto in ['Bienestar', 'Nutrición', 'Masajes', 'Lic. María Becerra', 'De La Rose',
-                      'Incluida en los paquetes desde', 'Sesión adicional: 1 crédito',
+                      'Incluida en los paquetes desde', 'Sesión adicional: 1 punto',
                       reverse('bienestar_servicio', args=['nutricion']), reverse('bienestar_servicio', args=['masajes'])]:
             self.assertContains(respuesta, texto)
         self.assertContains(respuesta, 'class="submenu"')

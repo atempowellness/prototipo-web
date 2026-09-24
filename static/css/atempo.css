@@ -1097,6 +1097,7 @@ main { min-height: 50vh; }
    13. CLASES Y HORARIOS
    --------------------------------------------------------- */
 .boton-chico { min-height: 44px; padding: 8px 16px 6px; font-size: .95rem; }
+.zona-cargando { opacity: .55; transition: opacity .15s; pointer-events: none; }   /* mientras se actualiza un filtro */
 
 /* Días: botones grandes que se desplazan de lado en celular */
 .dias { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 12px; }
@@ -1224,6 +1225,8 @@ main { min-height: 50vh; }
 }
 .proxima-hora { font-size: 1.3rem; }
 .proxima-compacta { grid-template-columns: 1fr auto; }
+.dia-agrupado { margin: 20px 0 0; font-size: 1.1rem; color: var(--texto-acento); }
+.dia-agrupado + .proximas-lista { margin-top: 4px; }
 .proxima-texto .apagado { display: block; font-size: .92rem; }
 @media (max-width: 560px) {
   .proxima { grid-template-columns: 60px 1fr; }

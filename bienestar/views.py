@@ -163,7 +163,7 @@ class AgendarView(LoginRequiredMixin, View):
         except NoSePuedeAgendar as error:
             texto = str(error)
             if texto == 'SIN_SESIONES':
-                texto = 'No tienes sesiones ni créditos disponibles para esta cita. Revisa los paquetes.'
+                texto = 'No tienes sesiones ni puntos disponibles para esta cita. Revisa los paquetes.'
             messages.error(request, texto)
             return redirect(destino)
 
@@ -193,9 +193,9 @@ class CancelarCitaView(LoginRequiredMixin, View):
             messages.error(request, 'Esta cita ya empezó, así que no se puede cancelar.')
             return redirect(destino)
         if cancelar_cita(cita):
-            que = 'la sesión' if cita.forma == 'incluida' else 'los créditos'
+            que = 'la sesión' if cita.forma == 'incluida' else 'los puntos'
             messages.success(request, f'Cancelaste tu cita. Te devolvimos {que}.')
         else:
             messages.info(request, f'Cancelaste tu cita. Como faltaban menos de {HORAS_PARA_CANCELAR} horas, '
-                                   'no se devuelve la sesión ni los créditos.')
+                                   'no se devuelve la sesión ni los puntos.')
         return redirect(destino)

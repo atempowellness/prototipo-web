@@ -17,17 +17,17 @@ def _fecha(dia):
 def creditos_activados(compra):
     """Después de pagar un paquete."""
     if compra.creditos == 1:
-        texto = f'Se activó tu crédito de {compra.nombre_paquete}. Puedes usarlo hasta el {_fecha(compra.vence)}.'
+        texto = f'Se activó tu punto de {compra.nombre_paquete}. Puedes usarlo hasta el {_fecha(compra.vence)}.'
     else:
-        texto = (f'Se activaron tus {compra.creditos} créditos de {compra.nombre_paquete}. '
+        texto = (f'Se activaron tus {compra.creditos} puntos de {compra.nombre_paquete}. '
                  f'Puedes usarlos hasta el {_fecha(compra.vence)}.')
     notificar(compra.usuario, Notificacion.CREDITOS_ACTIVADOS, texto, reverse('cuenta'))
 
 
 def credito_extra_activado(regalo, invitadora):
-    """A la amiga nueva, cuando se activa su crédito extra por referida."""
+    """A la amiga nueva, cuando se activa su punto extra por referida."""
     notificar(regalo.usuario, Notificacion.CREDITO_EXTRA,
-              f'Se activó tu crédito extra por venir invitada por {invitadora.nombre}. '
+              f'Se activó tu punto extra por venir invitada por {invitadora.nombre}. '
               f'Puedes usarlo hasta el {_fecha(regalo.vence)}.',
               reverse('cuenta'))
 
@@ -41,18 +41,18 @@ def bienvenida(usuario):
 def amiga_se_registro(invitadora, amiga):
     notificar(invitadora, Notificacion.REFERIDA_REGISTRO,
               f'{amiga.nombre_corto} se registró con tu código. Cuando compre su primer paquete desde '
-              f'Atempo 5, las dos reciben 1 crédito.',
+              f'Atempo 5, las dos reciben 1 punto.',
               reverse('cuenta'))
 
 
 def amiga_compro(invitadora, amiga, regalo):
-    """A quien invitó. `regalo` es su crédito de regalo, o None si ya llegó al tope del mes."""
+    """A quien invitó. `regalo` es su punto de regalo, o None si ya llegó al tope del mes."""
     if regalo is not None:
-        texto = (f'¡{amiga.nombre_corto} compró su paquete con tu código! Se activó tu crédito de regalo: '
+        texto = (f'¡{amiga.nombre_corto} compró su paquete con tu código! Se activó tu punto de regalo: '
                  f'puedes usarlo hasta el {_fecha(regalo.vence)}.')
     else:
         texto = (f'{amiga.nombre_corto} compró su paquete con tu código. Este mes ya llegaste al tope '
-                 f'de 5 créditos por referidas.')
+                 f'de 5 puntos por referidas.')
     notificar(invitadora, Notificacion.REFERIDA_COMPRA, texto, reverse('cuenta'))
 
 
@@ -86,14 +86,14 @@ def reserva_confirmada(reserva):
     dia = date_format(timezone.localtime(clase.inicio), 'l j \\d\\e F')
     notificar(reserva.usuario, Notificacion.RESERVA_CONFIRMADA,
               f'Reserva confirmada: {_clase_texto(clase)}, el {dia}. '
-              f'Puedes cancelar sin perder el crédito hasta 12 horas antes.',
+              f'Puedes cancelar sin perder el punto hasta 12 horas antes.',
               reverse('cuenta'), reserva=reserva)
 
 
 def ajuste_de_creditos(usuario, cantidad, motivo=''):
-    """El estudio sumó (cantidad > 0) o quitó (cantidad < 0) créditos desde el panel."""
+    """El estudio sumó (cantidad > 0) o quitó (cantidad < 0) puntos desde el panel."""
     n = abs(cantidad)
-    creditos = 'crédito' if n == 1 else 'créditos'
+    creditos = 'punto' if n == 1 else 'puntos'
     if cantidad > 0:
         texto = f'El estudio agregó {n} {creditos} a tu cuenta.'
     else:
@@ -110,8 +110,8 @@ def _cita_texto(cita):
 
 def cita_confirmada(cita):
     como = ('Se usó 1 sesión incluida en tu paquete.' if cita.forma == 'incluida'
-            else f'Se usaron {len(cita.compras_creditos)} créditos.' if len(cita.compras_creditos) != 1
-            else 'Se usó 1 crédito.')
+            else f'Se usaron {len(cita.compras_creditos)} puntos.' if len(cita.compras_creditos) != 1
+            else 'Se usó 1 punto.')
     notificar(cita.usuario, Notificacion.CITA_CONFIRMADA,
               f'Cita confirmada: {_cita_texto(cita)}. {como}', reverse('cuenta'), cita=cita)
 
@@ -119,7 +119,7 @@ def cita_confirmada(cita):
 def cita_cancelada(cita, devuelta):
     texto = f'El estudio canceló tu cita: {_cita_texto(cita)}.'
     if devuelta:
-        texto += ' Te devolvimos la sesión.' if cita.forma == 'incluida' else ' Te devolvimos los créditos.'
+        texto += ' Te devolvimos la sesión.' if cita.forma == 'incluida' else ' Te devolvimos los puntos.'
     notificar(cita.usuario, Notificacion.CITA_CANCELADA, texto, reverse('bienestar'), cita=cita)
 
 
@@ -140,17 +140,26 @@ def revisar_recordatorios_de_citas(usuario):
                   f'a las {local:%H:%M}. ¡Te esperamos!', reverse('cuenta'), cita=cita)
 
 
+def reserva_cancelada_por_estudio(reserva, devuelto):
+    """El estudio canceló la reserva de una clienta (la clase sigue en pie)."""
+    clase = reserva.clase
+    dia = date_format(timezone.localtime(clase.inicio), 'l j \\d\\e F')
+    texto = f'El estudio canceló tu reserva de {_clase_texto(clase)} del {dia}.'
+    texto += ' Te devolvimos tu punto.' if devuelto else ''
+    notificar(reserva.usuario, Notificacion.CLASE_CANCELADA, texto, reverse('horarios'), reserva=reserva)
+
+
 def clase_cancelada(reserva, credito_devuelto):
     clase = reserva.clase
     dia = date_format(timezone.localtime(clase.inicio), 'l j \\d\\e F')
     texto = f'El estudio canceló la clase de {_clase_texto(clase)} del {dia}.'
-    texto += ' Te devolvimos tu crédito.' if credito_devuelto else ''
+    texto += ' Te devolvimos tu punto.' if credito_devuelto else ''
     notificar(reserva.usuario, Notificacion.CLASE_CANCELADA, texto, reverse('horarios'), reserva=reserva)
 
 
 def revisar_vencimientos(usuario):
     """
-    Crea el aviso de créditos por vencer (7 días o menos) una sola vez por compra.
+    Crea el aviso de puntos por vencer (7 días o menos) una sola vez por compra.
     Se revisa al cargar cualquier página; en la versión real sería una tarea diaria.
     """
     from compras.models import compras_vigentes
@@ -162,8 +171,8 @@ def revisar_vencimientos(usuario):
             origen = compra.origen
             fecha = _fecha(compra.vence)
             if compra.creditos_disponibles == 1:
-                texto = f'Te queda 1 crédito {origen} y vence el {fecha}. ¡Reserva tu clase!'
+                texto = f'Te queda 1 punto {origen} y vence el {fecha}. ¡Reserva tu clase!'
             else:
-                texto = (f'Te quedan {compra.creditos_disponibles} créditos {origen} y vencen el {fecha}. '
+                texto = (f'Te quedan {compra.creditos_disponibles} puntos {origen} y vencen el {fecha}. '
                          f'¡Reserva tus clases!')
             notificar(usuario, Notificacion.VENCIMIENTO, texto, reverse('horarios'), compra=compra)

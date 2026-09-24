@@ -50,5 +50,5 @@ def meses(cantidad):
 
 @register.filter
 def creditos(cantidad):
-    """1 -> '1 crédito', 5 -> '5 créditos'."""
-    return f'{cantidad} crédito' if cantidad == 1 else f'{cantidad} créditos'
+    """1 -> '1 punto', 5 -> '5 puntos'."""
+    return f'{cantidad} punto' if cantidad == 1 else f'{cantidad} puntos'

@@ -7,7 +7,7 @@
 <section class="contenedor cabecera-pagina">
   <h1>Paquetes de lanzamiento</h1>
   <p class="entrada">
-    Un crédito equivale a una clase presencial de cualquiera de nuestras disciplinas.
+    Un punto equivale a una clase presencial de cualquiera de nuestras disciplinas.
     Úsalos cuando quieras dentro de la vigencia de tu paquete.
   </p>
 </section>
@@ -37,7 +37,7 @@
           <summary>Ver detalles</summary>
           {% if paquete.frase %}<p>{{ paquete.frase|marca }}</p>{% endif %}
           <ul>
-            <li>1 crédito = 1 clase</li>
+            <li>1 punto = 1 clase</li>
             <li>Duración: {{ paquete.vigencia_meses|meses }} desde la compra</li>
             {% if paquete.costo_nutricion_adicional %}<li>Nutrición adicional: {{ paquete.costo_nutricion_adicional|creditos }}</li>{% endif %}
             {% if paquete.costo_masaje_adicional %}<li>Masaje adicional: {{ paquete.costo_masaje_adicional|creditos }}</li>{% endif %}

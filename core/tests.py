@@ -34,7 +34,7 @@ class InicioTests(TestCase):
             'Vuelve a tu propio ritmo.', 'Ver horarios y reservar',
             'Muévete, cuídate y conecta', 'Conoce nuestra historia',
             'Nuestras disciplinas', 'Pilates', 'Yoga', 'Pesas', 'Zumba', 'Activa',
-            'Cómo funciona', 'Ahorra hasta <span class="cifra">S/ 15</span> por clase', 'Atempo Circle',
+            'Cómo funciona', 'Paquetes que acompañan tu ritmo', 'Atempo Circle',
             'Preguntas frecuentes', '¿Hay estacionamiento?',
         ]:
             self.assertContains(respuesta, texto)

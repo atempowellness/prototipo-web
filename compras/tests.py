@@ -101,7 +101,7 @@ class PaginaDePagoTests(TestCase):
         compra = Compra.objects.get()
         self.assertEqual(compra.detalle_pago, 'Tarjeta terminada en 1111')
         self.assertEqual(compra.vence, sumar_meses(timezone.localdate(), 2))
-        for texto in ['¡Compra confirmada!', 'Ya tienes <strong>10 créditos disponibles</strong>',
+        for texto in ['¡Compra confirmada!', 'Ya tienes <strong>10 puntos disponibles</strong>',
                       'Boleta de venta electrónica', compra.numero_boleta, '45678912', 'IGV (18 %)',
                       'También te enviamos la boleta a']:
             self.assertContains(respuesta, texto)
@@ -161,29 +161,29 @@ class MiCuentaConComprasTests(TestCase):
     def test_muestra_creditos_beneficios_e_historial(self):
         registrar_compra(self.maria, paquete('Atempo 20'), 'tarjeta', 'Tarjeta terminada en 1111')
         respuesta = self.client.get(reverse('cuenta'))
-        for texto in ['Créditos disponibles', '20 créditos de', 'Nutrición: <strong>2</strong>',
+        for texto in ['Puntos disponibles', '20 puntos de', 'Nutrición: <strong>2</strong>',
                       'Masajes: <strong>1</strong>', 'activo', 'Historial de compras', 'S/ 1,060', 'Ver boleta']:
             self.assertContains(respuesta, texto)
 
     def test_sin_compras(self):
         respuesta = self.client.get(reverse('cuenta'))
-        self.assertContains(respuesta, 'Aún no tienes créditos activos.')
+        self.assertContains(respuesta, 'Aún no tienes puntos activos.')
         self.assertContains(respuesta, 'Todavía no has comprado paquetes.')
 
     def test_aviso_cuando_vence_en_7_dias_o_menos(self):
         compra = registrar_compra(self.maria, paquete('Atempo 5'), 'yape', '')
         respuesta = self.client.get(reverse('cuenta'))
-        self.assertNotContains(respuesta, 'Tus créditos están por vencer')
+        self.assertNotContains(respuesta, 'Tus puntos están por vencer')
         Compra.objects.filter(pk=compra.pk).update(vence=timezone.localdate() + datetime.timedelta(days=7))
         respuesta = self.client.get(reverse('cuenta'))
-        self.assertContains(respuesta, 'Tus créditos están por vencer')
+        self.assertContains(respuesta, 'Tus puntos están por vencer')
         self.assertContains(respuesta, 'Ver el correo que te enviamos')
 
     def test_sin_aviso_si_ya_uso_todos_los_creditos(self):
         compra = registrar_compra(self.maria, paquete('Atempo 1'), 'yape', '')
         Compra.objects.filter(pk=compra.pk).update(creditos_usados=1,
                                                    vence=timezone.localdate() + datetime.timedelta(days=3))
-        self.assertNotContains(self.client.get(reverse('cuenta')), 'Tus créditos están por vencer')
+        self.assertNotContains(self.client.get(reverse('cuenta')), 'Tus puntos están por vencer')
 
 
 class PanelComprasTests(TestCase):

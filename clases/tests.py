@@ -130,7 +130,7 @@ class CancelarTests(TestCase):
         self.assertEqual(cancelar_clase_por_estudio(clase), 1)
         self.assertEqual(creditos_disponibles(self.maria), 5)          # siempre se devuelve
         aviso = self.maria.notificaciones.get(tipo=Notificacion.CLASE_CANCELADA)
-        self.assertIn('Te devolvimos tu crédito', aviso.texto)
+        self.assertIn('Te devolvimos tu punto', aviso.texto)
 
 
 class PaginasTests(TestCase):
@@ -140,7 +140,7 @@ class PaginasTests(TestCase):
 
     def test_horario_publico(self):
         respuesta = self.client.get(reverse('horarios'))
-        for texto in ['Clases y horarios', 'Hoy', 'Mañana', 'Pilates', 'Sala Calma', 'Todo el día',
+        for texto in ['<h1>Clases</h1>', 'id="zona-horario" data-zona', 'Hoy', 'Mañana', 'Pilates', 'Sala Calma', 'Todo el día',
                       'Temprano (antes de 9:00)', 'Simular ocupación']:
             self.assertContains(respuesta, texto)
         self.assertNotContains(respuesta, '12 cupos')   # el aforo no se muestra
@@ -163,7 +163,7 @@ class PaginasTests(TestCase):
         self.client.force_login(self.maria)
         confirmacion = self.client.get(reverse('reservar', args=[clase.pk]), {'parcial': 1})
         self.assertContains(confirmacion, 'Confirma tu reserva')
-        self.assertContains(confirmacion, 'Se usará 1 crédito de')
+        self.assertContains(confirmacion, 'Se usará 1 punto de')
         self.assertNotContains(confirmacion, '<html')                  # es solo el contenido de la ventana
         respuesta = self.client.post(reverse('reservar', args=[clase.pk]), follow=True)
         self.assertContains(respuesta, '¡Listo! Reservaste')
@@ -174,10 +174,10 @@ class PaginasTests(TestCase):
         self.client.force_login(self.maria)
         pronto = self.client.get(reverse('reservar', args=[clase_en(5).pk]), {'parcial': 1})
         self.assertContains(pronto, 'esta clase empieza en menos de 12 horas')
-        self.assertContains(pronto, 'no recuperarás el crédito')
+        self.assertContains(pronto, 'no recuperarás el punto')
         lejos = self.client.get(reverse('reservar', args=[clase_en(48, sala_orden=1).pk]), {'parcial': 1})
-        self.assertNotContains(lejos, 'no recuperarás el crédito')
-        self.assertContains(lejos, 'Puedes cancelar sin perder el crédito')
+        self.assertNotContains(lejos, 'no recuperarás el punto')
+        self.assertContains(lejos, 'Puedes cancelar sin perder el punto')
 
     def test_al_reservar_llega_notificacion(self):
         comprar(self.maria)
@@ -195,7 +195,7 @@ class PaginasTests(TestCase):
         self.client.force_login(self.maria)
         Compra.objects.all().delete()
         respuesta = self.client.get(reverse('reservar', args=[clase_en(48).pk]), {'parcial': 1})
-        self.assertContains(respuesta, 'Necesitas un crédito vigente')
+        self.assertContains(respuesta, 'Necesitas un punto vigente')
         self.assertContains(respuesta, 'Ver paquetes')
 
     def test_simulacion_apagada_por_defecto_y_se_puede_prender(self):
@@ -203,6 +203,19 @@ class PaginasTests(TestCase):
         self.client.post(reverse('simular_ocupacion'))
         self.assertTrue(self.client.session['simular_ocupacion'])
         self.assertContains(self.client.get(reverse('horarios')), 'Dejar de simular')
+
+    def test_mi_cuenta_agrupa_las_clases_por_dia(self):
+        comprar(self.maria, 'atempo-10')
+        reservar(self.maria, clase_en(48))
+        reservar(self.maria, clase_en(49, sala_orden=1))
+        reservar(self.maria, clase_en(72, sala_orden=2))
+        self.client.force_login(self.maria)
+        html = self.client.get(reverse('cuenta')).content.decode()
+        self.assertEqual(html.count('class="dia-agrupado"'), 2)   # dos días, tres clases
+
+    def test_textos_en_puntos(self):
+        self.assertNotContains(self.client.get(reverse('paquetes')), 'crédito')
+        self.assertContains(self.client.get(reverse('paquetes')), 'puntos')
 
     def test_mi_cuenta_muestra_proximas_clases_y_cancelar(self):
         comprar(self.maria)
@@ -212,7 +225,7 @@ class PaginasTests(TestCase):
         self.assertContains(respuesta, 'Próximas clases')
         self.assertContains(respuesta, reverse('cancelar_reserva', args=[reserva.pk]))
         cancelar = self.client.post(reverse('cancelar_reserva', args=[reserva.pk]), follow=True)
-        self.assertContains(cancelar, 'Tu crédito ya está de vuelta')
+        self.assertContains(cancelar, 'Tu punto ya está de vuelta')
 
     def test_recordatorio_24_horas_antes_una_sola_vez(self):
         comprar(self.maria)

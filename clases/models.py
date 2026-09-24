@@ -4,7 +4,7 @@ Clases, horarios y reservas.
 - Sala, Disciplina y Profesional: los datos fijos del estudio (editables en el panel).
 - HorarioBase: la semana tipo ("lunes 7:30, Sala Calma: Pilates Suave con …").
 - Clase: cada clase concreta de un día (se crean solas a partir del horario base).
-- Reserva: una clienta en una clase, con el crédito que usó.
+- Reserva: una clienta en una clase, con el punto que usó.
 
 Nota: los nombres en el panel van en masculino ("el salón seleccionado") porque las
 frases del panel de Django vienen traducidas así.
@@ -19,7 +19,7 @@ from django.utils import timezone
 AFORO = 12                    # dato interno: en la web se habla de "grupos reducidos"
 DURACION_MINUTOS = 50
 DIAS_PARA_RESERVAR = 7        # hasta cuántos días hacia adelante se puede reservar
-HORAS_PARA_CANCELAR = 12      # con esta anticipación o más, el crédito se devuelve
+HORAS_PARA_CANCELAR = 12      # con esta anticipación o más, el punto se devuelve
 OCUPACION_SIMULADA = (3, 10)  # personas "de ejemplo" por clase en el modo simulación
 
 NIVELES = [('suave', 'Suave'), ('media', 'Media'), ('activa', 'Activa')]
@@ -148,7 +148,7 @@ class Reserva(models.Model):
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='reservas')
     clase = models.ForeignKey(Clase, on_delete=models.CASCADE, related_name='reservas')
     compra = models.ForeignKey('compras.Compra', on_delete=models.SET_NULL, null=True, blank=True,
-                               related_name='reservas', help_text='De qué compra salió el crédito.')
+                               related_name='reservas', help_text='De qué compra salió el punto.')
     creada = models.DateTimeField(default=timezone.now)
     cancelada = models.BooleanField(default=False)
     cancelada_en = models.DateTimeField(null=True, blank=True)

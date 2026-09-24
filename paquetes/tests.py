@@ -38,7 +38,7 @@ class PaginaPaquetesTests(TestCase):
         self.assertEqual(respuesta.status_code, 200)
         for texto in ['Paquetes de lanzamiento', 'Atempo 1', 'Atempo 40', 'S/ 1,060',
                       'S/ 53 por clase', 'Ahorras S/ 600', 'Más popular', 'Clase suelta',
-                      'Masaje adicional: 2 créditos']:
+                      'Masaje adicional: 2 puntos']:
             self.assertContains(respuesta, texto)
 
     def test_comprar_lleva_a_iniciar_sesion_y_luego_al_pago(self):
@@ -55,7 +55,8 @@ class PaginaPaquetesTests(TestCase):
 class InicioUsaLosPreciosTests(TestCase):
     def test_textos_de_precio_en_inicio(self):
         respuesta = self.client.get(reverse('inicio'))
-        self.assertContains(respuesta, 'Ahorra hasta <span class="cifra">S/ 15</span> por clase')
+        self.assertNotContains(respuesta, 'Ahorra hasta')          # el mensaje ahora es de beneficios
+        self.assertContains(respuesta, 'Paquetes que acompañan tu ritmo')
         self.assertContains(respuesta, 'Prueba una clase por S/ 65')
         self.assertContains(
             respuesta,
@@ -64,9 +65,9 @@ class InicioUsaLosPreciosTests(TestCase):
         )
 
     def test_inicio_cambia_si_cambia_un_precio(self):
-        Paquete.objects.filter(nombre='Atempo 40').update(precio=Decimal(1800))
+        Paquete.objects.filter(nombre='Atempo 1').update(precio=Decimal(70))
         respuesta = self.client.get(reverse('inicio'))
-        self.assertContains(respuesta, 'Ahorra hasta <span class="cifra">S/ 20</span> por clase')
+        self.assertContains(respuesta, 'Prueba una clase por S/ 70')
 
 
 class PanelAdministracionTests(TestCase):
