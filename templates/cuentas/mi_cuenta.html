@@ -9,27 +9,29 @@
 
   {# Aviso: créditos que vencen en 7 días o menos (y correo simulado) #}
   {% for compra in por_vencer %}
+    {% with uno=compra.creditos_disponibles|stringformat:"d" %}
     <div class="aviso-vencimiento" role="status">
       <p>
-        <strong>Tus créditos están por vencer.</strong>
-        Te quedan {{ compra.creditos_disponibles|creditos }} de {% if compra.es_regalo %}regalo por referida{% else %}tu <strong class="nombre-marca">{{ compra.nombre_paquete }}</strong>{% endif %},
+        <strong>{% if uno == "1" %}Tu crédito está por vencer.{% else %}Tus créditos están por vencer.{% endif %}</strong>
+        {% if uno == "1" %}Te queda{% else %}Te quedan{% endif %} {{ compra.creditos_disponibles|creditos }} de {% if compra.es_regalo %}regalo por referida{% else %}tu <strong class="nombre-marca">{{ compra.nombre_paquete }}</strong>{% endif %},
         que vence{% if compra.dias_para_vencer == 0 %} hoy{% else %} el {{ compra.vence|date:"j \d\e F" }}{% endif %}.
-        <a href="{% url 'horarios' %}">Reserva tus clases</a> para no perderlos.
+        <a href="{% url 'horarios' %}">{% if uno == "1" %}Reserva tu clase{% else %}Reserva tus clases{% endif %}</a> para no {% if uno == "1" %}perderlo{% else %}perderlos{% endif %}.
       </p>
       <details class="ayuda-desplegable">
         <summary>Ver el correo que te enviamos</summary>
         <div class="correo-simulado">
           <p class="correo-simulado-aviso">Simulación del prototipo: así se vería el correo de aviso</p>
           <div class="correo-simulado-cuerpo">
-            <p class="correo-simulado-asunto"><strong>Asunto:</strong> Tus créditos de Atempo vencen pronto</p>
+            <p class="correo-simulado-asunto"><strong>Asunto:</strong> {% if uno == "1" %}Tu crédito de Atempo vence pronto{% else %}Tus créditos de Atempo vencen pronto{% endif %}</p>
             <p>Hola, {{ u.nombre }}:</p>
-            <p>Te quedan <strong>{{ compra.creditos_disponibles|creditos }}</strong> de {% if compra.es_regalo %}regalo por referida{% else %}tu {{ compra.nombre_paquete }}{% endif %}, que vence el {{ compra.vence|date:"j \d\e F \d\e Y" }}. ¡Todavía estás a tiempo de usarlos!</p>
+            <p>{% if uno == "1" %}Te queda{% else %}Te quedan{% endif %} <strong>{{ compra.creditos_disponibles|creditos }}</strong> de {% if compra.es_regalo %}regalo por referida{% else %}tu {{ compra.nombre_paquete }}{% endif %}, que vence el {{ compra.vence|date:"j \d\e F \d\e Y" }}. ¡Todavía estás a tiempo de {% if uno == "1" %}usarlo{% else %}usarlos{% endif %}!</p>
             <p><a class="boton" href="{% url 'horarios' %}">Reservar una clase</a></p>
             <p class="apagado">Con cariño,<br>el equipo de <strong class="nombre-marca">Atempo</strong></p>
           </div>
         </div>
       </details>
     </div>
+    {% endwith %}
   {% endfor %}
 </section>
 

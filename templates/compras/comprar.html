@@ -25,6 +25,25 @@
     {# Pago simulado #}
     <form method="post" class="pago-formulario" novalidate>
       {% csrf_token %}
+
+      {# Aviso al comprar un paquete que no activa el crédito extra por referida #}
+      {% if aviso_paquete_menor and paquete_minimo %}
+        <div class="aviso-vencimiento aviso-referida" role="note">
+          <p>
+            {% if aviso_paquete_menor == 'pendiente' %}
+              <strong>Tu crédito extra se activa desde {{ paquete_minimo.nombre }}.</strong>
+              Te registraste con el código de {{ user.referida_por.nombre }}: si compras
+              <strong class="nombre-marca">{{ paquete_minimo.nombre }}</strong> o un paquete mayor, las dos reciben 1 crédito extra.
+              Con <strong class="nombre-marca">{{ paquete.nombre }}</strong> no se activa, pero podrás hacerlo en una próxima compra.
+            {% else %}
+              <strong>¿Te invitó una amiga?</strong>
+              Si compras <strong class="nombre-marca">{{ paquete_minimo.nombre }}</strong> o un paquete mayor con su código,
+              las dos reciben 1 crédito extra. Con <strong class="nombre-marca">{{ paquete.nombre }}</strong> no se aplica.
+            {% endif %}
+          </p>
+          <a class="boton boton-borde" href="{% url 'comprar' paquete_minimo.slug %}">Ver {{ paquete_minimo.nombre }}</a>
+        </div>
+      {% endif %}
       {% for error in form.non_field_errors %}<p class="aviso-error" role="alert">{{ error }}</p>{% endfor %}
 
       <fieldset class="metodos">

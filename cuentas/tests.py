@@ -104,7 +104,7 @@ class MiCuentaTests(TestCase):
                       'Créditos disponibles', 'Próximamente', 'Cerrar sesión']:
             self.assertContains(respuesta, texto)
         # El encabezado ya dice "Mi cuenta" en lugar de "Ingresar"
-        self.assertContains(respuesta, '>Mi cuenta</a>')
+        self.assertContains(respuesta, 'class="texto-cuenta">Mi cuenta</span>')
 
     def test_cerrar_sesion(self):
         self.client.force_login(crear_maria())

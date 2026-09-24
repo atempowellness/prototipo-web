@@ -52,6 +52,16 @@ def activara_beneficio(usuario, paquete):
             and not ya_tuvo_compra_que_califica(usuario))
 
 
+def aviso_paquete_menor(usuario, paquete):
+    """
+    Al intentar comprar un paquete que no activa el beneficio (Atempo 1), avisa si podría obtenerlo:
+    'pendiente' si ya tiene el código de una amiga; 'disponible' si aún puede usar uno; None si no aplica.
+    """
+    if paquete_califica(paquete) or ya_tuvo_compra_que_califica(usuario):
+        return None
+    return 'pendiente' if usuario.referida_por_id else 'disponible'
+
+
 def regalos_del_mes(invitadora):
     hoy = timezone.localdate()
     return invitadora.compras.filter(tipo=Compra.REGALO, referida__isnull=False,
@@ -79,12 +89,17 @@ def aplicar_beneficio(compra):
 
     with transaction.atomic():
         # Crédito de la amiga nueva: con la misma vigencia de su compra
-        _regalo(usuaria, compra.vence, referida=usuaria)
+        regalo_amiga = _regalo(usuaria, compra.vence, referida=usuaria)
         # Crédito de quien invitó: 1 mes desde hoy, con tope mensual
-        invitadora_recibe = regalos_del_mes(invitadora).count() < TOPE_MENSUAL
-        if invitadora_recibe:
-            _regalo(invitadora, sumar_meses(timezone.localdate(), VIGENCIA_REGALO_MESES), referida=usuaria)
-    return {'invitadora': invitadora, 'invitadora_recibe': invitadora_recibe}
+        regalo_invitadora = None
+        if regalos_del_mes(invitadora).count() < TOPE_MENSUAL:
+            regalo_invitadora = _regalo(invitadora, sumar_meses(timezone.localdate(), VIGENCIA_REGALO_MESES),
+                                        referida=usuaria)
+
+    from notificaciones import avisos
+    avisos.credito_extra_activado(regalo_amiga, invitadora)
+    avisos.amiga_compro(invitadora, usuaria, regalo_invitadora)
+    return {'invitadora': invitadora, 'invitadora_recibe': regalo_invitadora is not None}
 
 
 def estado_de_invitadas(invitadora):

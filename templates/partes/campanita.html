@@ -1,0 +1,44 @@
+{% comment %}
+Campanita de notificaciones (solo con sesión iniciada). Es un menú plegable:
+al abrirlo, las notificaciones pasan a leídas. Datos: notificaciones/context_processors.py
+{% endcomment %}
+{% load formato %}
+<details class="campanita" data-campanita>
+  <summary class="campanita-boton" aria-label="Notificaciones{% if notificaciones_sin_leer %}: {{ notificaciones_sin_leer }} sin leer{% endif %}">
+    <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
+      <path d="M12 3a6 6 0 0 0-6 6v3.6l-1.6 2.9A1 1 0 0 0 5.3 17h13.4a1 1 0 0 0 .9-1.5L18 12.6V9a6 6 0 0 0-6-6Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+      <path d="M9.5 19.5a2.5 2.5 0 0 0 5 0" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+    </svg>
+    {% if notificaciones_sin_leer %}<span class="campanita-contador" data-contador>{{ notificaciones_sin_leer }}</span>{% endif %}
+  </summary>
+
+  <div class="campanita-menu" role="region" aria-label="Notificaciones">
+    <div class="campanita-cabecera">
+      <p class="etiqueta-seccion">Notificaciones</p>
+      {% if notificaciones %}
+        <form method="post" action="{% url 'notificaciones_borrar_todas' %}" data-borrar-todas>
+          {% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <button type="submit" class="campanita-accion">Borrar todas</button>
+        </form>
+      {% endif %}
+    </div>
+
+    <ul class="campanita-lista" data-lista>
+      {% for aviso in notificaciones %}
+        <li class="campanita-aviso{% if not aviso.leida %} campanita-nueva{% endif %}" data-aviso>
+          <div class="campanita-texto">
+            {% if aviso.enlace %}<a href="{{ aviso.enlace }}">{{ aviso.texto }}</a>{% else %}{{ aviso.texto }}{% endif %}
+            <span class="campanita-fecha">{{ aviso.creada|hace }}</span>
+          </div>
+          <form method="post" action="{% url 'notificacion_borrar' aviso.pk %}" data-borrar>
+            {% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <button type="submit" class="campanita-borrar" aria-label="Borrar esta notificación">✕</button>
+          </form>
+        </li>
+      {% endfor %}
+    </ul>
+    <p class="campanita-vacia" data-vacia{% if notificaciones %} hidden{% endif %}>No tienes notificaciones.</p>
+
+    <form method="post" action="{% url 'notificaciones_leidas' %}" data-marcar-leidas hidden>{% csrf_token %}</form>
+  </div>
+</details>

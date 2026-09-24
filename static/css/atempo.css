@@ -69,6 +69,7 @@
   --capa-imagen-suave: rgba(27, 27, 27, .15);
   --fondo-etiqueta-imagen: rgba(27, 27, 27, .45);
   --patron-linea: rgba(255, 255, 255, .16);  /* líneas del espacio de imagen provisional */
+  --sombra-menu: 0 12px 32px rgba(27, 27, 27, .14);  /* menús desplegables (campanita) */
 
   color-scheme: light;
 }
@@ -281,6 +282,105 @@ strong, b { font-weight: var(--peso-enfasis); }
   .encabezado-fila { gap: 8px; min-height: 76px; }
   .logo { width: var(--ancho-logo-celular); }
   .encabezado .boton, .boton-menu { padding: 10px 12px 8px; font-size: .95rem; }
+}
+
+/* "Mi cuenta": en celular se muestra como ícono de persona para que quepa la campanita */
+.icono-cuenta { display: none; }
+@media (max-width: 560px) {
+  .icono-cuenta { display: block; }
+  .texto-cuenta { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .encabezado .boton-cuenta { width: var(--alto-minimo); padding: 0; }
+}
+
+/* Campanita de notificaciones: menú plegable a la derecha de "Mi cuenta" */
+.campanita { position: relative; }
+.campanita-boton {
+  list-style: none;
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--alto-minimo);
+  height: var(--alto-minimo);
+  border: 1.5px solid var(--texto);
+  border-radius: var(--radio-boton);
+  color: var(--texto);
+  cursor: pointer;
+}
+.campanita-boton::-webkit-details-marker { display: none; }
+.campanita-boton:hover, .campanita[open] .campanita-boton { background: var(--fondo-alterno); }
+.campanita-contador {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  min-width: 22px;
+  height: 22px;
+  padding: 3px 6px 0;
+  border-radius: 11px;
+  background: var(--boton-fondo);
+  color: var(--boton-texto);
+  font-size: .75rem;
+  font-weight: var(--peso-enfasis);
+  line-height: 1.5;
+  text-align: center;
+}
+.campanita-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  z-index: 50;
+  width: min(400px, 90vw);
+  max-height: min(70vh, 560px);
+  overflow-y: auto;
+  background: var(--fondo);
+  border: 1px solid var(--decorativo);
+  border-radius: var(--radio-tarjeta);
+  box-shadow: var(--sombra-menu);
+}
+.campanita-cabecera {
+  position: sticky;
+  top: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px 10px;
+  background: var(--fondo);
+  border-bottom: 1px solid var(--decorativo);
+}
+.campanita-cabecera .etiqueta-seccion { margin: 0; }
+.campanita-accion, .campanita-borrar {
+  border: 0;
+  background: transparent;
+  color: var(--texto-acento);
+  font: inherit;
+  font-size: .9rem;
+  font-weight: var(--peso-enfasis);
+  cursor: pointer;
+  min-height: 40px;
+}
+.campanita-accion { text-decoration: underline; text-underline-offset: 3px; }
+.campanita-lista { list-style: none; margin: 0; padding: 0; }
+.campanita-aviso {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 12px 8px 12px 16px;
+  border-bottom: 1px solid var(--fondo-alterno);
+  font-size: .95rem;
+  line-height: 1.45;
+}
+.campanita-nueva { background: var(--fondo-alterno); border-left: 3px solid var(--decorativo); }
+.campanita-texto { flex: 1; }
+.campanita-texto a { color: var(--texto); text-decoration: none; }
+.campanita-texto a:hover { text-decoration: underline; }
+.campanita-fecha { display: block; margin-top: 4px; font-size: .82rem; color: var(--texto-secundario); }
+.campanita-borrar { min-width: 40px; color: var(--texto-secundario); font-size: 1rem; }
+.campanita-borrar:hover { color: var(--texto); }
+.campanita-vacia { margin: 0; padding: 20px 16px; color: var(--texto-secundario); }
+
+@media (max-width: 560px) {
+  .campanita { position: static; }
+  .campanita-menu { left: 12px; right: 12px; width: auto; top: calc(100% - 4px); }
 }
 
 /* ---------------------------------------------------------
@@ -831,6 +931,7 @@ main { min-height: 50vh; }
 }
 .aviso-vencimiento p { margin-bottom: 8px; }
 .aviso-vencimiento .correo-simulado { margin-top: 12px; }
+.aviso-referida { margin: 0 0 24px; }
 
 /* Tablas (historial, boleta) */
 .tabla, .boleta-tabla { width: 100%; border-collapse: collapse; font-size: .98rem; }

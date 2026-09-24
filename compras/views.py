@@ -4,11 +4,12 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.views.generic import DetailView, FormView
 
+from notificaciones import avisos
 from paquetes.models import paquetes_activos
 
 from .forms import PagoForm
 from .models import compras_pagadas, creditos_disponibles, registrar_compra
-from .referidas import activara_beneficio, aplicar_beneficio
+from .referidas import CREDITOS_MINIMOS, activara_beneficio, aplicar_beneficio, aviso_paquete_menor
 
 
 class ComprarView(LoginRequiredMixin, FormView):
@@ -32,6 +33,9 @@ class ComprarView(LoginRequiredMixin, FormView):
         # Si ya puso un código al registrarse y esta compra lo activa, se le avisa
         if activara_beneficio(self.request.user, self.paquete):
             contexto['beneficio_referida'] = self.request.user.referida_por
+        # Si compra Atempo 1, se le recuerda que el crédito extra se activa desde Atempo 5
+        contexto['aviso_paquete_menor'] = aviso_paquete_menor(self.request.user, self.paquete)
+        contexto['paquete_minimo'] = paquetes_activos().filter(creditos__gte=CREDITOS_MINIMOS).first()
         return contexto
 
     def form_valid(self, form):
@@ -42,6 +46,7 @@ class ComprarView(LoginRequiredMixin, FormView):
             usuario.save(update_fields=['referida_por'])
 
         compra = registrar_compra(usuario, self.paquete, datos['metodo'], datos['detalle_pago'])
+        avisos.creditos_activados(compra)
 
         resultado = aplicar_beneficio(compra)
         if resultado:

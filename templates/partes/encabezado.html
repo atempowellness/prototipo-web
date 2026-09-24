@@ -15,7 +15,14 @@
     </nav>
 
     {% if user.is_authenticated %}
-      <a class="boton boton-borde" href="{% url 'cuenta' %}">Mi cuenta</a>
+      <a class="boton boton-borde boton-cuenta" href="{% url 'cuenta' %}">
+        <svg class="icono-cuenta" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
+          <circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.7"/>
+          <path d="M4.5 20a7.5 7.5 0 0 1 15 0" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+        </svg>
+        <span class="texto-cuenta">Mi cuenta</span>
+      </a>
+      {% include 'partes/campanita.html' %}
     {% else %}
       <a class="boton boton-borde" href="{% url 'ingresar' %}{% if actual != 'ingresar' and actual != 'registro' and actual != 'recuperar' and actual != 'nueva_clave' %}?next={{ request.path|urlencode }}{% endif %}">Ingresar</a>
     {% endif %}

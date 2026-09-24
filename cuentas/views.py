@@ -40,7 +40,12 @@ class RegistroView(FormView):
         return contexto
 
     def form_valid(self, form):
+        from notificaciones import avisos
+
         usuario = form.save()
+        avisos.bienvenida(usuario)
+        if usuario.referida_por:
+            avisos.amiga_se_registro(usuario.referida_por, usuario)
         login(self.request, usuario, backend='cuentas.backends.CorreoOCelularBackend')
         messages.success(self.request, f'¡Bienvenida a Atempo, {usuario.nombre}! Tu cuenta está lista.')
         return redirect(destino_seguro(self.request))

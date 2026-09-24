@@ -99,6 +99,73 @@ document.querySelectorAll('.boton-mostrar').forEach(function (boton) {
   }
 })();
 
+/* ---------- Campanita de notificaciones ----------
+   Al abrirla, las notificaciones pasan a leídas. Borrar una o todas no recarga
+   la página. Se cierra al tocar fuera o con Esc. */
+(function () {
+  var campanita = document.querySelector('[data-campanita]');
+  if (!campanita) return;
+
+  function enviar(formulario) {
+    return fetch(formulario.action, {
+      method: 'POST',
+      body: new FormData(formulario),
+      headers: { 'X-Requested-With': 'fetch' },
+      credentials: 'same-origin'
+    }).then(function (r) { return r.json(); });
+  }
+
+  function actualizarVacia() {
+    var quedan = campanita.querySelectorAll('[data-aviso]').length;
+    campanita.querySelector('[data-vacia]').hidden = quedan > 0;
+    var todas = campanita.querySelector('[data-borrar-todas]');
+    if (todas) todas.hidden = quedan === 0;
+  }
+
+  campanita.addEventListener('toggle', function () {
+    if (!campanita.open) return;
+    var contador = campanita.querySelector('[data-contador]');
+    if (contador) {
+      enviar(campanita.querySelector('[data-marcar-leidas]')).then(function () {
+        contador.remove();
+        campanita.querySelector('.campanita-boton').setAttribute('aria-label', 'Notificaciones');
+      });
+    }
+  });
+
+  campanita.querySelectorAll('[data-borrar]').forEach(function (formulario) {
+    formulario.addEventListener('submit', function (e) {
+      e.preventDefault();
+      enviar(formulario).then(function () {
+        formulario.closest('[data-aviso]').remove();
+        actualizarVacia();
+      });
+    });
+  });
+
+  var borrarTodas = campanita.querySelector('[data-borrar-todas]');
+  if (borrarTodas) {
+    borrarTodas.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (!window.confirm('¿Borrar todas tus notificaciones? No se puede deshacer.')) return;
+      enviar(borrarTodas).then(function () {
+        campanita.querySelectorAll('[data-aviso]').forEach(function (li) { li.remove(); });
+        actualizarVacia();
+      });
+    });
+  }
+
+  document.addEventListener('click', function (e) {
+    if (campanita.open && !campanita.contains(e.target)) campanita.open = false;
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && campanita.open) {
+      campanita.open = false;
+      campanita.querySelector('summary').focus();
+    }
+  });
+})();
+
 /* ---------- Botones "Copiar" (por ejemplo, el código de referida) ---------- */
 document.querySelectorAll('[data-copiar]').forEach(function (boton) {
   var textoOriginal = boton.textContent;

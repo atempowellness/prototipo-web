@@ -121,8 +121,22 @@ class CodigoAlPagarTests(TestCase):
     def test_aparece_en_la_primera_compra_desde_atempo_5(self):
         self.assertContains(self.client.get(reverse('comprar', args=['atempo-5'])), '¿Te invitó una amiga?')
 
-    def test_no_aparece_en_atempo_1(self):
-        self.assertNotContains(self.client.get(reverse('comprar', args=['atempo-1'])), '¿Te invitó una amiga?')
+    def test_no_aparece_en_atempo_1_pero_avisa_que_se_activa_desde_atempo_5(self):
+        respuesta = self.client.get(reverse('comprar', args=['atempo-1']))
+        self.assertNotContains(respuesta, '¿Te invitó una amiga? Escribe')
+        self.assertContains(respuesta, 'Si compras <strong class="nombre-marca">Atempo 5</strong> o un paquete mayor')
+        self.assertContains(respuesta, 'href="/paquetes/atempo-5/comprar/"')
+
+    def test_atempo_1_con_codigo_del_registro_recuerda_el_beneficio(self):
+        self.ana.referida_por = self.maria
+        self.ana.save()
+        respuesta = self.client.get(reverse('comprar', args=['atempo-1']))
+        self.assertContains(respuesta, 'Tu crédito extra se activa desde Atempo 5.')
+        self.assertContains(respuesta, 'Te registraste con el código de María')
+
+    def test_sin_aviso_si_ya_compro_desde_atempo_5(self):
+        registrar_compra(self.ana, Paquete.objects.get(slug='atempo-5'), 'yape', '')
+        self.assertNotContains(self.client.get(reverse('comprar', args=['atempo-1'])), 'o un paquete mayor')
 
     def test_no_aparece_si_ya_compro_desde_atempo_5(self):
         registrar_compra(self.ana, Paquete.objects.get(slug='atempo-5'), 'yape', '')

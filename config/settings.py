@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'paquetes',
     'cuentas',
     'compras',
+    'notificaciones',
 ]
 
 # Cuentas: modelo propio de Atempo; se ingresa con correo o celular
@@ -75,6 +76,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.version_estaticos',
+                'notificaciones.context_processors.campanita',
             ],
         },
     },
