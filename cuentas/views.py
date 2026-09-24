@@ -93,6 +93,8 @@ class MiCuentaView(LoginRequiredMixin, TemplateView):
         from clases.servicios import proximas_reservas
         contexto['proximas_reservas'] = proximas_reservas(usuario)
         contexto['proximas_citas'] = proximas_citas(usuario)
+        from comunidad.servicios import proximas_inscripciones
+        contexto['proximas_inscripciones'] = proximas_inscripciones(usuario)
         contexto['reclamaciones'] = usuario.reclamaciones.filter(quitada_por_clienta=False)
 
         regalos_mes = regalos_del_mes(usuario).count()

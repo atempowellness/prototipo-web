@@ -1,0 +1,17 @@
+{% comment %}Confirmación para cancelar la asistencia a un encuentro (ventana o página propia).{% endcomment %}
+<div class="confirmacion">
+  <h2 id="dialogo-titulo">¿Cancelar tu asistencia?</h2>
+  <dl class="lista-datos">
+    <dt>Encuentro</dt><dd>{{ encuentro.titulo }}</dd>
+    <dt>Cuándo</dt><dd>{{ inicio|date:"l j \d\e F"|capfirst }}, {{ inicio|date:"H:i" }}</dd>
+    <dt>Dónde</dt><dd>{{ encuentro.lugar }}</dd>
+  </dl>
+  <p>Tu cupo quedará libre para otra socia. Si hay cupo, puedes volver a apuntarte.</p>
+  <form method="post" action="{% url 'cancelar_inscripcion' inscripcion.pk %}">
+    {% csrf_token %}<input type="hidden" name="next" value="{{ next }}">
+    <div class="fila-botones">
+      <button type="submit" class="boton">Sí, cancelar</button>
+      <button type="button" class="boton boton-borde" data-cerrar-dialogo>No, mantener</button>
+    </div>
+  </form>
+</div>

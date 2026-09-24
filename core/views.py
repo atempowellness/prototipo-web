@@ -78,6 +78,10 @@ class InicioView(TemplateView):
         contexto['disciplinas'] = Disciplina.objects.select_related('sala')
         contexto['niveles'] = [nombre for _, nombre in NIVELES]
         contexto['proximas_clases'] = proximas_clases_con_cupo()
+        # Próximos encuentros de Atempo Circle (panel → Comunidad)
+        from comunidad.servicios import ENCUENTROS_EN_INICIO, asegurar_encuentros_de_ejemplo, proximos_encuentros
+        asegurar_encuentros_de_ejemplo()
+        contexto['proximos_encuentros'] = proximos_encuentros().filter(cancelado=False)[:ENCUENTROS_EN_INICIO]
         contexto['hoy'] = timezone.localdate()
         return contexto
 

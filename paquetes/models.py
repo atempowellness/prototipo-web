@@ -20,6 +20,11 @@ class Paquete(models.Model):
     sesiones_nutricion = models.PositiveSmallIntegerField('sesiones de nutrición incluidas', default=0)
     sesiones_masaje = models.PositiveSmallIntegerField('sesiones de masaje incluidas', default=0)
     incluye_circle = models.BooleanField('incluye actividades de Atempo Circle', default=False)
+    dias_inscripcion_circle = models.PositiveSmallIntegerField(
+        'inscripción a encuentros (días antes)', null=True, blank=True,
+        help_text='Con cuántos días de anticipación se abre la inscripción a los encuentros de Atempo Circle '
+                  'para quien tiene este paquete. Más días = se inscribe antes. Solo cuenta si incluye Atempo Circle.',
+    )
     costo_nutricion_adicional = models.PositiveSmallIntegerField(
         'nutrición adicional (puntos)', null=True, blank=True,
         help_text='Déjalo vacío si este paquete no permite agendar nutrición adicional.',

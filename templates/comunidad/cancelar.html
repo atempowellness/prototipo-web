@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% comment %}Versión en página propia de la confirmación para cancelar la asistencia a un encuentro.{% endcomment %}
+{% block contenido %}
+<section class="contenedor cabecera-pagina formulario-pagina">
+  <p class="etiqueta-seccion"><a href="{{ next }}">← Volver</a></p>
+  <div class="tarjeta formulario">{% include 'comunidad/_confirmar_cancelacion.html' %}</div>
+</section>
+{% endblock %}

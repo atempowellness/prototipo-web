@@ -24,7 +24,15 @@ class Notificacion(models.Model):
     CITA_RECORDATORIO = 'cita_recordatorio'
     CITA_CANCELADA = 'cita_cancelada'
     RECLAMACION = 'reclamacion'
+    ENCUENTRO_CONFIRMADO = 'enc_confirmado'
+    ENCUENTRO_RECORDATORIO = 'enc_recordatorio'
+    ENCUENTRO_CANCELADO = 'enc_cancelado'
+    ENCUENTRO_APERTURA = 'enc_apertura'
     TIPOS = [
+        (ENCUENTRO_CONFIRMADO, 'Inscripción a un encuentro confirmada'),
+        (ENCUENTRO_RECORDATORIO, 'Recordatorio de encuentro'),
+        (ENCUENTRO_CANCELADO, 'Encuentro o asistencia cancelada por el estudio'),
+        (ENCUENTRO_APERTURA, 'Se abrió la inscripción a un encuentro'),
         (RECLAMACION, 'Libro de reclamaciones'),
         (CITA_CONFIRMADA, 'Cita de nutrición o masajes confirmada'),
         (CITA_RECORDATORIO, 'Recordatorio de cita'),
@@ -53,6 +61,8 @@ class Notificacion(models.Model):
                                 help_text='En los recordatorios: la reserva (se recuerda una sola vez).')
     cita = models.ForeignKey('bienestar.Cita', null=True, blank=True, on_delete=models.CASCADE,
                              help_text='En los avisos de nutrición y masajes: la cita.')
+    inscripcion = models.ForeignKey('comunidad.Inscripcion', null=True, blank=True, on_delete=models.CASCADE,
+                                    help_text='En los avisos de encuentros: la inscripción.')
 
     class Meta:
         ordering = ['-creada']
@@ -64,6 +74,6 @@ class Notificacion(models.Model):
         return f'{self.usuario.nombre}: {self.texto}'
 
 
-def notificar(usuario, tipo, texto, enlace='', compra=None, reserva=None, cita=None):
+def notificar(usuario, tipo, texto, enlace='', compra=None, reserva=None, cita=None, inscripcion=None):
     return Notificacion.objects.create(usuario=usuario, tipo=tipo, texto=texto, enlace=enlace,
-                                       compra=compra, reserva=reserva, cita=cita)
+                                       compra=compra, reserva=reserva, cita=cita, inscripcion=inscripcion)

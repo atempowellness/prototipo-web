@@ -972,7 +972,8 @@ main { min-height: 50vh; }
 .numero-grande { font-size: 3rem; line-height: 1; margin-bottom: 12px; }
 .lista-simple { margin: 0 0 12px; padding-left: 20px; }
 .lista-simple li { margin-bottom: 6px; }
-.aviso-vencimiento {
+.aviso-vencimiento,
+.aviso-apertura {
   margin-top: 20px;
   max-width: 820px;
   padding: 16px 20px;
@@ -980,8 +981,8 @@ main { min-height: 50vh; }
   border-radius: var(--radio-tarjeta);
   background: var(--destacado);
 }
-.aviso-vencimiento p { margin-bottom: 8px; }
-.aviso-vencimiento .correo-simulado { margin-top: 12px; }
+.aviso-vencimiento p, .aviso-apertura p { margin-bottom: 8px; }
+.aviso-vencimiento .correo-simulado, .aviso-apertura .correo-simulado { margin-top: 12px; }
 .aviso-referida { margin: 0 0 24px; }
 
 /* Tablas (historial, boleta) */
@@ -1230,12 +1231,63 @@ main { min-height: 50vh; }
 }
 .proxima-hora { font-size: 1.3rem; }
 .proxima-compacta { grid-template-columns: 1fr auto; }
-.dia-agrupado { margin: 20px 0 0; font-size: 1.1rem; color: var(--texto-acento); }
+.dia-agrupado,
+.subtitulo-tarjeta { margin: 20px 0 0; font-size: 1.1rem; color: var(--texto-acento); }
+.subtitulo-tarjeta + .proximas-lista { margin-top: 4px; }
 .dia-agrupado + .proximas-lista { margin-top: 4px; }
 .proxima-texto .apagado { display: block; font-size: .92rem; }
 @media (max-width: 560px) {
   .proxima { grid-template-columns: 60px 1fr; }
   .proxima .boton { grid-column: 1 / -1; }
+}
+
+/* Comunidad: encuentros de Atempo Circle */
+.encuentros { display: grid; gap: 12px; margin-top: 16px; }
+.encuentro {
+  display: grid;
+  grid-template-columns: 72px 1fr 200px;
+  gap: 20px;
+  align-items: start;
+  padding: 20px 22px;
+  background: var(--superficie);
+  border: 1.5px solid transparent;
+  border-radius: var(--radio-tarjeta);
+}
+.encuentro-mio { border-color: var(--texto); background: var(--destacado); }
+.encuentro-mio .etiqueta, .encuentro-mio .fecha-bloque { background: var(--fondo); }
+.encuentro h3 { margin: 8px 0 4px; font-size: 1.4rem; }
+.encuentro-descripcion { margin: 8px 0 0; }
+.encuentro-accion { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+.encuentro-accion form { margin: 0; }
+.apertura { font-size: .92rem; color: var(--texto-secundario); }
+.fecha-bloque {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border: 1px solid var(--decorativo);
+  border-radius: var(--radio-boton);
+  background: var(--fondo);
+  line-height: 1.1;
+}
+.fecha-dia { font-size: 1.5rem; font-weight: var(--peso-enfasis); }
+.fecha-mes { font-size: .78rem; text-transform: uppercase; letter-spacing: var(--espaciado-etiquetas); color: var(--texto-secundario); }
+@media (max-width: 760px) {
+  .encuentro { grid-template-columns: 64px 1fr; }
+  .encuentro-accion { grid-column: 1 / -1; flex-direction: row; flex-wrap: wrap; align-items: center; }
+}
+
+/* Inicio: próximos encuentros (lista breve dentro de Atempo Circle) */
+.encuentros-breves { list-style: none; margin: 8px 0 24px; padding: 0; }
+.encuentros-breves li {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 16px;
+  align-items: center;
+  padding: 10px 0;
+  border-top: 1px solid var(--decorativo);
 }
 .confirmacion .fila-botones { margin-top: 20px; }
 

@@ -70,24 +70,27 @@ class CreditosEnLinea(admin.TabularInline):
 def reiniciar_cuenta(usuario):
     """
     SOLO PARA PRUEBAS. Deja la cuenta como recién creada: borra sus pagos (con regalos y
-    ajustes), reservas de clases, citas y notificaciones. No toca sus datos personales,
-    su contraseña, su código de referida ni quién la invitó.
+    ajustes), reservas de clases, citas, encuentros y notificaciones. No toca sus datos
+    personales, su contraseña, su código de referida ni quién la invitó.
     Devuelve cuántos registros borró de cada tipo.
     """
     conteo = {
         'reservas': usuario.reservas.count(),
         'citas': usuario.citas.count(),
+        'encuentros': usuario.inscripciones.count(),
         'pagos': usuario.compras.count(),
         'avisos': usuario.notificaciones.count(),
     }
     usuario.reservas.all().delete()
     usuario.citas.all().delete()
+    usuario.inscripciones.all().delete()
+    usuario.avisos_de_apertura.all().delete()
     usuario.compras.all().delete()
     usuario.notificaciones.all().delete()
     return conteo
 
 
-@admin.action(description='Reiniciar cuentas de prueba (borra pagos, puntos, reservas, citas y avisos)')
+@admin.action(description='Reiniciar cuentas de prueba (borra pagos, puntos, reservas, citas, encuentros y avisos)')
 def reiniciar_cuentas(modeladmin, request, queryset):
     ids = ','.join(str(pk) for pk in queryset.values_list('pk', flat=True))
     return redirect(reverse('admin:cuentas_usuario_reiniciar') + f'?ids={ids}')
@@ -121,7 +124,8 @@ class UsuarioAdmin(UserAdmin):
             self.message_user(request, texto, messages.SUCCESS)
             return redirect(lista if len(usuarios) > 1 else reverse('admin:cuentas_usuario_change', args=[usuarios[0].pk]))
         resumen = [{'usuario': u, 'pagos': u.compras.count(), 'reservas': u.reservas.count(),
-                    'citas': u.citas.count(), 'avisos': u.notificaciones.count(),
+                    'citas': u.citas.count(), 'encuentros': u.inscripciones.count(),
+                    'avisos': u.notificaciones.count(),
                     'puntos': creditos_disponibles(u)} for u in usuarios]
         contexto = {**self.admin_site.each_context(request), 'title': 'Reiniciar cuenta de prueba',
                     'opts': self.model._meta, 'resumen': resumen, 'ids': ','.join(str(u.pk) for u in usuarios),

@@ -11,7 +11,7 @@ class PaqueteAdmin(admin.ModelAdmin):
     fieldsets = [
         (None, {'fields': ['nombre', 'slug', 'creditos', 'vigencia_meses', 'precio']}),
         ('Beneficios incluidos', {'fields': [
-            'sesiones_nutricion', 'sesiones_masaje', 'incluye_circle',
+            'sesiones_nutricion', 'sesiones_masaje', 'incluye_circle', 'dias_inscripcion_circle',
             'costo_nutricion_adicional', 'costo_masaje_adicional',
         ]}),
         ('Cómo se muestra en la web', {'fields': ['frase', 'etiqueta_destacado', 'orden', 'activo']}),

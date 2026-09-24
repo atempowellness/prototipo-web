@@ -164,6 +164,66 @@ def reclamacion_respondida(reclamacion):
               reverse('cuenta') + '#reclamos')
 
 
+def _encuentro_texto(encuentro):
+    local = timezone.localtime(encuentro.inicio)
+    return f'{encuentro.titulo}, el {date_format(local, "l j \\d\\e F")} a las {local:%H:%M}'
+
+
+def inscripcion_confirmada(inscripcion):
+    notificar(inscripcion.usuario, Notificacion.ENCUENTRO_CONFIRMADO,
+              f'Te apuntaste a {_encuentro_texto(inscripcion.encuentro)}. Si no puedes ir, cancela '
+              f'para liberar tu cupo.', reverse('cuenta') + '#encuentros', inscripcion=inscripcion)
+
+
+def inscripcion_cancelada_por_estudio(inscripcion):
+    notificar(inscripcion.usuario, Notificacion.ENCUENTRO_CANCELADO,
+              f'El estudio canceló tu asistencia a {_encuentro_texto(inscripcion.encuentro)}.',
+              reverse('comunidad'), inscripcion=inscripcion)
+
+
+def encuentro_cancelado(inscripcion):
+    notificar(inscripcion.usuario, Notificacion.ENCUENTRO_CANCELADO,
+              f'El estudio canceló el encuentro {_encuentro_texto(inscripcion.encuentro)}. '
+              f'Lo sentimos: te esperamos en el próximo.', reverse('comunidad'), inscripcion=inscripcion)
+
+
+def revisar_recordatorios_de_encuentros(usuario):
+    """Recuerda cada encuentro cuando faltan 24 horas o menos (una sola vez por inscripción)."""
+    ahora = timezone.now()
+    ya_avisadas = set(usuario.notificaciones.filter(tipo=Notificacion.ENCUENTRO_RECORDATORIO)
+                      .values_list('inscripcion_id', flat=True))
+    inscripciones = (usuario.inscripciones.filter(cancelada=False, encuentro__inicio__gt=ahora,
+                                                  encuentro__inicio__lte=ahora + datetime.timedelta(hours=24))
+                     .select_related('encuentro'))
+    for inscripcion in inscripciones:
+        if inscripcion.pk in ya_avisadas:
+            continue
+        encuentro = inscripcion.encuentro
+        local = timezone.localtime(encuentro.inicio)
+        dia = 'Hoy' if local.date() == timezone.localdate() else 'Mañana'
+        notificar(usuario, Notificacion.ENCUENTRO_RECORDATORIO,
+                  f'{dia} es {encuentro.titulo}, a las {local:%H:%M} en {encuentro.lugar}. ¡Te esperamos!',
+                  reverse('cuenta') + '#encuentros', inscripcion=inscripcion)
+
+
+def revisar_aperturas(usuario):
+    """Avisa (una sola vez) cuando se abre la inscripción a un encuentro que pidió "Recordarme"."""
+    from comunidad.servicios import apertura_para
+
+    hoy = timezone.localdate()
+    pedidos = usuario.avisos_de_apertura.filter(avisado=False, encuentro__cancelado=False,
+                                                encuentro__inicio__gt=timezone.now()).select_related('encuentro')
+    for pedido in pedidos:
+        apertura = apertura_para(usuario, pedido.encuentro)
+        if apertura is None or apertura > hoy:
+            continue
+        notificar(usuario, Notificacion.ENCUENTRO_APERTURA,
+                  f'Ya puedes apuntarte a {_encuentro_texto(pedido.encuentro)}. También te enviamos un correo.',
+                  reverse('comunidad'))
+        pedido.avisado = True
+        pedido.save(update_fields=['avisado'])
+
+
 def clase_cancelada(reserva, credito_devuelto):
     clase = reserva.clase
     dia = date_format(timezone.localtime(clase.inicio), 'l j \\d\\e F')

@@ -1,0 +1,5 @@
+{% comment %}Bloque de fecha de un encuentro: día con dos dígitos y mes corto (por ejemplo 04 / OCT).{% endcomment %}
+<span class="fecha-bloque" aria-hidden="true">
+  <span class="fecha-dia cifra">{{ inicio|date:"d" }}</span>
+  <span class="fecha-mes">{{ inicio|date:"b" }}</span>
+</span>

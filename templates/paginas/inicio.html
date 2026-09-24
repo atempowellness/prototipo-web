@@ -152,7 +152,21 @@
         que viven tu misma etapa. Las actividades están incluidas en los paquetes desde
         <strong class="nombre-marca">Atempo 5</strong>.
       </p>
-      <a class="boton boton-borde" href="{% url 'comunidad' %}">Conoce la comunidad</a>
+      {% if proximos_encuentros %}
+        <h3 class="subtitulo-tarjeta">Próximos encuentros</h3>
+        <ul class="encuentros-breves">
+          {% for e in proximos_encuentros %}
+            <li>
+              {% include 'comunidad/_fecha.html' with inicio=e.inicio %}
+              <span class="proxima-texto">
+                <strong>{{ e.titulo }}</strong>
+                <span class="apagado">{{ e.inicio|date:"l"|capfirst }}, {{ e.inicio|date:"H:i" }} · {{ e.lugar }}</span>
+              </span>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+      <a class="boton boton-borde" href="{% url 'comunidad' %}">Ver todos los encuentros</a>
     </div>
   </div>
 </section>

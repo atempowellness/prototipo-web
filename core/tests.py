@@ -1,19 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 
-PAGINAS_EN_CONSTRUCCION = [
-    'comunidad',
-]
-
-
 class MarcoComunTests(TestCase):
-    def test_paginas_en_construccion_cargan(self):
-        for nombre in PAGINAS_EN_CONSTRUCCION:
-            with self.subTest(pagina=nombre):
-                respuesta = self.client.get(reverse(nombre))
-                self.assertEqual(respuesta.status_code, 200)
-                self.assertContains(respuesta, 'Página en construcción')
-
     def test_marco_comun_presente(self):
         respuesta = self.client.get(reverse('inicio'))
         self.assertContains(respuesta, 'Prototipo de demostración')

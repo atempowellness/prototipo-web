@@ -109,7 +109,7 @@
     </div>
 
     {# Programa de referidas #}
-    <div class="tarjeta cuenta-completa">
+    <div class="tarjeta cuenta-completa" id="trae-una-amiga">
       <h2>Trae a una amiga</h2>
       <p>Cuando tu amiga compre su primer paquete desde <strong class="nombre-marca">Atempo 5</strong> con tu código, las dos reciben 1 punto extra.</p>
       <div class="codigo-referida">
@@ -203,9 +203,10 @@
       </div>
     {% endif %}
 
-    {# Lo que vendrá #}
-    <div class="tarjeta">
+    {# Citas de nutrición y masajes, y encuentros de Atempo Circle #}
+    <div class="tarjeta" id="encuentros">
       <h2>Citas y encuentros</h2>
+      <h3 class="subtitulo-tarjeta">Nutrición y masajes</h3>
       {% if proximas_citas %}
         <ul class="proximas-lista">
           {% for c in proximas_citas %}
@@ -223,8 +224,27 @@
       {% else %}
         <p>No tienes citas de nutrición ni masajes.</p>
       {% endif %}
-      <a class="boton" href="{% url 'bienestar' %}">Agendar nutrición o masajes</a>
-      <p class="nota">Los encuentros de <strong class="nombre-marca">Atempo Circle</strong> aparecerán aquí próximamente.</p>
+      <a class="boton boton-borde boton-chico" href="{% url 'bienestar' %}">Agendar nutrición o masajes</a>
+
+      <h3 class="subtitulo-tarjeta">Encuentros de <span class="nombre-marca">Atempo Circle</span></h3>
+      {% if proximas_inscripciones %}
+        <ul class="proximas-lista">
+          {% for i in proximas_inscripciones %}
+            <li class="proxima proxima-compacta">
+              <span class="proxima-texto">
+                <strong>{{ i.encuentro.titulo }}</strong>
+                <span class="apagado">{{ i.encuentro.inicio|date:"D j \d\e F"|capfirst }}, {{ i.encuentro.inicio|date:"H:i" }} · {{ i.encuentro.lugar }}</span>
+              </span>
+              {% if not i.encuentro.empezo %}
+                <a class="boton boton-borde boton-chico" href="{% url 'cancelar_inscripcion' i.pk %}?next={{ request.get_full_path|urlencode }}" data-dialogo>Cancelar</a>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>No estás inscrita en ningún encuentro.</p>
+      {% endif %}
+      <a class="boton boton-borde boton-chico" href="{% url 'comunidad' %}">Ver encuentros</a>
     </div>
 
 

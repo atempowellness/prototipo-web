@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block contenido %}
+<section class="contenedor cabecera-pagina">
+  <h1>Atempo Circle</h1>
+  <p class="entrada">Más que un estudio, una comunidad. Encuentros para conocerse fuera de clase: cafés, charlas, caminatas y talleres con mujeres que viven tu misma etapa.</p>
+
+  {# Aviso: se abrió la inscripción de un encuentro que pidió "Recordarme" (y correo simulado) #}
+  {% for aviso in aperturas %}
+    {% with en=aviso.encuentro %}
+    <div class="aviso-apertura" role="status">
+      <p><strong>Ya puedes apuntarte.</strong> Se abrió tu inscripción a {{ en.titulo }}, el {{ en.inicio|date:"l j \d\e F" }} a las {{ en.inicio|date:"H:i" }}.</p>
+      <p><a class="boton boton-chico" href="{% url 'inscribirse' en.pk %}?next={{ request.get_full_path|urlencode }}" data-dialogo>Apuntarme</a></p>
+      <details class="ayuda-desplegable">
+        <summary>Ver el correo que te enviamos</summary>
+        <div class="correo-simulado">
+          <p class="correo-simulado-aviso">Simulación del prototipo: así se vería el correo de aviso</p>
+          <div class="correo-simulado-cuerpo">
+            <p class="correo-simulado-asunto"><strong>Asunto:</strong> Ya puedes apuntarte a {{ en.titulo }}</p>
+            <p>Hola, {{ user.nombre }}:</p>
+            <p>Como nos pediste, te avisamos que ya se abrió tu inscripción a <strong>{{ en.titulo }}</strong>, el {{ en.inicio|date:"l j \d\e F" }} a las {{ en.inicio|date:"H:i" }}, en {{ en.lugar }}. Los cupos son limitados, ¡te esperamos!</p>
+            <p><a class="boton" href="{% url 'comunidad' %}">Apuntarme</a></p>
+            <p class="apagado">Con cariño,<br>el equipo de <strong class="nombre-marca">Atempo</strong></p>
+          </div>
+        </div>
+      </details>
+    </div>
+    {% endwith %}
+  {% endfor %}
+</section>
+
+{# Cómo funciona #}
+<section class="contenedor bloque-corto">
+  <div class="banda">
+    <h2>Cómo funciona</h2>
+    <ol class="pasos">
+      <li>
+        <h3>Ten tu paquete</h3>
+        <p>Los encuentros están incluidos en los paquetes desde <strong class="nombre-marca">Atempo 5</strong>, vigentes el día del encuentro. No gastan puntos.</p>
+      </li>
+      <li>
+        <h3>Elige tu encuentro</h3>
+        <p>Cada encuentro te muestra desde cuándo puedes apuntarte. Con los paquetes más grandes, tu inscripción se abre antes.</p>
+      </li>
+      <li>
+        <h3>Apúntate y ven</h3>
+        <p>Si al final no puedes ir, cancela desde Mi cuenta para que otra socia pueda usar tu cupo.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+{# Zona que se actualiza sin recargar la página al cambiar de filtro (ver atempo.js) #}
+<section class="contenedor bloque" id="zona-encuentros" data-zona>
+  <h2>Próximos encuentros</h2>
+  <div class="filtros">
+    <div class="filtro" role="group" aria-label="Tipo de encuentro">
+      <span class="etiqueta-seccion">Tipo</span>
+      <a class="pastilla{% if not tipo %} pastilla-activa{% endif %}" href="?">Todos</a>
+      {% for clave, nombre in tipos %}
+        <a class="pastilla{% if tipo == clave %} pastilla-activa{% endif %}" href="?tipo={{ clave }}">{{ nombre }}</a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="encuentros">
+    {% for e in estados %}
+      {% with en=e.encuentro %}
+      <article class="encuentro{% if e.mi_inscripcion %} encuentro-mio{% endif %}{% if en.cancelado %} clase-pasada{% endif %}">
+        {% include 'comunidad/_fecha.html' with inicio=en.inicio %}
+        <div class="encuentro-texto">
+          <span class="etiqueta">{{ en.get_tipo_display }}</span>
+          <h3>{{ en.titulo }}</h3>
+          <p class="clase-detalle">{{ en.inicio|date:"l j \d\e F"|capfirst }}, {{ en.inicio|date:"H:i" }} · {{ en.lugar }}</p>
+          <p class="encuentro-descripcion">{{ en.descripcion }}</p>
+        </div>
+        <div class="encuentro-accion">
+          {% if en.cancelado %}
+            <span class="clase-estado">Cancelado por el estudio</span>
+          {% elif e.mi_inscripcion %}
+            <span class="clase-estado clase-estado-mia">✓ Estás inscrita</span>
+            <a class="boton boton-borde boton-chico" href="{% url 'cancelar_inscripcion' e.mi_inscripcion.pk %}?next={{ request.get_full_path|urlencode }}" data-dialogo>Cancelar</a>
+          {% elif e.lleno %}
+            <span class="clase-estado">Lleno</span>
+          {% else %}
+            <span class="clase-estado{% if e.pocos_cupos %} clase-estado-pocos{% endif %}">{% if e.pocos_cupos %}{% if e.cupos == 1 %}Queda 1 cupo{% else %}Quedan {{ e.cupos }} cupos{% endif %}{% else %}Hay cupos{% endif %}</span>
+            {% if e.apertura %}
+              <span class="apertura">Inscripción desde el {{ e.apertura|date:"D d/m" }}</span>
+              <form method="post" action="{% url 'recordarme' en.pk %}">
+                {% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
+                {% if e.pidio_aviso %}
+                  <button type="submit" class="boton boton-borde boton-chico" aria-label="Quitar el aviso de apertura">✓ Te avisaremos</button>
+                {% else %}
+                  <button type="submit" class="boton boton-borde boton-chico">Recordarme</button>
+                {% endif %}
+              </form>
+            {% else %}
+              <a class="boton boton-chico" href="{% url 'inscribirse' en.pk %}?next={{ request.get_full_path|urlencode }}" data-dialogo>Apuntarme</a>
+            {% endif %}
+          {% endif %}
+        </div>
+      </article>
+      {% endwith %}
+    {% empty %}
+      <p class="vacio">No hay encuentros de este tipo por ahora. Prueba con otro filtro.</p>
+    {% endfor %}
+  </div>
+</section>
+
+{% include 'partes/franja_imagen.html' with etiqueta='La comunidad' %}
+
+{# Trae a una amiga #}
+<section class="contenedor bloque bloque-corto">
+  <div class="linea-paquetes">
+    <div>
+      <h2>Trae a una amiga</h2>
+      <p class="apagado">Comparte tu código: cuando tu amiga compre su primer paquete desde <strong class="nombre-marca">Atempo 5</strong>, las dos reciben 1 punto extra.</p>
+    </div>
+    {% if user.is_authenticated %}
+      <a class="boton" href="{% url 'cuenta' %}#trae-una-amiga">Ver mi código</a>
+    {% else %}
+      <a class="boton" href="{% url 'registro' %}">Crear mi cuenta</a>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

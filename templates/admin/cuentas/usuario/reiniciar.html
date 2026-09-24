@@ -12,16 +12,16 @@
 {% endblock %}
 
 {% block content %}
-<p><strong>Solo para pruebas.</strong> Se {% if resumen|length == 1 %}dejará la cuenta{% else %}dejarán estas cuentas{% endif %} como recién {% if resumen|length == 1 %}creada{% else %}creadas{% endif %}: se borrarán sus pagos (incluidos los puntos de regalo y los ajustes), sus reservas de clases, sus citas y sus avisos. <strong>No se puede deshacer.</strong></p>
+<p><strong>Solo para pruebas.</strong> Se {% if resumen|length == 1 %}dejará la cuenta{% else %}dejarán estas cuentas{% endif %} como recién {% if resumen|length == 1 %}creada{% else %}creadas{% endif %}: se borrarán sus pagos (incluidos los puntos de regalo y los ajustes), sus reservas de clases, sus citas, sus encuentros y sus avisos. <strong>No se puede deshacer.</strong></p>
 <p>Se mantienen los datos personales, la contraseña, el código de referida y quién la invitó.</p>
 
 <table>
-  <thead><tr><th>Cuenta</th><th>Puntos disponibles</th><th>Pagos</th><th>Reservas</th><th>Citas</th><th>Avisos</th></tr></thead>
+  <thead><tr><th>Cuenta</th><th>Puntos disponibles</th><th>Pagos</th><th>Reservas</th><th>Citas</th><th>Encuentros</th><th>Avisos</th></tr></thead>
   <tbody>
     {% for r in resumen %}
       <tr>
         <td>{{ r.usuario.get_full_name }} ({{ r.usuario.email }})</td>
-        <td>{{ r.puntos }}</td><td>{{ r.pagos }}</td><td>{{ r.reservas }}</td><td>{{ r.citas }}</td><td>{{ r.avisos }}</td>
+        <td>{{ r.puntos }}</td><td>{{ r.pagos }}</td><td>{{ r.reservas }}</td><td>{{ r.citas }}</td><td>{{ r.encuentros }}</td><td>{{ r.avisos }}</td>
       </tr>
     {% endfor %}
   </tbody>

@@ -1,0 +1,41 @@
+{% comment %}
+Confirmación para apuntarse a un encuentro. Se muestra dentro de la ventana (con JavaScript)
+o como página propia (sin JavaScript): ver comunidad/inscribirse.html.
+{% endcomment %}
+<div class="confirmacion">
+  <h2 id="dialogo-titulo">{% if motivo == 'AUN_NO' %}Tu inscripción aún no se abre{% elif motivo %}No puedes apuntarte{% else %}Confirma tu asistencia{% endif %}</h2>
+
+  <dl class="lista-datos">
+    <dt>Encuentro</dt><dd>{{ encuentro.titulo }}</dd>
+    <dt>Cuándo</dt><dd>{{ inicio|date:"l j \d\e F"|capfirst }}, {{ inicio|date:"H:i" }}</dd>
+    <dt>Dónde</dt><dd>{{ encuentro.lugar }}</dd>
+  </dl>
+
+  {% if motivo == 'SIN_ACCESO' %}
+    {% if vence_antes %}
+      <p class="aviso-error">Tu paquete vence el {{ vence_antes|date:"d/m/Y" }}, antes de este encuentro. Los encuentros están incluidos en los paquetes desde <strong class="nombre-marca">Atempo 5</strong> vigentes el día del encuentro.</p>
+    {% else %}
+      <p class="aviso-error">Los encuentros de <strong class="nombre-marca">Atempo Circle</strong> están incluidos en los paquetes desde <strong class="nombre-marca">Atempo 5</strong>, vigentes el día del encuentro.</p>
+    {% endif %}
+    <div class="fila-botones">
+      <a class="boton" href="{% url 'paquetes' %}">Ver paquetes</a>
+      <button type="button" class="boton boton-borde" data-cerrar-dialogo>Volver</button>
+    </div>
+  {% elif motivo == 'AUN_NO' %}
+    <p>Tu inscripción a este encuentro se abre el <strong>{{ apertura|date:"l j \d\e F" }}</strong>.</p>
+    <div class="fila-botones"><button type="button" class="boton boton-borde" data-cerrar-dialogo>Volver</button></div>
+  {% elif motivo %}
+    <p class="aviso-error">{{ motivo }}</p>
+    <div class="fila-botones"><button type="button" class="boton boton-borde" data-cerrar-dialogo>Volver</button></div>
+  {% else %}
+    <p>Está incluido en tu <strong class="nombre-marca">{{ compra.nombre_paquete }}</strong>: no gasta puntos.</p>
+    <p class="nota">Si al final no puedes ir, cancela antes de que empiece para que otra socia pueda usar tu cupo.</p>
+    <form method="post" action="{% url 'inscribirse' encuentro.pk %}">
+      {% csrf_token %}<input type="hidden" name="next" value="{{ next }}">
+      <div class="fila-botones">
+        <button type="submit" class="boton">Confirmar asistencia</button>
+        <button type="button" class="boton boton-borde" data-cerrar-dialogo>Volver</button>
+      </div>
+    </form>
+  {% endif %}
+</div>

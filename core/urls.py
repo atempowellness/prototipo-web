@@ -1,28 +1,14 @@
 """
-Mapa del sitio de Atempo Wellness.
-
-Las páginas que aún no tienen contenido muestran solo su título y el
-aviso "Página en construcción". El contenido de cada una se define
-junto con el equipo antes de programarlo.
+Mapa del sitio de Atempo Wellness: páginas generales. Cada app define las suyas
+(paquetes, cuentas, clases, bienestar, comunidad, legal...).
 """
 from django.urls import path
-from django.views.generic import TemplateView
 
 from . import views
-
-
-def en_construccion(titulo):
-    """Página provisional que solo muestra su título."""
-    return TemplateView.as_view(
-        template_name='en_construccion.html',
-        extra_context={'titulo': titulo},
-    )
-
 
 urlpatterns = [
     # Páginas públicas
     path('', views.InicioView.as_view(), name='inicio'),
-    path('comunidad/', en_construccion('Comunidad'), name='comunidad'),
     path('nosotros/', views.NosotrosView.as_view(), name='nosotros'),
-    # Las páginas legales están en la app "legal"
+    # Comunidad está en la app "comunidad" y las páginas legales en la app "legal"
 ]
