@@ -1,0 +1,18 @@
+{% comment %}
+Un campo de formulario con su etiqueta, ayuda y errores.
+Uso: {% include 'partes/campo.html' with campo=form.email %}
+Las contraseñas tienen un botón "Mostrar" para ver lo que se escribe.
+{% endcomment %}
+<div class="campo{% if campo.errors %} campo-con-error{% endif %}">
+  <label for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+  {% if campo.help_text %}<p class="campo-ayuda">{{ campo.help_text }}</p>{% endif %}
+  {% if campo.widget_type == 'password' %}
+    <div class="campo-clave">
+      {{ campo }}
+      <button type="button" class="boton-mostrar" aria-controls="{{ campo.id_for_label }}" aria-pressed="false">Mostrar</button>
+    </div>
+  {% else %}
+    {{ campo }}
+  {% endif %}
+  {% for error in campo.errors %}<p class="campo-error" role="alert">{{ error }}</p>{% endfor %}
+</div>

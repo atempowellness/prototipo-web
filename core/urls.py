@@ -27,11 +27,6 @@ urlpatterns = [
     path('comunidad/', en_construccion('Comunidad'), name='comunidad'),
     path('nosotros/', views.NosotrosView.as_view(), name='nosotros'),
 
-    # Páginas de la clienta
-    path('cuenta/', en_construccion('Mi cuenta'), name='cuenta'),
-    path('cuenta/registro/', en_construccion('Crear cuenta'), name='registro'),
-    path('cuenta/ingresar/', en_construccion('Iniciar sesión'), name='ingresar'),
-
     # Páginas legales
     path('privacidad/', en_construccion('Política de privacidad'), name='privacidad'),
     path('terminos/', en_construccion('Términos y condiciones'), name='terminos'),

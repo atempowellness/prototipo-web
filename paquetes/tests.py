@@ -43,7 +43,7 @@ class PaginaPaquetesTests(TestCase):
 
     def test_comprar_lleva_a_iniciar_sesion(self):
         respuesta = self.client.get(reverse('paquetes'))
-        self.assertContains(respuesta, f'href="{reverse("ingresar")}">Comprar</a>', count=5)
+        self.assertContains(respuesta, f'href="{reverse("ingresar")}?next=/paquetes/">Comprar</a>', count=5)
 
     def test_paquete_inactivo_no_se_muestra(self):
         Paquete.objects.filter(nombre='Atempo 40').update(activo=False)
@@ -70,8 +70,9 @@ class InicioUsaLosPreciosTests(TestCase):
 
 class PanelAdministracionTests(TestCase):
     def test_paquetes_editables_en_el_panel(self):
-        from django.contrib.auth.models import User
-        admin = User.objects.create_superuser('admin', 'admin@example.com', 'clave-de-prueba')
+        from django.contrib.auth import get_user_model
+        admin = get_user_model().objects.create_superuser(
+            'admin@example.com', 'clave-de-prueba', nombre='Admin', apellido='Atempo')
         self.client.force_login(admin)
         respuesta = self.client.get('/admin/paquetes/paquete/')
         self.assertEqual(respuesta.status_code, 200)

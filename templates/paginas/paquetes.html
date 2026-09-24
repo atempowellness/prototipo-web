@@ -44,8 +44,12 @@
           </ul>
         </details>
 
-        {# La compra aún no existe: por ahora lleva a iniciar sesión #}
-        <a class="boton" href="{% url 'ingresar' %}">Comprar</a>
+        {# La compra aún no existe: sin sesión lleva a iniciar sesión (y vuelve aquí); con sesión avisa que viene pronto #}
+        {% if user.is_authenticated %}
+          <button class="boton" type="button" disabled>Compra en línea próximamente</button>
+        {% else %}
+          <a class="boton" href="{% url 'ingresar' %}?next={{ request.path|urlencode }}">Comprar</a>
+        {% endif %}
       </article>
     {% endfor %}
   </div>

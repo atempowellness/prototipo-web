@@ -28,6 +28,11 @@
   {% include 'partes/encabezado.html' %}
 
   <main id="contenido">
+    {% if messages %}
+      <div class="contenedor mensajes">
+        {% for mensaje in messages %}<p class="mensaje mensaje-{{ mensaje.tags }}" role="status">{{ mensaje }}</p>{% endfor %}
+      </div>
+    {% endif %}
     {% block contenido %}{% endblock %}
   </main>
 

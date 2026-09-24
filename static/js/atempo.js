@@ -48,6 +48,18 @@
   actualizarBoton();
 })();
 
+/* ---------- Contraseñas: botón "Mostrar" / "Ocultar" ---------- */
+document.querySelectorAll('.boton-mostrar').forEach(function (boton) {
+  var campo = document.getElementById(boton.getAttribute('aria-controls'));
+  if (!campo) return;
+  boton.addEventListener('click', function () {
+    var mostrar = campo.type === 'password';
+    campo.type = mostrar ? 'text' : 'password';
+    boton.textContent = mostrar ? 'Ocultar' : 'Mostrar';
+    boton.setAttribute('aria-pressed', mostrar ? 'true' : 'false');
+  });
+});
+
 /* ---------- Portada: imágenes que cambian solas ----------
    Cambian cada 6 segundos con un fundido. Los puntos permiten elegir
    una imagen y el botón "Pausar" detiene el cambio. Si la persona pidió

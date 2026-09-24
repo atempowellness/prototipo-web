@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block contenido %}
+<section class="contenedor cabecera-pagina formulario-pagina">
+  <h1>Crea tu cuenta</h1>
+  <p class="entrada">Compra tus paquetes, reserva tus clases y sigue tus beneficios en un solo lugar.</p>
+
+  <form method="post" class="formulario tarjeta" novalidate>
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}">
+    {% for error in form.non_field_errors %}<p class="aviso-error" role="alert">{{ error }}</p>{% endfor %}
+
+    <div class="campos-dos">
+      {% include 'partes/campo.html' with campo=form.nombre %}
+      {% include 'partes/campo.html' with campo=form.apellido %}
+    </div>
+    {% include 'partes/campo.html' with campo=form.email %}
+    <div class="campos-dos">
+      {% include 'partes/campo.html' with campo=form.celular %}
+      {% include 'partes/campo.html' with campo=form.dni %}
+    </div>
+    {% include 'partes/campo.html' with campo=form.password1 %}
+    {% include 'partes/campo.html' with campo=form.password2 %}
+
+    <div class="campo{% if form.acepto_privacidad.errors %} campo-con-error{% endif %}">
+      <label class="casilla">
+        {{ form.acepto_privacidad }}
+        <span>Acepto la <a href="{% url 'privacidad' %}" target="_blank" rel="noopener">política de privacidad</a> y el tratamiento de mis datos personales según la Ley N.° 29733.</span>
+      </label>
+      {% for error in form.acepto_privacidad.errors %}<p class="campo-error" role="alert">{{ error }}</p>{% endfor %}
+    </div>
+
+    <button class="boton boton-ancho" type="submit">Crear cuenta</button>
+    <p class="formulario-pie">¿Ya tienes cuenta?
+      <a href="{% url 'ingresar' %}{% if next %}?next={{ next|urlencode }}{% endif %}">Inicia sesión</a>
+    </p>
+  </form>
+</section>
+{% endblock %}

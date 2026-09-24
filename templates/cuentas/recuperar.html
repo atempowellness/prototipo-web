@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block contenido %}
+<section class="contenedor cabecera-pagina formulario-pagina">
+  <h1>Recupera tu contraseña</h1>
+  <p class="entrada">Escribe el correo de tu cuenta y te enviaremos un enlace para crear una nueva contraseña.</p>
+
+  <form method="post" class="formulario tarjeta" novalidate>
+    {% csrf_token %}
+    {% include 'partes/campo.html' with campo=form.email %}
+    <button class="boton boton-ancho" type="submit">Enviar enlace</button>
+    <p class="formulario-pie"><a href="{% url 'ingresar' %}">Volver a iniciar sesión</a></p>
+  </form>
+
+  {% if no_encontrado %}
+    <p class="aviso-error formulario-ancho" role="alert">No encontramos una cuenta con el correo {{ email }}. Revisa que esté bien escrito o <a href="{% url 'registro' %}">crea una cuenta</a>.</p>
+  {% endif %}
+
+  {% if correo_simulado %}
+    {# SIMULACIÓN: en la versión real este mensaje llegaría al correo #}
+    <div class="correo-simulado formulario-ancho" role="status">
+      <p class="correo-simulado-aviso">Simulación del prototipo: así se vería el correo que te enviamos a {{ email }}</p>
+      <div class="correo-simulado-cuerpo">
+        <p class="correo-simulado-asunto"><strong>Asunto:</strong> Crea una nueva contraseña para tu cuenta Atempo</p>
+        <p>Hola, {{ correo_simulado.nombre }}:</p>
+        <p>Recibimos un pedido para cambiar la contraseña de tu cuenta. Si fuiste tú, usa este botón. Si no, puedes ignorar este mensaje.</p>
+        <p><a class="boton" href="{{ correo_simulado.ruta }}">Crear nueva contraseña</a></p>
+        <p class="apagado">Con cariño,<br>el equipo de <strong class="nombre-marca">Atempo</strong></p>
+      </div>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

@@ -3,7 +3,6 @@ from django.urls import reverse
 
 PAGINAS_EN_CONSTRUCCION = [
     'horarios', 'bienestar', 'comunidad',
-    'cuenta', 'registro', 'ingresar',
     'privacidad', 'terminos', 'reclamaciones',
 ]
 

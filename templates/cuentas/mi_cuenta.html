@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block contenido %}
+{% with u=request.user %}
+<section class="contenedor cabecera-pagina">
+  <h1>¡Hola, {{ u.nombre }}!</h1>
+  <p class="entrada">Aquí verás tus créditos, tus reservas y tus beneficios de bienestar.</p>
+</section>
+
+<section class="contenedor">
+  <div class="cuenta-rejilla">
+
+    {# Datos reales de la cuenta #}
+    <div class="tarjeta cuenta-datos">
+      <h2>Tus datos</h2>
+      <dl class="lista-datos">
+        <dt>Nombre</dt><dd>{{ u.get_full_name }}</dd>
+        <dt>Correo</dt><dd>{{ u.email }}</dd>
+        <dt>Celular</dt><dd>{{ u.celular|default:"—" }}</dd>
+        <dt>DNI</dt><dd>{{ u.dni|default:"—" }}</dd>
+      </dl>
+      <form method="post" action="{% url 'salir' %}">
+        {% csrf_token %}
+        <button class="boton boton-borde" type="submit">Cerrar sesión</button>
+      </form>
+    </div>
+
+    {# Espacios de lo que vendrá, cuando existan compras y reservas #}
+    <div class="tarjeta-pronto">
+      <p class="etiqueta-seccion">Próximamente</p>
+      <h2>Créditos disponibles</h2>
+      <p>Tus créditos, el paquete que tienes activo y cuándo vence.</p>
+      <a href="{% url 'paquetes' %}">Ver paquetes</a>
+    </div>
+    <div class="tarjeta-pronto">
+      <p class="etiqueta-seccion">Próximamente</p>
+      <h2>Próximas clases</h2>
+      <p>Las clases que reservaste, con la opción de cancelarlas hasta 12 horas antes.</p>
+    </div>
+    <div class="tarjeta-pronto">
+      <p class="etiqueta-seccion">Próximamente</p>
+      <h2>Beneficios incluidos</h2>
+      <p>Tus sesiones de nutrición y masajes disponibles según tu paquete.</p>
+    </div>
+    <div class="tarjeta-pronto">
+      <p class="etiqueta-seccion">Próximamente</p>
+      <h2>Citas y encuentros</h2>
+      <p>Tus citas de nutrición y masajes, y los eventos de <strong class="nombre-marca">Atempo Circle</strong> a los que te apuntaste.</p>
+    </div>
+    <div class="tarjeta-pronto">
+      <p class="etiqueta-seccion">Próximamente</p>
+      <h2>Historial de compras</h2>
+      <p>Los paquetes que compraste, con la fecha y el medio de pago.</p>
+    </div>
+    <div class="tarjeta-pronto">
+      <p class="etiqueta-seccion">Próximamente</p>
+      <h2>Trae a una amiga</h2>
+      <p>Tu código personal: cuando tu amiga compre su primer paquete, las dos reciben 1 crédito extra.</p>
+    </div>
+
+  </div>
+</section>
+{% endwith %}
+{% endblock %}

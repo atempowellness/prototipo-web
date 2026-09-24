@@ -40,7 +40,15 @@ INSTALLED_APPS = [
     # Apps de Atempo
     'core',
     'paquetes',
+    'cuentas',
 ]
+
+# Cuentas: modelo propio de Atempo; se ingresa con correo o celular
+AUTH_USER_MODEL = 'cuentas.Usuario'
+AUTHENTICATION_BACKENDS = ['cuentas.backends.CorreoOCelularBackend']
+LOGIN_URL = 'ingresar'
+LOGIN_REDIRECT_URL = 'cuenta'
+LOGOUT_REDIRECT_URL = 'inicio'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

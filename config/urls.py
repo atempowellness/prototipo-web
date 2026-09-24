@@ -15,4 +15,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('core.urls')),
     path('', include('paquetes.urls')),
+    path('', include('cuentas.urls')),
 ]
