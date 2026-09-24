@@ -21,6 +21,7 @@
     </div>
     {% include 'partes/campo.html' with campo=form.password1 %}
     {% include 'partes/campo.html' with campo=form.password2 %}
+    {% include 'partes/campo.html' with campo=form.codigo_referida %}
 
     <div class="campo{% if form.acepto_privacidad.errors %} campo-con-error{% endif %}">
       <label class="casilla">

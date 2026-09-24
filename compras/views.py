@@ -1,13 +1,14 @@
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect
-
 from django.urls import reverse
 from django.views.generic import DetailView, FormView
 
 from paquetes.models import paquetes_activos
 
 from .forms import PagoForm
-from .models import creditos_disponibles, registrar_compra
+from .models import compras_pagadas, creditos_disponibles, registrar_compra
+from .referidas import activara_beneficio, aplicar_beneficio
 
 
 class ComprarView(LoginRequiredMixin, FormView):
@@ -19,15 +20,36 @@ class ComprarView(LoginRequiredMixin, FormView):
         self.paquete = get_object_or_404(paquetes_activos(), slug=kwargs['slug'])
         return super().dispatch(request, *args, **kwargs)
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update(usuario=self.request.user, paquete=self.paquete)
+        return kwargs
+
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
         contexto['titulo'] = f'Comprar {self.paquete.nombre}'
         contexto['paquete'] = self.paquete
+        # Si ya puso un código al registrarse y esta compra lo activa, se le avisa
+        if activara_beneficio(self.request.user, self.paquete):
+            contexto['beneficio_referida'] = self.request.user.referida_por
         return contexto
 
     def form_valid(self, form):
         datos = form.cleaned_data
-        compra = registrar_compra(self.request.user, self.paquete, datos['metodo'], datos['detalle_pago'])
+        usuario = self.request.user
+        if datos.get('codigo_referida'):
+            usuario.referida_por = datos['codigo_referida']
+            usuario.save(update_fields=['referida_por'])
+
+        compra = registrar_compra(usuario, self.paquete, datos['metodo'], datos['detalle_pago'])
+
+        resultado = aplicar_beneficio(compra)
+        if resultado:
+            amiga = resultado['invitadora'].nombre
+            texto = f'¡Recibiste 1 crédito de regalo por venir invitada por {amiga}!'
+            if resultado['invitadora_recibe']:
+                texto += f' {amiga} también recibe el suyo.'
+            messages.success(self.request, texto)
         return redirect(reverse('compra', args=[compra.pk]) + '?nueva=1')
 
 
@@ -37,7 +59,7 @@ class CompraView(LoginRequiredMixin, DetailView):
     context_object_name = 'compra'
 
     def get_queryset(self):
-        return self.request.user.compras.all()
+        return compras_pagadas(self.request.user)
 
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)

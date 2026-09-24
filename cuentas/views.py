@@ -30,6 +30,10 @@ class RegistroView(FormView):
             return redirect(destino_seguro(request))
         return super().dispatch(request, *args, **kwargs)
 
+    def get_initial(self):
+        # El enlace para compartir por WhatsApp trae el código: /cuenta/registro/?codigo=MARIA-7K3Q
+        return {'codigo_referida': self.request.GET.get('codigo', '')}
+
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
         contexto['next'] = self.request.POST.get('next') or self.request.GET.get('next', '')
@@ -66,11 +70,29 @@ class MiCuentaView(LoginRequiredMixin, TemplateView):
     extra_context = {'titulo': 'Mi cuenta'}
 
     def get_context_data(self, **kwargs):
-        from compras.models import compras_vigentes, creditos_disponibles, tiene_atempo_circle
+        from urllib.parse import quote
+
+        from compras.models import compras_pagadas, compras_vigentes, creditos_disponibles, tiene_atempo_circle
+        from compras.referidas import TOPE_MENSUAL, estado_de_invitadas, regalos_del_mes
 
         contexto = super().get_context_data(**kwargs)
         usuario = self.request.user
         vigentes = list(compras_vigentes(usuario))
+
+        # Programa de referidas
+        enlace = self.request.build_absolute_uri(reverse('registro') + f'?codigo={usuario.codigo_referida}')
+        mensaje = (f'Te invito a Atempo Wellness, un estudio boutique de bienestar en San Isidro. '
+                   f'Usa mi código {usuario.codigo_referida} al comprar tu primer paquete desde Atempo 5 '
+                   f'y las dos recibimos 1 clase extra: {enlace}')
+        regalos_mes = regalos_del_mes(usuario).count()
+        contexto.update({
+            'enlace_referida': enlace,
+            'whatsapp_referida': 'https://wa.me/?text=' + quote(mensaje),
+            'invitadas': estado_de_invitadas(usuario),
+            'regalos_mes': regalos_mes,
+            'tope_referidas': TOPE_MENSUAL,
+            'tope_alcanzado': regalos_mes >= TOPE_MENSUAL,
+        })
         contexto.update({
             'compras_vigentes': [c for c in vigentes if c.creditos_disponibles > 0 or
                                  c.nutricion_disponible > 0 or c.masaje_disponible > 0],
@@ -79,7 +101,7 @@ class MiCuentaView(LoginRequiredMixin, TemplateView):
             'masaje_total': sum(c.masaje_disponible for c in vigentes),
             'tiene_circle': tiene_atempo_circle(usuario),
             'por_vencer': [c for c in vigentes if c.vence_pronto],
-            'historial': usuario.compras.all(),
+            'historial': compras_pagadas(usuario),
         })
         return contexto
 

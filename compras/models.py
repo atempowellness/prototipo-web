@@ -28,11 +28,24 @@ def sumar_meses(fecha, meses):
 
 
 class Compra(models.Model):
+    """
+    Una "bolsa" de créditos con su vigencia. Normalmente es una compra pagada; también
+    puede ser un crédito de regalo del programa de referidas (tipo REGALO, precio S/ 0,
+    sin paquete ni boleta), que sigue las mismas reglas de vigencia y uso.
+    """
     TARJETA, YAPE, PLIN = 'tarjeta', 'yape', 'plin'
     METODOS = [(TARJETA, 'Tarjeta'), (YAPE, 'Yape'), (PLIN, 'Plin')]
+    COMPRA, REGALO = 'compra', 'regalo'
+    TIPOS = [(COMPRA, 'Compra'), (REGALO, 'Crédito de regalo por referida')]
 
+    tipo = models.CharField(max_length=10, choices=TIPOS, default=COMPRA)
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='compras')
-    paquete = models.ForeignKey('paquetes.Paquete', on_delete=models.PROTECT, related_name='compras')
+    paquete = models.ForeignKey('paquetes.Paquete', on_delete=models.PROTECT, related_name='compras',
+                                null=True, blank=True)
+    referida = models.ForeignKey(
+        settings.AUTH_USER_MODEL, verbose_name='por la referida de', on_delete=models.SET_NULL,
+        null=True, blank=True, related_name='regalos_generados',
+        help_text='En los créditos de regalo: la amiga cuya primera compra generó este crédito.')
     fecha = models.DateTimeField('fecha de compra', default=timezone.now)
     vence = models.DateField('vence el', help_text='Los créditos se pueden usar hasta este día, inclusive.')
 
@@ -50,9 +63,9 @@ class Compra(models.Model):
     masaje_usado = models.PositiveSmallIntegerField('masajes usados', default=0)
 
     # Pago (simulado). De la tarjeta solo se guardan los últimos 4 dígitos.
-    metodo = models.CharField('medio de pago', max_length=10, choices=METODOS)
+    metodo = models.CharField('medio de pago', max_length=10, choices=METODOS, blank=True)
     detalle_pago = models.CharField('detalle del pago', max_length=60, blank=True)
-    numero_operacion = models.CharField('n.° de operación', max_length=12)
+    numero_operacion = models.CharField('n.° de operación', max_length=12, blank=True)
 
     class Meta:
         ordering = ['-fecha']
@@ -62,6 +75,10 @@ class Compra(models.Model):
 
     def __str__(self):
         return f'{self.nombre_paquete} – {self.usuario.get_full_name()} ({self.fecha:%d/%m/%Y})'
+
+    @property
+    def es_regalo(self):
+        return self.tipo == self.REGALO
 
     # --- Créditos y beneficios ---
     @property
@@ -135,6 +152,11 @@ def usar_credito(usuario):
         compra.save(update_fields=['creditos_usados'])
         compra.refresh_from_db()
         return compra
+
+
+def compras_pagadas(usuario):
+    """Solo las compras pagadas (sin créditos de regalo): para el historial y las boletas."""
+    return usuario.compras.filter(tipo=Compra.COMPRA)
 
 
 def registrar_compra(usuario, paquete, metodo, detalle_pago):

@@ -99,6 +99,24 @@ document.querySelectorAll('.boton-mostrar').forEach(function (boton) {
   }
 })();
 
+/* ---------- Botones "Copiar" (por ejemplo, el código de referida) ---------- */
+document.querySelectorAll('[data-copiar]').forEach(function (boton) {
+  var textoOriginal = boton.textContent;
+  boton.addEventListener('click', function () {
+    var listo = function () {
+      boton.textContent = '¡Copiado!';
+      setTimeout(function () { boton.textContent = textoOriginal; }, 2000);
+    };
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(boton.dataset.copiar).then(listo, function () {
+        boton.textContent = 'Tu código: ' + boton.dataset.copiar;
+      });
+    } else {
+      boton.textContent = 'Tu código: ' + boton.dataset.copiar;
+    }
+  });
+});
+
 /* ---------- Portada: imágenes que cambian solas ----------
    Cambian cada 6 segundos con un fundido. Los puntos permiten elegir
    una imagen y el botón "Pausar" detiene el cambio. Si la persona pidió

@@ -66,6 +66,13 @@
         <p class="nota-destacada">Al pagar, recibirás una notificación en la app de tu banco para aprobar el pago con Plin.</p>
       </div>
 
+      {# Programa de referidas: el campo solo existe si esta compra puede activar el beneficio #}
+      {% if form.codigo_referida %}
+        {% include 'partes/campo.html' with campo=form.codigo_referida %}
+      {% elif beneficio_referida %}
+        <p class="nota-destacada">Con esta compra se aplica el código de <strong>{{ beneficio_referida.nombre }}</strong>: las dos recibirán 1 crédito extra.</p>
+      {% endif %}
+
       <div class="fila-botones pago-botones">
         <button class="boton" type="submit">Pagar <span class="cifra">{{ paquete.precio|soles }}</span></button>
         <button class="boton boton-borde" type="button" data-datos-prueba>Completar con datos de prueba</button>

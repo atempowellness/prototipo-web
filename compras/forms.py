@@ -41,6 +41,33 @@ class PagoForm(forms.Form):
         label='Código de aprobación de Yape', required=False, max_length=6,
         widget=forms.TextInput(attrs={'inputmode': 'numeric', 'placeholder': '6 dígitos'}))
 
+    def __init__(self, *args, usuario=None, paquete=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        from .referidas import puede_ingresar_codigo_al_pagar
+
+        self.usuario = usuario
+        # El código de referida solo aparece si esta compra puede activar el beneficio
+        if usuario is not None and puede_ingresar_codigo_al_pagar(usuario, paquete):
+            self.fields['codigo_referida'] = forms.CharField(
+                label='¿Te invitó una amiga? Escribe su código (opcional)', required=False, max_length=20,
+                help_text='Con esta compra, las dos recibirán 1 crédito extra.',
+                widget=forms.TextInput(attrs={'placeholder': 'Por ejemplo: MARIA-7K3Q',
+                                              'autocapitalize': 'characters'}),
+            )
+
+    def clean_codigo_referida(self):
+        from .referidas import buscar_por_codigo
+
+        codigo = self.cleaned_data.get('codigo_referida', '').strip()
+        if not codigo:
+            return None
+        invitadora = buscar_por_codigo(codigo)
+        if invitadora is None:
+            raise forms.ValidationError('No encontramos ese código. Revisa que esté bien escrito.')
+        if invitadora.pk == self.usuario.pk:
+            raise forms.ValidationError('Ese es tu propio código: compártelo con tus amigas.')
+        return invitadora
+
     def clean(self):
         datos = super().clean()
         metodo = datos.get('metodo')

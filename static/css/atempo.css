@@ -804,6 +804,20 @@ main { min-height: 50vh; }
 .tarjeta-pronto .etiqueta-seccion { margin-bottom: 6px; }
 
 .cuenta-ancha { grid-column: span 2; }
+.cuenta-completa { grid-column: 1 / -1; }
+.codigo-referida {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 24px;
+  margin: 16px 0 20px;
+  padding: 18px 20px;
+  border: 1.5px dashed var(--decorativo);
+  border-radius: var(--radio-tarjeta);
+  background: var(--fondo);
+}
+.codigo-referida .etiqueta-seccion { margin: 0; flex-basis: 100%; }
+.codigo-referida-valor { font-size: 1.8rem; letter-spacing: .08em; margin: 0; }
 .numero-grande { font-size: 3rem; line-height: 1; margin-bottom: 12px; }
 .lista-simple { margin: 0 0 12px; padding-left: 20px; }
 .lista-simple li { margin-bottom: 6px; }

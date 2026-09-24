@@ -31,6 +31,11 @@ class RegistroForm(forms.ModelForm):
         label='Repite tu contraseña', strip=False,
         widget=forms.PasswordInput(attrs={'autocomplete': 'new-password'}),
     )
+    codigo_referida = forms.CharField(
+        label='¿Te invitó una amiga? Escribe su código (opcional)', required=False, max_length=20,
+        help_text='Cuando compres tu primer paquete desde Atempo 5, las dos recibirán 1 crédito extra.',
+        widget=forms.TextInput(attrs={'placeholder': 'Por ejemplo: MARIA-7K3Q', 'autocapitalize': 'characters'}),
+    )
     acepto_privacidad = forms.BooleanField(
         required=True,
         error_messages={'required': 'Para crear tu cuenta necesitas aceptar la política de privacidad.'},
@@ -70,6 +75,17 @@ class RegistroForm(forms.ModelForm):
             raise forms.ValidationError(self._meta.error_messages['dni']['unique'])
         return dni
 
+    def clean_codigo_referida(self):
+        from compras.referidas import buscar_por_codigo
+
+        codigo = self.cleaned_data.get('codigo_referida', '').strip()
+        if not codigo:
+            return None
+        invitadora = buscar_por_codigo(codigo)
+        if invitadora is None:
+            raise forms.ValidationError('No encontramos ese código. Revisa que esté bien escrito.')
+        return invitadora
+
     def clean_password2(self):
         p1 = self.cleaned_data.get('password1')
         p2 = self.cleaned_data.get('password2')
@@ -90,6 +106,7 @@ class RegistroForm(forms.ModelForm):
         usuario = super().save(commit=False)
         usuario.set_password(self.cleaned_data['password1'])
         usuario.acepto_privacidad = timezone.now()
+        usuario.referida_por = self.cleaned_data.get('codigo_referida')
         if commit:
             usuario.save()
         return usuario

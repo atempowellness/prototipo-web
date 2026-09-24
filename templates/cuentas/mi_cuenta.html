@@ -12,7 +12,7 @@
     <div class="aviso-vencimiento" role="status">
       <p>
         <strong>Tus créditos están por vencer.</strong>
-        Te quedan {{ compra.creditos_disponibles|creditos }} de tu <strong class="nombre-marca">{{ compra.nombre_paquete }}</strong>,
+        Te quedan {{ compra.creditos_disponibles|creditos }} de {% if compra.es_regalo %}regalo por referida{% else %}tu <strong class="nombre-marca">{{ compra.nombre_paquete }}</strong>{% endif %},
         que vence{% if compra.dias_para_vencer == 0 %} hoy{% else %} el {{ compra.vence|date:"j \d\e F" }}{% endif %}.
         <a href="{% url 'horarios' %}">Reserva tus clases</a> para no perderlos.
       </p>
@@ -23,7 +23,7 @@
           <div class="correo-simulado-cuerpo">
             <p class="correo-simulado-asunto"><strong>Asunto:</strong> Tus créditos de Atempo vencen pronto</p>
             <p>Hola, {{ u.nombre }}:</p>
-            <p>Te quedan <strong>{{ compra.creditos_disponibles|creditos }}</strong> de tu {{ compra.nombre_paquete }}, que vence el {{ compra.vence|date:"j \d\e F \d\e Y" }}. ¡Todavía estás a tiempo de usarlos!</p>
+            <p>Te quedan <strong>{{ compra.creditos_disponibles|creditos }}</strong> de {% if compra.es_regalo %}regalo por referida{% else %}tu {{ compra.nombre_paquete }}{% endif %}, que vence el {{ compra.vence|date:"j \d\e F \d\e Y" }}. ¡Todavía estás a tiempo de usarlos!</p>
             <p><a class="boton" href="{% url 'horarios' %}">Reservar una clase</a></p>
             <p class="apagado">Con cariño,<br>el equipo de <strong class="nombre-marca">Atempo</strong></p>
           </div>
@@ -58,7 +58,11 @@
       {% if compras_vigentes %}
         <ul class="lista-simple">
           {% for compra in compras_vigentes %}{% if compra.creditos_disponibles %}
-            <li>{{ compra.creditos_disponibles|creditos }} de <strong class="nombre-marca">{{ compra.nombre_paquete }}</strong>, vence el {{ compra.vence|date:"d/m/Y" }}</li>
+            {% if compra.es_regalo %}
+              <li>{{ compra.creditos_disponibles|creditos }} de regalo por referida, vence el {{ compra.vence|date:"d/m/Y" }}</li>
+            {% else %}
+              <li>{{ compra.creditos_disponibles|creditos }} de <strong class="nombre-marca">{{ compra.nombre_paquete }}</strong>, vence el {{ compra.vence|date:"d/m/Y" }}</li>
+            {% endif %}
           {% endif %}{% endfor %}
         </ul>
         <p class="nota">Al reservar, se usan primero los créditos que vencen antes.</p>
@@ -102,6 +106,35 @@
       {% endif %}
     </div>
 
+    {# Programa de referidas #}
+    <div class="tarjeta cuenta-completa">
+      <h2>Trae a una amiga</h2>
+      <p>Cuando tu amiga compre su primer paquete desde <strong class="nombre-marca">Atempo 5</strong> con tu código, las dos reciben 1 crédito extra.</p>
+      <div class="codigo-referida">
+        <p class="etiqueta-seccion">Tu código</p>
+        <p class="codigo-referida-valor cifra" id="codigo-referida">{{ u.codigo_referida }}</p>
+        <div class="fila-botones">
+          <button class="boton boton-borde" type="button" data-copiar="{{ u.codigo_referida }}">Copiar código</button>
+          <a class="boton" href="{{ whatsapp_referida }}" target="_blank" rel="noopener">Compartir por WhatsApp</a>
+        </div>
+      </div>
+      {% if invitadas %}
+        <ul class="lista-simple">
+          {% for amiga in invitadas %}
+            <li><strong>{{ amiga.nombre }}</strong>:
+              {% if amiga.recibi_credito %}compró su paquete · recibiste 1 crédito ✓
+              {% elif amiga.compro %}compró su paquete · no sumó crédito (tope mensual)
+              {% else %}se registró · esperando su primera compra desde <strong class="nombre-marca">Atempo 5</strong>{% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+      <p class="nota">
+        {% if tope_alcanzado %}Llegaste al tope de {{ tope_referidas }} créditos por referidas este mes. Tus amigas igual reciben el suyo.
+        {% else %}Este mes: {{ regalos_mes }} de {{ tope_referidas }} créditos por referidas. Cada crédito de regalo vale por 1 mes.{% endif %}
+      </p>
+    </div>
+
     {# Lo que vendrá #}
     <div class="tarjeta-pronto">
       <p class="etiqueta-seccion">Próximamente</p>
@@ -113,11 +146,7 @@
       <h2>Citas y encuentros</h2>
       <p>Tus citas de nutrición y masajes, y los eventos de <strong class="nombre-marca">Atempo Circle</strong> a los que te apuntaste.</p>
     </div>
-    <div class="tarjeta-pronto">
-      <p class="etiqueta-seccion">Próximamente</p>
-      <h2>Trae a una amiga</h2>
-      <p>Tu código personal: cuando tu amiga compre su primer paquete, las dos reciben 1 crédito extra.</p>
-    </div>
+
 
   </div>
 </section>

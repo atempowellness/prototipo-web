@@ -24,12 +24,15 @@ class UsuarioAdmin(UserAdmin):
     form = UsuarioCambioForm
     add_form = UsuarioCreacionForm
     ordering = ['-date_joined']
-    list_display = ['email', 'nombre', 'apellido', 'celular', 'dni', 'date_joined', 'is_staff']
-    search_fields = ['email', 'nombre', 'apellido', 'celular', 'dni']
-    readonly_fields = ['date_joined', 'last_login', 'acepto_privacidad']
+    list_display = ['email', 'nombre', 'apellido', 'celular', 'dni', 'codigo_referida', 'referida_por',
+                    'date_joined', 'is_staff']
+    search_fields = ['email', 'nombre', 'apellido', 'celular', 'dni', 'codigo_referida']
+    readonly_fields = ['date_joined', 'last_login', 'acepto_privacidad', 'codigo_referida']
+    autocomplete_fields = ['referida_por']
     fieldsets = [
         (None, {'fields': ['email', 'password']}),
         ('Datos personales', {'fields': ['nombre', 'apellido', 'celular', 'dni', 'acepto_privacidad']}),
+        ('Programa de referidas', {'fields': ['codigo_referida', 'referida_por']}),
         ('Permisos', {'fields': ['is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions']}),
         ('Fechas', {'fields': ['last_login', 'date_joined']}),
     ]
