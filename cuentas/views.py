@@ -65,6 +65,24 @@ class MiCuentaView(LoginRequiredMixin, TemplateView):
     template_name = 'cuentas/mi_cuenta.html'
     extra_context = {'titulo': 'Mi cuenta'}
 
+    def get_context_data(self, **kwargs):
+        from compras.models import compras_vigentes, creditos_disponibles, tiene_atempo_circle
+
+        contexto = super().get_context_data(**kwargs)
+        usuario = self.request.user
+        vigentes = list(compras_vigentes(usuario))
+        contexto.update({
+            'compras_vigentes': [c for c in vigentes if c.creditos_disponibles > 0 or
+                                 c.nutricion_disponible > 0 or c.masaje_disponible > 0],
+            'creditos_totales': creditos_disponibles(usuario),
+            'nutricion_total': sum(c.nutricion_disponible for c in vigentes),
+            'masaje_total': sum(c.masaje_disponible for c in vigentes),
+            'tiene_circle': tiene_atempo_circle(usuario),
+            'por_vencer': [c for c in vigentes if c.vence_pronto],
+            'historial': usuario.compras.all(),
+        })
+        return contexto
+
 
 class RecuperarView(FormView):
     """

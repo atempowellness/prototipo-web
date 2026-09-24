@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'core',
     'paquetes',
     'cuentas',
+    'compras',
 ]
 
 # Cuentas: modelo propio de Atempo; se ingresa con correo o celular

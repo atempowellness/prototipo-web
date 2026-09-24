@@ -9,6 +9,10 @@ class Paquete(models.Model):
     Se editan desde el panel de administración (/admin/).
     """
     nombre = models.CharField(max_length=40, unique=True)
+    slug = models.SlugField(
+        'dirección web', max_length=40, unique=True,
+        help_text='Se usa en la dirección de compra, por ejemplo "atempo-10" → /paquetes/atempo-10/comprar/.',
+    )
     creditos = models.PositiveSmallIntegerField('créditos')
     vigencia_meses = models.PositiveSmallIntegerField('vigencia (meses)')
     precio = models.DecimalField('precio (S/)', max_digits=8, decimal_places=2)

@@ -60,6 +60,45 @@ document.querySelectorAll('.boton-mostrar').forEach(function (boton) {
   });
 });
 
+/* ---------- Pago: mostrar solo los campos del método elegido ----------
+   Sin JavaScript se ven todos los campos y el formulario igual funciona. */
+(function () {
+  var opciones = document.querySelectorAll('input[name="metodo"]');
+  var grupos = document.querySelectorAll('.metodo-campos');
+  if (!opciones.length) return;
+
+  function metodoElegido() {
+    var marcado = document.querySelector('input[name="metodo"]:checked');
+    return marcado ? marcado.value : 'tarjeta';
+  }
+
+  function actualizar() {
+    var metodo = metodoElegido();
+    grupos.forEach(function (grupo) {
+      grupo.hidden = grupo.dataset.metodo.split(' ').indexOf(metodo) === -1;
+    });
+  }
+
+  opciones.forEach(function (opcion) { opcion.addEventListener('change', actualizar); });
+  actualizar();
+
+  // "Completar con datos de prueba" (para la demostración)
+  var prueba = document.querySelector('[data-datos-prueba]');
+  if (prueba) {
+    prueba.addEventListener('click', function () {
+      var datos = {
+        tarjeta: { tarjeta_numero: '4111 1111 1111 1111', tarjeta_vence: '12/29', tarjeta_cvv: '123' },
+        yape: { celular: '912 345 678', codigo_yape: '123456' },
+        plin: { celular: '912 345 678' }
+      }[metodoElegido()];
+      Object.keys(datos).forEach(function (nombre) {
+        var campo = document.querySelector('[name="' + nombre + '"]');
+        if (campo) campo.value = datos[nombre];
+      });
+    });
+  }
+})();
+
 /* ---------- Portada: imágenes que cambian solas ----------
    Cambian cada 6 segundos con un fundido. Los puntos permiten elegir
    una imagen y el botón "Pausar" detiene el cambio. Si la persona pidió

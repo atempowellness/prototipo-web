@@ -177,8 +177,10 @@ class PanelAdministracionTests(TestCase):
 
 class PaquetesConSesionTests(TestCase):
     def test_boton_comprar_segun_sesion(self):
+        # Sin sesión: primero ingresar, luego directo al pago
         respuesta = self.client.get(reverse('paquetes'))
-        self.assertContains(respuesta, '/cuenta/ingresar/?next=/paquetes/')
+        self.assertContains(respuesta, '/cuenta/ingresar/?next=/paquetes/atempo-10/comprar/')
+        # Con sesión: directo al pago
         self.client.force_login(crear_maria())
         respuesta = self.client.get(reverse('paquetes'))
-        self.assertContains(respuesta, 'Compra en línea próximamente')
+        self.assertContains(respuesta, 'href="/paquetes/atempo-10/comprar/">Comprar</a>')

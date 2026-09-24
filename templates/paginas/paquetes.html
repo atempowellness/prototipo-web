@@ -44,11 +44,12 @@
           </ul>
         </details>
 
-        {# La compra aún no existe: sin sesión lleva a iniciar sesión (y vuelve aquí); con sesión avisa que viene pronto #}
+        {# Sin sesión, primero pide ingresar y luego lleva directo al pago #}
+        {% url 'comprar' paquete.slug as url_comprar %}
         {% if user.is_authenticated %}
-          <button class="boton" type="button" disabled>Compra en línea próximamente</button>
+          <a class="boton" href="{{ url_comprar }}">Comprar</a>
         {% else %}
-          <a class="boton" href="{% url 'ingresar' %}?next={{ request.path|urlencode }}">Comprar</a>
+          <a class="boton" href="{% url 'ingresar' %}?next={{ url_comprar|urlencode }}">Comprar</a>
         {% endif %}
       </article>
     {% endfor %}

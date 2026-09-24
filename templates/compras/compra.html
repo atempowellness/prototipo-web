@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load formato %}
+
+{% block contenido %}
+<section class="contenedor cabecera-pagina">
+  {% if nueva %}
+    <p class="confirmacion-marca" aria-hidden="true">✓</p>
+    <h1>¡Compra confirmada!</h1>
+    <p class="entrada">
+      Ya tienes <strong>{{ creditos_totales|creditos }} disponible{{ creditos_totales|pluralize }}</strong>.
+      Tu <strong class="nombre-marca">{{ compra.nombre_paquete }}</strong> vence el {{ compra.vence|date:"j \d\e F \d\e Y" }}.
+    </p>
+    <p>También te enviamos la boleta a <strong>{{ user.email }}</strong>.</p>
+    <div class="fila-botones">
+      <a class="boton" href="{% url 'horarios' %}">Ver horarios</a>
+      <a class="boton boton-borde" href="{% url 'cuenta' %}">Ir a Mi cuenta</a>
+    </div>
+  {% else %}
+    <p class="etiqueta-seccion"><a href="{% url 'cuenta' %}">← Volver a Mi cuenta</a></p>
+    <h1>Tu compra</h1>
+  {% endif %}
+</section>
+
+{# Boleta simulada #}
+<section class="contenedor">
+  <div class="correo-simulado boleta">
+    <p class="correo-simulado-aviso">Simulación del prototipo: así se ve la boleta electrónica que te enviamos por correo</p>
+    <div class="correo-simulado-cuerpo">
+      <div class="boleta-cabecera">
+        <div>
+          {% include 'partes/logo.html' %}
+          <p class="apagado">Atempo Wellness S.A.C. (razón social de ejemplo)<br>RUC 20000000000 · Av. Petit Thouars, San Isidro, Lima</p>
+        </div>
+        <div class="boleta-numero">
+          <p class="etiqueta-seccion">Boleta de venta electrónica</p>
+          <p class="cifra">{{ compra.numero_boleta }}</p>
+        </div>
+      </div>
+
+      <dl class="lista-datos">
+        <dt>Fecha</dt><dd>{{ compra.fecha|date:"d/m/Y H:i" }}</dd>
+        <dt>Cliente</dt><dd>{{ compra.usuario.get_full_name }}</dd>
+        <dt>DNI</dt><dd>{{ compra.usuario.dni|default:"—" }}</dd>
+        <dt>Medio de pago</dt><dd>{{ compra.detalle_pago }}</dd>
+        <dt>N.° de operación</dt><dd>{{ compra.numero_operacion }}</dd>
+      </dl>
+
+      <table class="boleta-tabla">
+        <thead><tr><th>Descripción</th><th>Cant.</th><th>Importe</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Paquete {{ compra.nombre_paquete }}: {{ compra.creditos|creditos }}, vigente hasta el {{ compra.vence|date:"d/m/Y" }}</td>
+            <td>1</td>
+            <td>{{ compra.precio_pagado|soles }}</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr><td colspan="2">Op. gravada</td><td>{{ compra.subtotal|soles }}</td></tr>
+          <tr><td colspan="2">IGV (18 %)</td><td>{{ compra.igv|soles }}</td></tr>
+          <tr class="boleta-total"><td colspan="2">Total</td><td>{{ compra.precio_pagado|soles }}</td></tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+</section>
+{% endblock %}

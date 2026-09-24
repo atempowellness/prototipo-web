@@ -1,16 +1,42 @@
 {% extends 'base.html' %}
+{% load formato %}
 
 {% block contenido %}
 {% with u=request.user %}
 <section class="contenedor cabecera-pagina">
   <h1>¡Hola, {{ u.nombre }}!</h1>
   <p class="entrada">Aquí verás tus créditos, tus reservas y tus beneficios de bienestar.</p>
+
+  {# Aviso: créditos que vencen en 7 días o menos (y correo simulado) #}
+  {% for compra in por_vencer %}
+    <div class="aviso-vencimiento" role="status">
+      <p>
+        <strong>Tus créditos están por vencer.</strong>
+        Te quedan {{ compra.creditos_disponibles|creditos }} de tu <strong class="nombre-marca">{{ compra.nombre_paquete }}</strong>,
+        que vence{% if compra.dias_para_vencer == 0 %} hoy{% else %} el {{ compra.vence|date:"j \d\e F" }}{% endif %}.
+        <a href="{% url 'horarios' %}">Reserva tus clases</a> para no perderlos.
+      </p>
+      <details class="ayuda-desplegable">
+        <summary>Ver el correo que te enviamos</summary>
+        <div class="correo-simulado">
+          <p class="correo-simulado-aviso">Simulación del prototipo: así se vería el correo de aviso</p>
+          <div class="correo-simulado-cuerpo">
+            <p class="correo-simulado-asunto"><strong>Asunto:</strong> Tus créditos de Atempo vencen pronto</p>
+            <p>Hola, {{ u.nombre }}:</p>
+            <p>Te quedan <strong>{{ compra.creditos_disponibles|creditos }}</strong> de tu {{ compra.nombre_paquete }}, que vence el {{ compra.vence|date:"j \d\e F \d\e Y" }}. ¡Todavía estás a tiempo de usarlos!</p>
+            <p><a class="boton" href="{% url 'horarios' %}">Reservar una clase</a></p>
+            <p class="apagado">Con cariño,<br>el equipo de <strong class="nombre-marca">Atempo</strong></p>
+          </div>
+        </div>
+      </details>
+    </div>
+  {% endfor %}
 </section>
 
 <section class="contenedor">
   <div class="cuenta-rejilla">
 
-    {# Datos reales de la cuenta #}
+    {# Datos de la cuenta #}
     <div class="tarjeta cuenta-datos">
       <h2>Tus datos</h2>
       <dl class="lista-datos">
@@ -25,13 +51,58 @@
       </form>
     </div>
 
-    {# Espacios de lo que vendrá, cuando existan compras y reservas #}
-    <div class="tarjeta-pronto">
-      <p class="etiqueta-seccion">Próximamente</p>
+    {# Créditos #}
+    <div class="tarjeta">
       <h2>Créditos disponibles</h2>
-      <p>Tus créditos, el paquete que tienes activo y cuándo vence.</p>
-      <a href="{% url 'paquetes' %}">Ver paquetes</a>
+      <p class="numero-grande cifra">{{ creditos_totales }}</p>
+      {% if compras_vigentes %}
+        <ul class="lista-simple">
+          {% for compra in compras_vigentes %}{% if compra.creditos_disponibles %}
+            <li>{{ compra.creditos_disponibles|creditos }} de <strong class="nombre-marca">{{ compra.nombre_paquete }}</strong>, vence el {{ compra.vence|date:"d/m/Y" }}</li>
+          {% endif %}{% endfor %}
+        </ul>
+        <p class="nota">Al reservar, se usan primero los créditos que vencen antes.</p>
+      {% else %}
+        <p>Aún no tienes créditos activos.</p>
+      {% endif %}
+      <a class="boton" href="{% url 'paquetes' %}">Comprar créditos</a>
     </div>
+
+    {# Beneficios #}
+    <div class="tarjeta">
+      <h2>Beneficios incluidos</h2>
+      <ul class="lista-simple">
+        <li>Nutrición: <strong>{{ nutricion_total }}</strong> {% if nutricion_total == 1 %}sesión disponible{% else %}sesiones disponibles{% endif %}</li>
+        <li>Masajes: <strong>{{ masaje_total }}</strong> {% if masaje_total == 1 %}sesión disponible{% else %}sesiones disponibles{% endif %}</li>
+        <li><strong class="nombre-marca">Atempo Circle</strong>: {% if tiene_circle %}activo{% else %}incluido desde <strong class="nombre-marca">Atempo 5</strong>{% endif %}</li>
+      </ul>
+      <p class="nota">Las sesiones se agendan desde <a href="{% url 'bienestar' %}">Nutrición y masajes</a>.</p>
+    </div>
+
+    {# Historial #}
+    <div class="tarjeta cuenta-ancha">
+      <h2>Historial de compras</h2>
+      {% if historial %}
+        <table class="tabla">
+          <thead><tr><th>Fecha</th><th>Paquete</th><th>Monto</th><th>Medio de pago</th><th><span class="lectores">Boleta</span></th></tr></thead>
+          <tbody>
+            {% for compra in historial %}
+              <tr>
+                <td>{{ compra.fecha|date:"d/m/Y" }}</td>
+                <td><strong class="nombre-marca">{{ compra.nombre_paquete }}</strong></td>
+                <td>{{ compra.precio_pagado|soles }}</td>
+                <td>{{ compra.get_metodo_display }}</td>
+                <td><a href="{% url 'compra' compra.pk %}">Ver boleta</a></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p>Todavía no has comprado paquetes.</p>
+      {% endif %}
+    </div>
+
+    {# Lo que vendrá #}
     <div class="tarjeta-pronto">
       <p class="etiqueta-seccion">Próximamente</p>
       <h2>Próximas clases</h2>
@@ -39,18 +110,8 @@
     </div>
     <div class="tarjeta-pronto">
       <p class="etiqueta-seccion">Próximamente</p>
-      <h2>Beneficios incluidos</h2>
-      <p>Tus sesiones de nutrición y masajes disponibles según tu paquete.</p>
-    </div>
-    <div class="tarjeta-pronto">
-      <p class="etiqueta-seccion">Próximamente</p>
       <h2>Citas y encuentros</h2>
       <p>Tus citas de nutrición y masajes, y los eventos de <strong class="nombre-marca">Atempo Circle</strong> a los que te apuntaste.</p>
-    </div>
-    <div class="tarjeta-pronto">
-      <p class="etiqueta-seccion">Próximamente</p>
-      <h2>Historial de compras</h2>
-      <p>Los paquetes que compraste, con la fecha y el medio de pago.</p>
     </div>
     <div class="tarjeta-pronto">
       <p class="etiqueta-seccion">Próximamente</p>

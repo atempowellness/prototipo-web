@@ -41,9 +41,10 @@ class PaginaPaquetesTests(TestCase):
                       'Masaje adicional: 2 créditos']:
             self.assertContains(respuesta, texto)
 
-    def test_comprar_lleva_a_iniciar_sesion(self):
+    def test_comprar_lleva_a_iniciar_sesion_y_luego_al_pago(self):
         respuesta = self.client.get(reverse('paquetes'))
-        self.assertContains(respuesta, f'href="{reverse("ingresar")}?next=/paquetes/">Comprar</a>', count=5)
+        for slug in ['atempo-1', 'atempo-5', 'atempo-10', 'atempo-20', 'atempo-40']:
+            self.assertContains(respuesta, f'href="{reverse("ingresar")}?next=/paquetes/{slug}/comprar/">Comprar</a>')
 
     def test_paquete_inactivo_no_se_muestra(self):
         Paquete.objects.filter(nombre='Atempo 40').update(activo=False)

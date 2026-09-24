@@ -7,8 +7,9 @@ from .models import Paquete
 class PaqueteAdmin(admin.ModelAdmin):
     list_display = ['nombre', 'creditos', 'vigencia_meses', 'precio', 'etiqueta_destacado', 'activo', 'orden']
     list_editable = ['precio', 'activo', 'orden']
+    prepopulated_fields = {'slug': ['nombre']}
     fieldsets = [
-        (None, {'fields': ['nombre', 'creditos', 'vigencia_meses', 'precio']}),
+        (None, {'fields': ['nombre', 'slug', 'creditos', 'vigencia_meses', 'precio']}),
         ('Beneficios incluidos', {'fields': [
             'sesiones_nutricion', 'sesiones_masaje', 'incluye_circle',
             'costo_nutricion_adicional', 'costo_masaje_adicional',

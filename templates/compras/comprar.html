@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load formato marca %}
+
+{% block contenido %}
+<section class="contenedor cabecera-pagina">
+  <p class="etiqueta-seccion"><a href="{% url 'paquetes' %}">← Volver a paquetes</a></p>
+  <h1>Comprar <span class="cifra">{{ paquete.nombre }}</span></h1>
+</section>
+
+<section class="contenedor">
+  <div class="pago">
+
+    {# Resumen de la compra #}
+    <aside class="pago-resumen tarjeta" aria-label="Resumen de tu compra">
+      <h2>Tu compra</h2>
+      <p class="pago-resumen-linea"><strong class="nombre-marca">{{ paquete.nombre }}</strong><span class="cifra">{{ paquete.precio|soles }}</span></p>
+      <p class="apagado">{{ paquete.creditos|creditos }}, válido por {{ paquete.vigencia_meses|meses }} desde hoy.</p>
+      <ul class="pago-resumen-beneficios">
+        {% for beneficio in paquete.beneficios %}<li>{{ beneficio|marca }}</li>{% endfor %}
+      </ul>
+      <p class="pago-resumen-linea pago-total"><span>Total</span><span class="cifra">{{ paquete.precio|soles }}</span></p>
+      <p class="nota">Comprando como <strong>{{ user.get_full_name }}</strong> ({{ user.email }}).</p>
+    </aside>
+
+    {# Pago simulado #}
+    <form method="post" class="pago-formulario" novalidate>
+      {% csrf_token %}
+      {% for error in form.non_field_errors %}<p class="aviso-error" role="alert">{{ error }}</p>{% endfor %}
+
+      <fieldset class="metodos">
+        <legend>Método de pago</legend>
+        {% for opcion in form.metodo %}
+          <label class="metodo">
+            {{ opcion.tag }}
+            <span>{{ opcion.choice_label }}</span>
+          </label>
+        {% endfor %}
+      </fieldset>
+
+      <div class="metodo-campos" data-metodo="tarjeta">
+        {% include 'partes/campo.html' with campo=form.tarjeta_numero %}
+        <div class="campos-dos">
+          {% include 'partes/campo.html' with campo=form.tarjeta_vence %}
+          {% include 'partes/campo.html' with campo=form.tarjeta_cvv %}
+        </div>
+      </div>
+
+      <div class="metodo-campos" data-metodo="yape plin">
+        {% include 'partes/campo.html' with campo=form.celular %}
+      </div>
+
+      <div class="metodo-campos" data-metodo="yape">
+        {% include 'partes/campo.html' with campo=form.codigo_yape %}
+        <details class="ayuda-desplegable">
+          <summary>¿Dónde encuentro el código de aprobación?</summary>
+          <ol>
+            <li>Abre tu app <strong>Yape</strong> en el celular.</li>
+            <li>Toca el <strong>menú</strong> (arriba a la derecha) y elige <strong>“Aprobar compras”</strong>.</li>
+            <li>Debajo de las solicitudes por aprobar verás tu <strong>código de aprobación</strong>: copia los <strong>6 dígitos</strong> y escríbelos aquí.</li>
+          </ol>
+          <p class="apagado">El código cambia aproximadamente cada minuto y medio: escríbelo apenas lo veas. Si cambia, usa el nuevo.</p>
+        </details>
+      </div>
+
+      <div class="metodo-campos" data-metodo="plin">
+        <p class="nota-destacada">Al pagar, recibirás una notificación en la app de tu banco para aprobar el pago con Plin.</p>
+      </div>
+
+      <div class="fila-botones pago-botones">
+        <button class="boton" type="submit">Pagar <span class="cifra">{{ paquete.precio|soles }}</span></button>
+        <button class="boton boton-borde" type="button" data-datos-prueba>Completar con datos de prueba</button>
+      </div>
+      <p class="nota">
+        Pago simulado: no se cobra nada. En la versión final se procesaría con la pasarela Culqi.
+        Para probar un pago rechazado, usa una tarjeta que termine en 0000.
+      </p>
+    </form>
+
+  </div>
+</section>
+{% endblock %}
