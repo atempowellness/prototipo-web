@@ -135,15 +135,44 @@ class RecuperarTests(TestCase):
 
 
 class PanelAdministracionTests(TestCase):
-    def test_confirmacion_de_borrado_con_gramatica_correcta(self):
-        admin = Usuario.objects.create_superuser('admin@atempo.pe', 'clave-de-prueba', nombre='Admin', apellido='Atempo')
-        maria = crear_maria()
-        self.client.force_login(admin)
-        respuesta = self.client.post('/admin/cuentas/usuario/', {
-            'action': 'delete_selected', '_selected_action': [maria.pk],
-        })
-        self.assertContains(respuesta, 'el usuario seleccionado')
-        self.assertNotContains(respuesta, 'el cuenta')
+    """Las frases de "eliminar seleccionados" deben ir en singular o plural según corresponda."""
+
+    def setUp(self):
+        self.admin = Usuario.objects.create_superuser('admin@atempo.pe', 'clave-de-prueba', nombre='Admin', apellido='Atempo')
+        self.maria = crear_maria()
+        self.ana = Usuario.objects.create_user('ana@correo.pe', 'Ritmo-propio-2026', nombre='Ana', apellido='Paz',
+                                               celular='912345678', dni='12345678')
+        self.client.force_login(self.admin)
+
+    def eliminar(self, ids, confirmar=False):
+        datos = {'action': 'delete_selected', '_selected_action': ids}
+        if confirmar:
+            datos['post'] = 'yes'
+        return self.client.post('/admin/cuentas/usuario/', datos, follow=confirmar)
+
+    def test_menu_de_acciones(self):
+        respuesta = self.client.get('/admin/cuentas/usuario/')
+        self.assertContains(respuesta, 'Eliminar usuarios seleccionados')
+        self.assertNotContains(respuesta, 'seleccionado/s')
+
+    def test_confirmacion_en_singular(self):
+        respuesta = self.eliminar([self.maria.pk])
+        self.assertContains(respuesta, '¿Seguro que quieres eliminar el usuario seleccionado?')
+
+    def test_confirmacion_en_plural(self):
+        respuesta = self.eliminar([self.maria.pk, self.ana.pk])
+        self.assertContains(respuesta, '¿Seguro que quieres eliminar los 2 usuarios seleccionados?')
+        self.assertNotContains(respuesta, 'el usuarios')
+
+    def test_mensaje_final_en_singular_y_plural(self):
+        respuesta = self.eliminar([self.maria.pk], confirmar=True)
+        self.assertContains(respuesta, 'Se eliminó 1 usuario correctamente.')
+        respuesta = self.eliminar([self.ana.pk, self.admin.pk], confirmar=True)
+        self.assertContains(respuesta, 'Se eliminaron 2 usuarios correctamente.')
+
+    def test_paquetes_tambien(self):
+        respuesta = self.client.get('/admin/paquetes/paquete/')
+        self.assertContains(respuesta, 'Eliminar paquetes seleccionados')
 
 
 class PaquetesConSesionTests(TestCase):
