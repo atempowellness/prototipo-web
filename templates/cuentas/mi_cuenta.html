@@ -33,6 +33,9 @@
     </div>
     {% endwith %}
   {% endfor %}
+
+  {# Aviso: se liberó un cupo de la lista de espera (y correo simulado) #}
+  {% include 'clases/_aviso_oferta.html' %}
 </section>
 
 <section class="contenedor">
@@ -165,6 +168,27 @@
         <p class="nota">Puedes cancelar sin perder el punto hasta 12 horas antes de cada clase.</p>
       {% else %}
         <p>Aún no tienes clases reservadas.</p>
+      {% endif %}
+
+      {# Listas de espera (solo si está en alguna) #}
+      {% if listas_espera %}
+        <h3 class="subtitulo-tarjeta" id="lista-de-espera">Listas de espera</h3>
+        <ul class="proximas-lista">
+          {% for p in listas_espera %}
+            <li class="proxima">
+              <span class="proxima-hora cifra">{{ p.clase.inicio|date:"H:i" }}</span>
+              <span class="proxima-texto">
+                <strong>{{ p.clase.disciplina.nombre }}</strong> · {{ p.clase.inicio|date:"D j \d\e F"|capfirst }}
+                <span class="apagado">{% if p.estado == 'ofrecido' %}¡Se liberó un cupo para ti! Confírmalo hasta las {{ p.oferta_vence|date:"H:i" }}{% if p.oferta_vence|date:"Y-m-d" != hoy|date:"Y-m-d" %} del {{ p.oferta_vence|date:"l j" }}{% endif %}{% else %}Eres la {{ p.puesto }}.ª en la lista{% endif %}</span>
+              </span>
+              {% if p.estado == 'ofrecido' %}
+                <a class="boton boton-chico" href="{% url 'confirmar_cupo' p.pk %}?next={{ request.get_full_path|urlencode }}" data-dialogo>Confirmar</a>
+              {% else %}
+                <a class="boton boton-borde boton-chico" href="{% url 'salir_espera' p.pk %}?next={{ request.get_full_path|urlencode }}" data-dialogo>Salir</a>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
       {% endif %}
       <a class="boton" href="{% url 'horarios' %}">Ver horarios y reservar</a>
     </div>

@@ -221,6 +221,20 @@ strong, b { font-weight: var(--peso-enfasis); }
   text-align: center;
   padding: 7px 16px 5px;
 }
+.aviso-demo-form { display: inline; }
+.aviso-demo-boton {
+  margin-left: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: var(--peso-enfasis);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.tarjeta-demo { margin-top: 24px; }
+.tarjeta-demo h2 { font-size: 1.6rem; }
 
 /* ---------------------------------------------------------
    6. ENCABEZADO Y MENÚ
@@ -1182,6 +1196,7 @@ main { min-height: 50vh; }
 .clase-estado-pocos { color: var(--texto-acento); }
 .clase-estado-mia { color: var(--texto); }
 .vacio { padding: 32px 0; color: var(--texto-secundario); }
+.simular-cupo { margin: 0; font-size: .9rem; }
 .simulacion { margin-top: 32px; border-top: 1px solid var(--decorativo); padding-top: 12px; }
 .simulacion .campanita-accion { margin-left: 6px; }
 

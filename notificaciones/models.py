@@ -28,7 +28,13 @@ class Notificacion(models.Model):
     ENCUENTRO_RECORDATORIO = 'enc_recordatorio'
     ENCUENTRO_CANCELADO = 'enc_cancelado'
     ENCUENTRO_APERTURA = 'enc_apertura'
+    ESPERA_OFERTA = 'espera_oferta'
+    ESPERA_VENCIDA = 'espera_vencida'
+    ESPERA_FIN = 'espera_fin'
     TIPOS = [
+        (ESPERA_OFERTA, 'Lista de espera: se liberó un cupo para ti'),
+        (ESPERA_VENCIDA, 'Lista de espera: venció el plazo para confirmar'),
+        (ESPERA_FIN, 'Lista de espera: se cerró, se saltó o se canceló la clase'),
         (ENCUENTRO_CONFIRMADO, 'Inscripción a un encuentro confirmada'),
         (ENCUENTRO_RECORDATORIO, 'Recordatorio de encuentro'),
         (ENCUENTRO_CANCELADO, 'Encuentro o asistencia cancelada por el estudio'),

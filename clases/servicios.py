@@ -128,6 +128,9 @@ def cancelar_reserva(reserva, por_el_estudio=False):
     if por_el_estudio:
         from notificaciones import avisos
         avisos.reserva_cancelada_por_estudio(reserva, devuelto)
+    # El cupo liberado pasa primero a la lista de espera (si hay)
+    from .lista_espera import procesar_lista
+    procesar_lista(reserva.clase)
     return devuelto
 
 
@@ -149,6 +152,8 @@ def cancelar_clase_por_estudio(clase, motivo=''):
         reserva.save(update_fields=['cancelada', 'cancelada_en', 'credito_devuelto'])
         avisos.clase_cancelada(reserva, devuelto)
         afectadas += 1
+    from .lista_espera import procesar_lista
+    procesar_lista(clase)   # cierra la lista de espera y avisa a quienes esperaban
     return afectadas
 
 

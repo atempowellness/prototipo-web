@@ -5,8 +5,14 @@ from .models import MAXIMO_EN_MENU
 
 
 def campanita(request):
+    if request.path.startswith('/admin/'):
+        return {}
+    # Plazos de la lista de espera (en el prototipo se revisan al cargar cualquier página)
+    from clases.lista_espera import revisar_listas_de_espera
+    revisar_listas_de_espera()
+
     usuario = getattr(request, 'user', None)
-    if usuario is None or not usuario.is_authenticated or request.path.startswith('/admin/'):
+    if usuario is None or not usuario.is_authenticated:
         return {}
     revisar_vencimientos(usuario)
     revisar_recordatorios(usuario)

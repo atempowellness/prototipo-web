@@ -81,6 +81,12 @@ def reiniciar_cuenta(usuario):
         'pagos': usuario.compras.count(),
         'avisos': usuario.notificaciones.count(),
     }
+    # Sus puestos en listas de espera: si tenía un cupo ofrecido, pasa a la siguiente
+    from clases.lista_espera import procesar_lista
+    clases_con_puesto = {p.clase for p in usuario.listas_espera.select_related('clase')}
+    usuario.listas_espera.all().delete()
+    for clase in clases_con_puesto:
+        procesar_lista(clase)
     usuario.reservas.all().delete()
     usuario.citas.all().delete()
     usuario.inscripciones.all().delete()

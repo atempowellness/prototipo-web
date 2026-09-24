@@ -96,5 +96,11 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     def get_full_name(self):
         return f'{self.nombre} {self.apellido}'
 
+    @property
+    def es_demostracion(self):
+        """¿Es la cuenta de demostración del prototipo? (ver cuentas/demostracion.py)."""
+        from .demostracion import CORREO_DEMO
+        return self.email == CORREO_DEMO
+
     def get_short_name(self):
         return self.nombre

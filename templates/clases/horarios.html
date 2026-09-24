@@ -4,6 +4,7 @@
 <section class="contenedor cabecera-pagina">
   <h1>Clases</h1>
   <p class="entrada">Elige el día, filtra por disciplina o por horario y reserva con un punto. Puedes reservar con hasta {{ dias_para_reservar }} días de anticipación.</p>
+  {% include 'clases/_aviso_oferta.html' %}
 </section>
 
 {# Zona que se actualiza sin recargar la página al cambiar de día o filtro (ver atempo.js) #}
@@ -60,13 +61,29 @@
               {% elif e.mi_reserva %}
                 <span class="clase-estado clase-estado-mia">✓ Tu reserva</span>
                 <a class="boton boton-borde boton-chico" href="{% url 'cancelar_reserva' e.mi_reserva.pk %}?next={{ request.get_full_path|urlencode }}" data-dialogo>Cancelar</a>
+              {% elif e.mi_puesto.estado == 'ofrecido' %}
+                <span class="clase-estado clase-estado-mia">¡Cupo para ti! Hasta las {{ e.mi_puesto.oferta_vence|date:"H:i" }}</span>
+                <a class="boton boton-chico" href="{% url 'confirmar_cupo' e.mi_puesto.pk %}?next={{ request.get_full_path|urlencode }}" data-dialogo>Confirmar</a>
+              {% elif e.mi_puesto %}
+                <span class="clase-estado clase-estado-mia">En lista de espera: eres la {{ e.mi_puesto.puesto }}.ª</span>
+                <a class="boton boton-borde boton-chico" href="{% url 'salir_espera' e.mi_puesto.pk %}?next={{ request.get_full_path|urlencode }}" data-dialogo>Salir</a>
               {% elif e.llena %}
-                <span class="clase-estado">Llena</span>
+                <span class="clase-estado">Llena{% if e.en_espera %} · {{ e.en_espera }} en espera{% endif %}</span>
+                {% if e.lista_abierta %}
+                  <a class="boton boton-borde boton-chico" href="{% url 'anotarse_espera' c.pk %}?next={{ request.get_full_path|urlencode }}" data-dialogo>Lista de espera</a>
+                {% endif %}
               {% else %}
                 <span class="clase-estado{% if e.pocos_cupos %} clase-estado-pocos{% endif %}">{% if e.pocos_cupos %}{% if e.cupos == 1 %}Queda 1 cupo{% else %}Quedan {{ e.cupos }} cupos{% endif %}{% else %}Hay cupos{% endif %}</span>
                 <a class="boton boton-chico" href="{% url 'reservar' c.pk %}?next={{ request.get_full_path|urlencode }}" data-dialogo>Reservar</a>
               {% endif %}
             </div>
+            {# Modo demostración: una persona de ejemplo cancela y su cupo pasa a la lista #}
+            {% if simular and e.en_espera and c.ocupacion_fija and c.ocupacion_simulada and not c.empezo %}
+              <form method="post" action="{% url 'simular_cupo' c.pk %}" class="simular-cupo">
+                {% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
+                <button type="submit" class="campanita-accion">Simular que se libera un cupo</button>
+              </form>
+            {% endif %}
           </article>
           {% endwith %}
         {% endfor %}
@@ -81,7 +98,7 @@
     {% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
     <p class="nota">
       <strong>Modo demostración:</strong>
-      {% if simular %}se está simulando la ocupación de otras personas en cada clase.{% else %}solo se cuentan las reservas reales.{% endif %}
+      {% if simular %}se está simulando la ocupación de otras personas en cada clase. En una clase llena, anótate en la lista de espera y usa "Simular que se libera un cupo".{% else %}solo se cuentan las reservas reales.{% endif %}
       <button type="submit" class="campanita-accion">{% if simular %}Dejar de simular{% else %}Simular ocupación{% endif %}</button>
     </p>
   </form>

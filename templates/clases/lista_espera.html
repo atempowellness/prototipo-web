@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% comment %}Versión en página propia de las ventanas de la lista de espera.{% endcomment %}
+{% block contenido %}
+<section class="contenedor cabecera-pagina formulario-pagina">
+  <p class="etiqueta-seccion"><a href="{{ next }}">← Volver</a></p>
+  <div class="tarjeta formulario">{% include 'clases/_lista_espera.html' %}</div>
+</section>
+{% endblock %}

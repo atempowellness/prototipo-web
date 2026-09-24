@@ -19,5 +19,15 @@
       <a href="{% url 'registro' %}{% if next %}?next={{ next|urlencode }}{% endif %}">Créala aquí</a>
     </p>
   </form>
+
+  {# Atajo para la presentación del prototipo #}
+  <div class="tarjeta formulario tarjeta-demo">
+    <h2>¿Estás presentando el prototipo?</h2>
+    <p>Entra con Nicole, una socia de ejemplo con un <strong class="nombre-marca">Atempo 20</strong>, clases reservadas, una cita de nutrición, un encuentro de <strong class="nombre-marca">Atempo Circle</strong> y amigas invitadas. Cada vez que entras, la cuenta vuelve a empezar.</p>
+    <form method="post" action="{% url 'demostracion' %}">
+      {% csrf_token %}
+      <button class="boton boton-borde boton-ancho" type="submit">Usar cuenta de demostración</button>
+    </form>
+  </div>
 </section>
 {% endblock %}

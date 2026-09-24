@@ -1,0 +1,29 @@
+{% comment %}
+Aviso de cupo ofrecido por la lista de espera, con el correo simulado. Va arriba de Clases
+y de Mi cuenta mientras la oferta esté vigente.
+{% endcomment %}
+{% for o in ofertas %}
+  {% with c=o.clase %}
+  <div class="aviso-apertura" role="status">
+    <p><strong>¡Se liberó un cupo para ti!</strong> {{ c.disciplina.nombre }}, {{ c.inicio|date:"l j \d\e F" }} a las {{ c.inicio|date:"H:i" }} en {{ c.sala.nombre }}. Confírmalo hasta las <strong>{{ o.oferta_vence|date:"H:i" }}</strong>{% if o.oferta_vence|date:"Y-m-d" != hoy|date:"Y-m-d" %} del {{ o.oferta_vence|date:"l j" }}{% endif %}.</p>
+    <p class="fila-botones">
+      <a class="boton boton-chico" href="{% url 'confirmar_cupo' o.pk %}?next={{ request.get_full_path|urlencode }}" data-dialogo>Confirmar mi cupo</a>
+      <a class="boton boton-borde boton-chico" href="{% url 'salir_espera' o.pk %}?next={{ request.get_full_path|urlencode }}" data-dialogo>Dejarlo pasar</a>
+    </p>
+    <details class="ayuda-desplegable">
+      <summary>Ver el correo que te enviamos</summary>
+      <div class="correo-simulado">
+        <p class="correo-simulado-aviso">Simulación del prototipo: así se vería el correo de aviso</p>
+        <div class="correo-simulado-cuerpo">
+          <p class="correo-simulado-asunto"><strong>Asunto:</strong> Se liberó un cupo para ti en {{ c.disciplina.nombre }}</p>
+          <p>Hola, {{ user.nombre }}:</p>
+          <p>¡Buenas noticias! Se liberó un cupo en la clase de <strong>{{ c.disciplina.nombre }}</strong> del {{ c.inicio|date:"l j \d\e F" }} a las {{ c.inicio|date:"H:i" }}, en {{ c.sala.nombre }}. Eres la siguiente en la lista de espera.</p>
+          <p>Tienes hasta las <strong>{{ o.oferta_vence|date:"H:i" }}</strong> del {{ o.oferta_vence|date:"l j \d\e F" }} para confirmarlo. Si no, pasará a la siguiente persona.</p>
+          <p><a class="boton" href="{% url 'horarios' %}?dia={{ c.fecha|date:'Y-m-d' }}">Confirmar mi cupo</a></p>
+          <p class="apagado">Con cariño,<br>el equipo de <strong class="nombre-marca">Atempo</strong></p>
+        </div>
+      </div>
+    </details>
+  </div>
+  {% endwith %}
+{% endfor %}

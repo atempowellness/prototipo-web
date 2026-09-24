@@ -7,6 +7,7 @@ from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.encoding import force_bytes
 from django.utils.http import url_has_allowed_host_and_scheme, urlsafe_base64_encode
+from django.views import View
 from django.views.generic import FormView, TemplateView
 
 from .forms import IngresarForm, NuevaClaveForm, RecuperarForm, RegistroForm
@@ -70,6 +71,21 @@ class SalirView(auth_views.LogoutView):
         return respuesta
 
 
+class DemostracionView(View):
+    """
+    SOLO PARA EL PROTOTIPO. Deja la cuenta de demostración en su estado inicial (con fechas
+    actualizadas) y entra con ella. No pide contraseña: en la versión real se quitaría.
+    """
+    def post(self, request):
+        from .demostracion import preparar_cuenta_demo
+
+        nicole = preparar_cuenta_demo()
+        login(request, nicole, backend='cuentas.backends.CorreoOCelularBackend')
+        messages.success(request, f'Entraste a la cuenta de demostración de {nicole.nombre}: tiene un paquete, '
+                                  'clases, una cita, un encuentro y amigas invitadas. Todo es de ejemplo.')
+        return redirect('cuenta')
+
+
 class MiCuentaView(LoginRequiredMixin, TemplateView):
     template_name = 'cuentas/mi_cuenta.html'
     extra_context = {'titulo': 'Mi cuenta'}
@@ -92,6 +108,11 @@ class MiCuentaView(LoginRequiredMixin, TemplateView):
         from bienestar.servicios import proximas_citas
         from clases.servicios import proximas_reservas
         contexto['proximas_reservas'] = proximas_reservas(usuario)
+        from clases.lista_espera import listas_de, ofertas_de, revisar_listas_de_espera
+        from django.utils import timezone
+        revisar_listas_de_espera()
+        contexto.update({'listas_espera': listas_de(usuario), 'ofertas': ofertas_de(usuario),
+                         'hoy': timezone.localdate()})
         contexto['proximas_citas'] = proximas_citas(usuario)
         from comunidad.servicios import proximas_inscripciones
         contexto['proximas_inscripciones'] = proximas_inscripciones(usuario)

@@ -110,6 +110,10 @@ class Clase(models.Model):
     aforo = models.PositiveSmallIntegerField(default=AFORO)
     ocupacion_simulada = models.PositiveSmallIntegerField(
         default=0, help_text='Personas "de ejemplo", solo se cuentan en el modo simulación.')
+    ocupacion_fija = models.BooleanField(
+        'personas de ejemplo siempre', default=False,
+        help_text='Se activa cuando alguien usa la lista de espera en el modo demostración: desde ahí, las '
+                  'personas de ejemplo cuentan para todos (así la clase sigue llena y la lista tiene sentido).')
     cancelada = models.BooleanField(default=False)
     motivo_cancelacion = models.CharField(max_length=120, blank=True)
 
@@ -137,8 +141,13 @@ class Clase(models.Model):
     def reservas_activas(self):
         return self.reservas.filter(cancelada=False)
 
+    def ofertas_activas(self):
+        """Cupos guardados para alguien de la lista de espera mientras decide."""
+        return self.lista_espera.filter(estado=ListaEspera.OFRECIDO)
+
     def ocupados(self, simular=False):
-        return self.reservas_activas().count() + (self.ocupacion_simulada if simular else 0)
+        ejemplo = self.ocupacion_simulada if (simular or self.ocupacion_fija) else 0
+        return self.reservas_activas().count() + self.ofertas_activas().count() + ejemplo
 
     def cupos(self, simular=False):
         return max(self.aforo - self.ocupados(simular), 0)
@@ -165,6 +174,50 @@ class Reserva(models.Model):
     def se_devuelve_si_cancela(self):
         """¿Faltan 12 horas o más?"""
         return self.clase.inicio - timezone.now() >= datetime.timedelta(hours=HORAS_PARA_CANCELAR)
+
+
+class ListaEspera(models.Model):
+    """
+    Un puesto en la lista de espera de una clase llena. Cuando se libera un cupo, se le
+    ofrece a la primera que espera, con un plazo para confirmar (ver clases/lista_espera.py).
+    """
+    ESPERANDO, OFRECIDO, CONFIRMADO = 'esperando', 'ofrecido', 'confirmado'
+    VENCIDO, OMITIDO, SALIO, CERRADO = 'vencido', 'omitido', 'salio', 'cerrado'
+    ESTADOS = [
+        (ESPERANDO, 'Esperando'),
+        (OFRECIDO, 'Cupo ofrecido: esperando que confirme'),
+        (CONFIRMADO, 'Confirmó: tiene reserva'),
+        (VENCIDO, 'No confirmó a tiempo'),
+        (OMITIDO, 'Se saltó (sin punto vigente u otra clase a esa hora)'),
+        (SALIO, 'Salió de la lista'),
+        (CERRADO, 'La lista se cerró'),
+    ]
+
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='listas_espera')
+    clase = models.ForeignKey(Clase, on_delete=models.CASCADE, related_name='lista_espera')
+    creada = models.DateTimeField('se anotó', default=timezone.now)
+    estado = models.CharField(max_length=12, choices=ESTADOS, default=ESPERANDO)
+    oferta_desde = models.DateTimeField('cupo ofrecido el', null=True, blank=True)
+    oferta_vence = models.DateTimeField('plazo para confirmar', null=True, blank=True)
+    reserva = models.ForeignKey(Reserva, on_delete=models.SET_NULL, null=True, blank=True, related_name='+')
+
+    class Meta:
+        ordering = ['clase__inicio', 'creada']
+        verbose_name, verbose_name_plural = 'puesto en lista de espera', 'puestos en lista de espera'
+
+    def __str__(self):
+        return f'{self.usuario.nombre_corto} → {self.clase}'
+
+    @property
+    def activa(self):
+        return self.estado in (self.ESPERANDO, self.OFRECIDO)
+
+    @property
+    def puesto(self):
+        """1 = la siguiente en recibir un cupo."""
+        if self.estado != self.ESPERANDO:
+            return None
+        return self.clase.lista_espera.filter(estado=self.ESPERANDO, creada__lt=self.creada).count() + 1
 
 
 def numero_simulado():

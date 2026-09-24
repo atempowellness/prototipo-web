@@ -184,3 +184,49 @@ class PaquetesConSesionTests(TestCase):
         self.client.force_login(crear_maria())
         respuesta = self.client.get(reverse('paquetes'))
         self.assertContains(respuesta, 'href="/paquetes/atempo-10/comprar/">Comprar</a>')
+
+
+class CuentaDemostracionTests(TestCase):
+    def test_boton_en_la_franja_y_en_iniciar_sesion(self):
+        self.assertContains(self.client.get(reverse('inicio')), 'Usar cuenta de demostración')
+        self.assertContains(self.client.get(reverse('ingresar')), '¿Estás presentando el prototipo?')
+        # Con otra cuenta no aparece
+        self.client.force_login(crear_maria())
+        self.assertNotContains(self.client.get(reverse('inicio')), 'cuenta de demostración')
+
+    def test_entra_con_todo_en_uso(self):
+        from compras.models import creditos_disponibles
+
+        respuesta = self.client.post(reverse('demostracion'), follow=True)
+        self.assertEqual(respuesta.redirect_chain[-1][0], reverse('cuenta'))
+        nicole = Usuario.objects.get(email='demo@atempo.pe')
+        self.assertEqual(int(self.client.session['_auth_user_id']), nicole.pk)
+        self.assertFalse(nicole.has_usable_password())
+
+        # Atempo 20 con 6 clases tomadas y 2 reservadas, más 1 punto de regalo por Ana Paula
+        self.assertEqual(nicole.reservas.filter(cancelada=False).count(), 2)
+        self.assertEqual(creditos_disponibles(nicole), 20 - 6 - 2 + 1)
+        self.assertEqual(nicole.citas.filter(cancelada=False).count(), 1)
+        self.assertEqual(nicole.inscripciones.filter(cancelada=False).count(), 1)
+        self.assertEqual(nicole.avisos_de_apertura.count(), 1)
+        self.assertEqual(nicole.invitadas.count(), 2)
+        # 3 sin leer al preparar la cuenta, más los que la campanita suma al abrir la página
+        # (punto por vencer y, según la hora, el recordatorio de la clase de mañana)
+        self.assertGreaterEqual(nicole.notificaciones.filter(leida=False).count(), 4)
+        self.assertTrue(nicole.notificaciones.filter(tipo='vencimiento').exists())
+
+        for texto in ['Atempo 20', 'Tu punto está por vencer', 'Ana Paula', 'Sofia', 'Encuentros de',
+                      'Volver a empezar la demostración']:
+            self.assertContains(respuesta, texto)
+
+    def test_vuelve_a_empezar_sin_acumular(self):
+        self.client.post(reverse('demostracion'))
+        nicole = Usuario.objects.get(email='demo@atempo.pe')
+        codigo = nicole.codigo_referida
+        nicole.reservas.update(cancelada=True)
+        self.client.post(reverse('demostracion'))
+        nicole.refresh_from_db()
+        self.assertEqual(nicole.codigo_referida, codigo)
+        self.assertEqual(nicole.reservas.count(), 2)
+        self.assertEqual(nicole.compras.count(), 2)      # su Atempo 20 y el punto de regalo
+        self.assertEqual(Usuario.objects.filter(email__endswith='.demo@atempo.pe').count(), 2)

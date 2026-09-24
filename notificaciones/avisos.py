@@ -90,6 +90,57 @@ def reserva_confirmada(reserva):
               reverse('cuenta'), reserva=reserva)
 
 
+def _clase_con_dia(clase):
+    local = timezone.localtime(clase.inicio)
+    return f'{_clase_texto(clase)} del {date_format(local, "l j \\d\\e F")}'
+
+
+def _hasta(momento):
+    """'las 10:45' si es hoy; 'mañana a las 5:45' o 'el martes 3 a las 5:45' si no."""
+    local = timezone.localtime(momento)
+    hoy = timezone.localdate()
+    if local.date() == hoy:
+        return f'las {local:%H:%M}'
+    if local.date() == hoy + datetime.timedelta(days=1):
+        return f'mañana a las {local:%H:%M}'
+    return f'el {date_format(local, "l j")} a las {local:%H:%M}'
+
+
+def _enlace_clase(clase):
+    return reverse('horarios') + f'?dia={clase.fecha.isoformat()}'
+
+
+def espera_oferta(puesto):
+    notificar(puesto.usuario, Notificacion.ESPERA_OFERTA,
+              f'¡Se liberó un cupo para ti en {_clase_con_dia(puesto.clase)}! Confírmalo hasta '
+              f'{_hasta(puesto.oferta_vence)}. También te enviamos un correo.', _enlace_clase(puesto.clase))
+
+
+def espera_vencida(puesto):
+    notificar(puesto.usuario, Notificacion.ESPERA_VENCIDA,
+              f'Venció el plazo para confirmar el cupo de {_clase_con_dia(puesto.clase)}. '
+              f'Se lo ofrecimos a la siguiente persona de la lista.', _enlace_clase(puesto.clase))
+
+
+def espera_omitida(puesto):
+    notificar(puesto.usuario, Notificacion.ESPERA_FIN,
+              f'Se liberó un cupo en {_clase_con_dia(puesto.clase)}, pero no tenías un punto vigente para ese día '
+              f'u otra clase a esa hora, así que pasó a la siguiente persona.', _enlace_clase(puesto.clase))
+
+
+def espera_cerrada(puesto, hay_cupo):
+    clase = puesto.clase
+    if clase.cancelada:
+        texto = f'El estudio canceló la clase de {_clase_con_dia(clase)}, así que saliste de su lista de espera.'
+    elif hay_cupo:
+        texto = (f'Se liberó un cupo en {_clase_con_dia(clase)}. Como la lista de espera ya cerró, '
+                 f'puedes reservarlo directamente si aún quieres ir.')
+    else:
+        texto = (f'La lista de espera de {_clase_con_dia(clase)} cerró y no se liberó ningún cupo. '
+                 f'¡Te esperamos en otra clase!')
+    notificar(puesto.usuario, Notificacion.ESPERA_FIN, texto, _enlace_clase(clase))
+
+
 def ajuste_de_creditos(usuario, cantidad, motivo=''):
     """El estudio sumó (cantidad > 0) o quitó (cantidad < 0) puntos desde el panel."""
     n = abs(cantidad)

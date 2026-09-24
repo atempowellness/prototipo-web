@@ -23,6 +23,13 @@
 
   <div class="aviso-demo" role="note">
     Prototipo de demostración: los datos son de ejemplo y ningún pago es real.
+    {# Atajo para la presentación: entra (o vuelve a empezar) con la socia de ejemplo #}
+    {% if not user.is_authenticated or user.es_demostracion %}
+      <form method="post" action="{% url 'demostracion' %}" class="aviso-demo-form">
+        {% csrf_token %}
+        <button type="submit" class="aviso-demo-boton">{% if user.is_authenticated %}Volver a empezar la demostración{% else %}Usar cuenta de demostración{% endif %}</button>
+      </form>
+    {% endif %}
   </div>
 
   {% include 'partes/encabezado.html' %}
