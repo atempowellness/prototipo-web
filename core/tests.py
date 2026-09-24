@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 PAGINAS_EN_CONSTRUCCION = [
-    'comunidad', 'privacidad', 'terminos', 'reclamaciones',
+    'comunidad',
 ]
 
 

@@ -1,0 +1,17 @@
+{% comment %}Confirmación para quitar una hoja respondida de Mi cuenta (ventana o página propia).{% endcomment %}
+<div class="confirmacion">
+  <h2 id="dialogo-titulo">¿Quitar esta hoja de tu cuenta?</h2>
+  <dl class="lista-datos">
+    <dt>Hoja</dt><dd class="cifra">N.° {{ reclamacion.numero }}</dd>
+    <dt>Tipo</dt><dd>{{ reclamacion.get_tipo_display }}</dd>
+    <dt>Fecha</dt><dd>{{ reclamacion.creada|date:"d/m/Y" }}</dd>
+  </dl>
+  <p>Dejará de verse en Mi cuenta. El estudio conserva una copia, como lo pide la ley.</p>
+  <form method="post" action="{% url 'quitar_reclamacion' reclamacion.pk %}">
+    {% csrf_token %}
+    <div class="fila-botones">
+      <button type="submit" class="boton">Sí, quitar</button>
+      <button type="button" class="boton boton-borde" data-cerrar-dialogo>No, mantenerla</button>
+    </div>
+  </form>
+</div>

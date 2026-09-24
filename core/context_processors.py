@@ -3,13 +3,14 @@ Datos que se agregan automáticamente a todas las plantillas.
 """
 from django.conf import settings
 
-ARCHIVOS_COMPARTIDOS = ['css/atempo.css', 'js/atempo.js']
+ARCHIVOS_COMPARTIDOS = ['css/atempo.css', 'js/atempo.js', 'css/panel.css']
 
 
 def datos_estudio(request):
-    """Datos del local que se muestran en varias páginas (pie de página, boleta)."""
-    from .views import DIRECCION
-    return {'direccion_estudio': DIRECCION}
+    """Datos de la empresa que se muestran en varias páginas (pie, boleta, páginas legales)."""
+    from .views import CORREO, DIRECCION, RAZON_SOCIAL, RUC, WHATSAPP
+    return {'direccion_estudio': DIRECCION, 'razon_social': RAZON_SOCIAL, 'ruc': RUC,
+            'correo_estudio': CORREO, 'whatsapp_estudio': WHATSAPP}
 
 
 def version_estaticos(request):

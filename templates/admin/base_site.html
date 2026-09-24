@@ -1,0 +1,7 @@
+{% extends "admin/base_site.html" %}
+{% comment %}Agrega a todo el panel la hoja de estilos propia (static/css/panel.css).{% endcomment %}
+{% load static %}
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'css/panel.css' %}?v={{ version_estaticos }}">
+{% endblock %}

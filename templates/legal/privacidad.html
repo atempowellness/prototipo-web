@@ -1,0 +1,69 @@
+{% extends 'legal/base_legal.html' %}
+
+{% block indice %}
+  <li><a href="#responsable">Quién es responsable de tus datos</a></li>
+  <li><a href="#datos">Qué datos recogemos</a></li>
+  <li><a href="#salud">Datos de salud</a></li>
+  <li><a href="#finalidades">Para qué los usamos</a></li>
+  <li><a href="#compartir">Con quién los compartimos</a></li>
+  <li><a href="#conservacion">Cuánto tiempo los guardamos</a></li>
+  <li><a href="#derechos">Tus derechos</a></li>
+  <li><a href="#seguridad">Cómo los protegemos</a></li>
+  <li><a href="#cookies">Cookies</a></li>
+  <li><a href="#cambios">Cambios a esta política</a></li>
+{% endblock %}
+
+{% block texto %}
+<p>En <strong class="nombre-marca">Atempo</strong> cuidamos tu información con la misma dedicación con la que cuidamos tu bienestar. Esta política explica qué datos personales recogemos, para qué los usamos y cómo puedes ejercer tus derechos, de acuerdo con la Ley N.° 29733, Ley de Protección de Datos Personales, y su reglamento.</p>
+
+<h2 id="responsable">1. Quién es responsable de tus datos</h2>
+<p>El responsable del tratamiento de tus datos es <strong>{{ razon_social }}</strong>, con RUC {{ ruc }} y domicilio en {{ direccion_estudio }}. Para cualquier consulta sobre tus datos, escríbenos a <a href="mailto:{{ correo_estudio }}">{{ correo_estudio }}</a>.</p>
+<p>Tus datos se guardan en un banco de datos que será inscrito en el Registro Nacional de Protección de Datos Personales de la Autoridad Nacional de Protección de Datos Personales.</p>
+
+<h2 id="datos">2. Qué datos recogemos</h2>
+<ul>
+  <li><strong>Datos de identificación y contacto:</strong> nombre, apellido, DNI, correo electrónico y celular, que nos das al crear tu cuenta.</li>
+  <li><strong>Datos de tus compras:</strong> paquetes comprados, montos, medio de pago y número de operación. De las tarjetas solo guardamos los últimos 4 dígitos: nunca el número completo ni el código de seguridad.</li>
+  <li><strong>Datos de uso del servicio:</strong> clases reservadas, citas de nutrición y masajes, participación en actividades de <strong class="nombre-marca">Atempo Circle</strong> y uso de tus puntos.</li>
+  <li><strong>Datos del programa de referidas:</strong> tu código personal y qué amigas se registraron con él.</li>
+  <li><strong>Datos de salud,</strong> solo si agendas una evaluación nutricional (ver punto 3).</li>
+</ul>
+
+<h2 id="salud">3. Datos de salud</h2>
+<p>Al agendar una evaluación nutricional te pedimos tu objetivo principal, tus alergias o restricciones alimentarias y, si quieres, condiciones de salud que la nutricionista deba conocer. La ley considera estos datos como <strong>datos sensibles</strong>, por lo que:</p>
+<ul>
+  <li>Solo los recogemos con tu <strong>consentimiento expreso</strong>, que das al marcar la casilla correspondiente.</li>
+  <li>Solo los usamos para tu asesoría nutricional.</li>
+  <li>Solo tienen acceso el equipo de nutrición y la administración del estudio.</li>
+</ul>
+
+<h2 id="finalidades">4. Para qué usamos tus datos</h2>
+<ul>
+  <li>Crear y administrar tu cuenta.</li>
+  <li>Procesar tus compras y emitir tus comprobantes de pago.</li>
+  <li>Gestionar tus reservas de clases y tus citas de nutrición y masajes.</li>
+  <li>Enviarte avisos sobre tu cuenta: confirmaciones, recordatorios y vencimiento de puntos.</li>
+  <li>Gestionar el programa de referidas.</li>
+  <li>Atender tus consultas, reclamos y quejas.</li>
+</ul>
+<p>Solo si lo aceptas por separado, podríamos usar tus datos para enviarte novedades y promociones. Puedes retirar ese permiso en cualquier momento.</p>
+
+<h2 id="compartir">5. Con quién compartimos tus datos</h2>
+<p><strong>No vendemos ni alquilamos tus datos.</strong> Solo los compartimos con proveedores que nos ayudan a prestarte el servicio y que están obligados a protegerlos, por ejemplo la pasarela de pagos que procesa tus compras. También podríamos entregarlos a una autoridad si la ley lo exige.</p>
+
+<h2 id="conservacion">6. Cuánto tiempo los guardamos</h2>
+<p>Guardamos tus datos mientras tengas una cuenta activa con nosotras y, después, solo el tiempo necesario para cumplir obligaciones legales, tributarias o contables. Luego los eliminamos o los anonimizamos.</p>
+
+<h2 id="derechos">7. Tus derechos</h2>
+<p>En cualquier momento puedes ejercer tus derechos de <strong>acceso</strong> (saber qué datos tenemos), <strong>rectificación</strong> (corregirlos), <strong>cancelación</strong> (pedir que los eliminemos) y <strong>oposición</strong> (pedir que dejemos de usarlos para algún fin). También puedes retirar tu consentimiento para el uso de tus datos de salud.</p>
+<p>Para hacerlo, escríbenos a <a href="mailto:{{ correo_estudio }}">{{ correo_estudio }}</a> indicando tu nombre, tu DNI y qué derecho quieres ejercer. Te responderemos en los plazos que establece la ley. Si no estás conforme con nuestra respuesta, puedes acudir a la Autoridad Nacional de Protección de Datos Personales.</p>
+
+<h2 id="seguridad">8. Cómo protegemos tus datos</h2>
+<p>Usamos medidas técnicas y de organización para proteger tu información: acceso restringido solo al personal que la necesita, contraseñas guardadas de forma cifrada y conexión segura en nuestra web.</p>
+
+<h2 id="cookies">9. Cookies</h2>
+<p>Nuestra web usa cookies propias solo para mantener tu sesión iniciada, proteger los formularios y recordar si prefieres el tema claro u oscuro. No usamos cookies de publicidad.</p>
+
+<h2 id="cambios">10. Cambios a esta política</h2>
+<p>Si cambiamos esta política, publicaremos la nueva versión en esta página con su fecha de actualización y, si el cambio es importante, te avisaremos.</p>
+{% endblock %}

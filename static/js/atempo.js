@@ -236,6 +236,30 @@ document.querySelectorAll('.boton-mostrar').forEach(function (boton) {
   if (zona) history.replaceState({ zona: zona.id }, '', window.location.href);
 })();
 
+/* ---------- Libro de reclamaciones: "Completar con datos de prueba" (para la demostración) ----------
+   Solo llena los campos vacíos, así respeta los datos que ya vienen de la cuenta. */
+(function () {
+  var boton = document.querySelector('[data-datos-prueba-reclamo]');
+  if (!boton) return;
+  boton.addEventListener('click', function () {
+    var datos = {
+      nombre: 'María Salas', dni: '45678912', telefono: '987654321', email: 'maria@correo.pe',
+      domicilio: 'Av. Ejemplo 123, San Isidro, Lima', servicio: 'clase', monto: '',
+      descripcion_servicio: 'Clase de Pilates del lunes a las 7:30',
+      detalle: 'La clase empezó 20 minutos tarde y no se avisó con anticipación.',
+      pedido: 'Que me devuelvan el punto usado en esa clase.'
+    };
+    Object.keys(datos).forEach(function (nombre) {
+      var campo = boton.form.querySelector('[name="' + nombre + '"]');
+      if (campo && !campo.value) campo.value = datos[nombre];
+    });
+    var reclamo = boton.form.querySelector('input[name="tipo"][value="reclamo"]');
+    if (reclamo && !boton.form.querySelector('input[name="tipo"]:checked')) reclamo.checked = true;
+    var acepto = boton.form.querySelector('[name="acepto"]');
+    if (acepto) acepto.checked = true;
+  });
+})();
+
 /* ---------- Botones "Copiar" (por ejemplo, el código de referida) ---------- */
 document.querySelectorAll('[data-copiar]').forEach(function (boton) {
   var textoOriginal = boton.textContent;
@@ -300,6 +324,52 @@ document.querySelectorAll('[data-copiar]').forEach(function (boton) {
   });
 
   if (reducirMovimiento) detener(); else iniciar();
+})();
+
+/* ---------- Desplegables que se abren y cierran suavemente ----------
+   Preguntas frecuentes, "Ver detalles" de paquetes, reclamos y ayudas.
+   La duración sale de --duracion-desplegable (atempo.css). La campanita no
+   se anima (es un menú). Sin JavaScript o con "reducir movimiento", se
+   abren al instante como siempre. */
+(function () {
+  if (!document.body.animate) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  var duracion = parseFloat(getComputedStyle(document.documentElement)
+    .getPropertyValue('--duracion-desplegable')) || 300;
+
+  document.addEventListener('click', function (evento) {
+    var resumen = evento.target.closest('summary');
+    if (!resumen) return;
+    var desplegable = resumen.parentElement;
+    if (desplegable.tagName !== 'DETAILS' || desplegable.matches('[data-campanita]')) return;
+    evento.preventDefault();
+
+    // Si estaba a medio animar, se parte desde la altura actual
+    var altoInicial = desplegable.offsetHeight;
+    if (desplegable._animacion) desplegable._animacion.cancel();
+    var abriendo = !desplegable.open || desplegable._cerrando;
+    desplegable._cerrando = !abriendo;
+
+    // Se mide cómo queda cerrado y abierto (no se alcanza a ver en pantalla)
+    desplegable.open = false;
+    var altoCerrado = desplegable.offsetHeight;
+    desplegable.open = true;
+    var altoFinal = abriendo ? desplegable.offsetHeight : altoCerrado;
+
+    desplegable.style.overflow = 'hidden';
+    var animacion = desplegable.animate(
+      { height: [altoInicial + 'px', altoFinal + 'px'] },
+      { duration: duracion, easing: 'ease' }
+    );
+    desplegable._animacion = animacion;
+    animacion.onfinish = function () {
+      desplegable.open = abriendo;
+      desplegable._animacion = null;
+      desplegable._cerrando = false;
+      desplegable.style.overflow = '';
+    };
+  });
 })();
 
 /* ---------- Franjas de imagen con efecto de profundidad ----------

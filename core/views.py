@@ -7,9 +7,13 @@ from django.views.generic import TemplateView
 from clases.models import NIVELES, Clase, Disciplina, Profesional
 from paquetes.models import ahorro_maximo_por_clase, paquetes_activos, precio_clase_suelta
 
-# Dirección de ejemplo del local (referencia del Plan de operaciones del Excel).
-# Es el único lugar donde está escrita: la usan el pie de página, la boleta y el mapa.
-DIRECCION = 'Av. Vía Principal 140, San Isidro, Lima'
+# Datos de la empresa (DE EJEMPLO). Es el único lugar donde están escritos: los usan
+# el pie de página, la boleta, las páginas legales y el mapa de estacionamientos.
+DIRECCION = 'Av. Vía Principal 140, San Isidro, Lima'   # referencia del Plan de operaciones del Excel
+RAZON_SOCIAL = 'Atempo Wellness S.A.C.'
+RUC = '20000000000'
+CORREO = 'hola@atempo.pe'
+WHATSAPP = '+51 900 000 000'
 
 PROXIMAS_CLASES_EN_INICIO = 6
 

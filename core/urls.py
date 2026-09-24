@@ -24,9 +24,5 @@ urlpatterns = [
     path('', views.InicioView.as_view(), name='inicio'),
     path('comunidad/', en_construccion('Comunidad'), name='comunidad'),
     path('nosotros/', views.NosotrosView.as_view(), name='nosotros'),
-
-    # Páginas legales
-    path('privacidad/', en_construccion('Política de privacidad'), name='privacidad'),
-    path('terminos/', en_construccion('Términos y condiciones'), name='terminos'),
-    path('libro-de-reclamaciones/', en_construccion('Libro de reclamaciones'), name='reclamaciones'),
+    # Las páginas legales están en la app "legal"
 ]

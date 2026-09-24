@@ -169,6 +169,40 @@
       <a class="boton" href="{% url 'horarios' %}">Ver horarios y reservar</a>
     </div>
 
+    {# Reclamos y quejas (solo aparece si presentó alguno) #}
+    {% if reclamaciones %}
+      <div class="tarjeta cuenta-completa" id="reclamos">
+        <h2>Tus reclamos y quejas</h2>
+        <ul class="proximas-lista">
+          {% for r in reclamaciones %}
+            <li class="reclamo">
+              <div class="reclamo-cabecera">
+                <span><strong class="cifra">Hoja N.° {{ r.numero }}</strong> · {{ r.get_tipo_display }} · {{ r.creada|date:"d/m/Y" }}</span>
+                <span class="estado-hoja estado-hoja-{{ r.estado }}">{{ r.get_estado_display }}</span>
+              </div>
+              <details class="ayuda-desplegable">
+                <summary>Ver detalle{% if r.respuesta %} y respuesta{% endif %}</summary>
+                <dl class="lista-datos">
+                  <dt>Servicio</dt><dd>{{ r.get_servicio_display }}: {{ r.descripcion_servicio }}</dd>
+                  <dt>Detalle</dt><dd>{{ r.detalle|linebreaksbr }}</dd>
+                  <dt>Pedido</dt><dd>{{ r.pedido|linebreaksbr }}</dd>
+                  {% if r.respuesta %}
+                    <dt>Respuesta</dt><dd>{{ r.respuesta|linebreaksbr }}</dd>
+                    <dt>Respondida el</dt><dd>{{ r.respondida_en|date:"d/m/Y" }}</dd>
+                  {% else %}
+                    <dt>Respuesta</dt><dd>Te responderemos en un plazo máximo de 15 días hábiles.</dd>
+                  {% endif %}
+                </dl>
+                {% if r.estado == 'respondida' %}
+                  <a class="boton boton-borde boton-chico" href="{% url 'quitar_reclamacion' r.pk %}" data-dialogo>Quitar de mi cuenta</a>
+                {% endif %}
+              </details>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
     {# Lo que vendrá #}
     <div class="tarjeta">
       <h2>Citas y encuentros</h2>

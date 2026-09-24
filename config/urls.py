@@ -20,4 +20,5 @@ urlpatterns = [
     path('', include('notificaciones.urls')),
     path('', include('clases.urls')),
     path('', include('bienestar.urls')),
+    path('', include('legal.urls')),
 ]

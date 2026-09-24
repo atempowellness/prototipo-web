@@ -43,6 +43,9 @@
   --ancho-logo: 200px;           /* logo en el encabezado (mínimo 140 px) */
   --ancho-logo-celular: 150px;
 
+  /* Movimiento */
+  --duracion-desplegable: 300ms;  /* abrir y cerrar preguntas y "Ver detalles" */
+
   /* Usos de color en el TEMA CLARO */
   --fondo: var(--marfil);
   --fondo-alterno: var(--nude-claro);    /* secciones alternas */
@@ -425,6 +428,7 @@ main { min-height: 50vh; }
 .nota { font-size: .92rem; color: var(--texto-secundario); margin-top: 20px; }
 .fila-botones { display: flex; flex-wrap: wrap; gap: 12px; }
 .enlace-mas { margin-top: 28px; font-weight: var(--peso-enfasis); }
+.separado-arriba { margin-top: 24px; }
 
 /* Dos columnas de texto (en celular, una debajo de otra) */
 .dos-columnas {
@@ -844,6 +848,7 @@ main { min-height: 50vh; }
 .campo input[type="email"],
 .campo input[type="password"],
 .campo input[type="tel"],
+.campo input[type="number"],
 .campo select,
 .campo textarea {
   width: 100%;
@@ -1289,7 +1294,52 @@ main { min-height: 50vh; }
 @media (max-width: 800px) { .servicios { grid-template-columns: 1fr; } }
 
 /* ---------------------------------------------------------
-   15. PIE DE PÁGINA
+   15. PÁGINAS LEGALES Y LIBRO DE RECLAMACIONES
+   --------------------------------------------------------- */
+.texto-legal-ancho { max-width: 760px; }
+.texto-legal { display: grid; grid-template-columns: 260px 1fr; gap: 48px; align-items: start; }
+.indice { position: sticky; top: 110px; font-size: .95rem; }
+.indice ol { margin: 8px 0 0; padding-left: 20px; }
+.indice li { margin-bottom: 6px; }
+.indice a { color: var(--texto); }
+.texto-legal-cuerpo { max-width: 760px; }
+.texto-legal-cuerpo h2 {                 /* títulos con número: en la tipografía de texto */
+  font-family: var(--fuente-texto);
+  font-weight: var(--peso-enfasis);
+  font-size: 1.3rem;
+  margin-top: 36px;
+  padding-top: 12px;
+  border-top: 1px solid var(--decorativo);
+  scroll-margin-top: 110px;
+}
+.texto-legal-cuerpo ul { padding-left: 22px; }
+.texto-legal-cuerpo li { margin-bottom: 8px; }
+.hoja-reclamacion { max-width: 760px; margin-top: 24px; }
+.hoja-reclamacion h3 { margin-top: 24px; color: var(--texto-acento); }
+.enlace-libro { display: inline-flex; align-items: center; gap: 8px; }
+
+/* Mi cuenta: reclamos y quejas, con su estado en color */
+.reclamo { padding: 12px 0; border-top: 1px solid var(--decorativo); }
+.reclamo-cabecera { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; }
+.reclamo .ayuda-desplegable { margin: 4px 0 0; }
+.estado-hoja {
+  padding: 3px 12px 1px;
+  border-radius: var(--radio-boton);
+  font-size: .85rem;
+  font-weight: var(--peso-enfasis);
+  color: var(--marfil);
+}
+.estado-hoja-pendiente { background: var(--error); }
+.estado-hoja-respondida { background: var(--exito); }
+#reclamos { scroll-margin-top: 110px; }
+
+@media (max-width: 900px) {
+  .texto-legal { grid-template-columns: 1fr; gap: 16px; }
+  .indice { position: static; }
+}
+
+/* ---------------------------------------------------------
+   16. PIE DE PÁGINA
    --------------------------------------------------------- */
 .pie {
   margin-top: 72px;
@@ -1332,7 +1382,7 @@ main { min-height: 50vh; }
 @media (max-width: 560px) { .pie-columnas { grid-template-columns: 1fr; } }
 
 /* ---------------------------------------------------------
-   16. TRANSICIÓN ENTRE PÁGINAS
+   17. TRANSICIÓN ENTRE PÁGINAS
    Al pasar de una página a otra, el encabezado queda quieto
    y el resto se funde suavemente. Funciona en Chrome, Edge
    y Safari; en otros navegadores la página cambia como siempre.

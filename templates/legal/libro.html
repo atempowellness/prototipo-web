@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% load formato %}
+{% comment %}
+Libro de Reclamaciones virtual. Muestra el formulario (Hoja de Reclamación) y,
+al enviarlo, la constancia con su número (y cómo se vería el correo, simulado).
+{% endcomment %}
+{% block contenido %}
+<section class="contenedor cabecera-pagina">
+  <p class="etiqueta-seccion">Información legal</p>
+  <h1>Libro de reclamaciones</h1>
+  <p class="entrada texto-legal-ancho">Conforme al Código de Protección y Defensa del Consumidor, contamos con un Libro de Reclamaciones virtual a tu disposición.</p>
+</section>
+
+{% if reclamacion %}
+  {# Constancia después de enviar #}
+  <section class="contenedor">
+    <p class="confirmacion-marca" aria-hidden="true">✓</p>
+    <h2>Recibimos tu {{ reclamacion.get_tipo_display|lower }}</h2>
+    <p class="entrada texto-legal-ancho">Tu hoja de reclamación es la <strong class="cifra">N.° {{ reclamacion.numero }}</strong>. Te responderemos en un plazo máximo de {{ dias_habiles }} días hábiles al correo <strong>{{ reclamacion.email }}</strong>.</p>
+
+    <div class="correo-simulado boleta">
+      <p class="correo-simulado-aviso">Simulación del prototipo: así se vería la constancia que te enviamos por correo</p>
+      <div class="correo-simulado-cuerpo">
+        <div class="boleta-cabecera">
+          <div>
+            {% include 'partes/logo.html' %}
+            <p class="apagado">{{ razon_social }} · RUC {{ ruc }}<br>{{ direccion_estudio }}</p>
+          </div>
+          <div class="boleta-numero">
+            <p class="etiqueta-seccion">Hoja de reclamación</p>
+            <p class="cifra">N.° {{ reclamacion.numero }}</p>
+          </div>
+        </div>
+        <dl class="lista-datos">
+          <dt>Fecha</dt><dd>{{ reclamacion.creada|date:"d/m/Y H:i" }}</dd>
+          <dt>Tipo</dt><dd>{{ reclamacion.get_tipo_display }}</dd>
+          <dt>Nombre</dt><dd>{{ reclamacion.nombre }}</dd>
+          <dt>DNI</dt><dd>{{ reclamacion.dni }}</dd>
+          <dt>Domicilio</dt><dd>{{ reclamacion.domicilio }}</dd>
+          <dt>Teléfono</dt><dd>{{ reclamacion.telefono }}</dd>
+          <dt>Correo</dt><dd>{{ reclamacion.email }}</dd>
+          <dt>Servicio</dt><dd>{{ reclamacion.get_servicio_display }}: {{ reclamacion.descripcion_servicio }}</dd>
+          {% if reclamacion.monto %}<dt>Monto</dt><dd>{{ reclamacion.monto|soles }}</dd>{% endif %}
+          <dt>Detalle</dt><dd>{{ reclamacion.detalle|linebreaksbr }}</dd>
+          <dt>Pedido</dt><dd>{{ reclamacion.pedido|linebreaksbr }}</dd>
+        </dl>
+        <p class="nota">La presentación de esta hoja no impide acudir a otras vías de solución de controversias ni es requisito previo para interponer una denuncia ante el INDECOPI.</p>
+      </div>
+    </div>
+    <p class="fila-botones separado-arriba"><a class="boton boton-borde" href="{% url 'inicio' %}">Volver al inicio</a></p>
+  </section>
+
+{% else %}
+  <section class="contenedor">
+    <div class="texto-legal-ancho">
+      <div class="servicio-condiciones">
+        <p><strong>Reclamo:</strong> disconformidad relacionada con los servicios (por ejemplo, con una clase, un paquete o un cobro).</p>
+        <p><strong>Queja:</strong> malestar o descontento con la atención recibida, que no tiene que ver directamente con el servicio.</p>
+        <p>Te responderemos en un plazo máximo de <strong>{{ dias_habiles }} días hábiles</strong>. Proveedor: {{ razon_social }}, RUC {{ ruc }}, {{ direccion_estudio }}.</p>
+      </div>
+    </div>
+
+    <form method="post" class="formulario tarjeta hoja-reclamacion" novalidate>
+      {% csrf_token %}
+      <h2>Hoja de reclamación</h2>
+      {% for error in form.non_field_errors %}<p class="aviso-error" role="alert">{{ error }}</p>{% endfor %}
+
+      <h3>1. Tus datos</h3>
+      {% if user.is_authenticated %}<p class="nota">Completamos tus datos con los de tu cuenta. Puedes corregirlos si hace falta.</p>{% endif %}
+      {% include 'partes/campo.html' with campo=form.nombre %}
+      <div class="campos-dos">
+        {% include 'partes/campo.html' with campo=form.dni %}
+        {% include 'partes/campo.html' with campo=form.telefono %}
+      </div>
+      {% include 'partes/campo.html' with campo=form.email %}
+      {% include 'partes/campo.html' with campo=form.domicilio %}
+
+      <h3>2. Servicio contratado</h3>
+      <div class="campos-dos">
+        {% include 'partes/campo.html' with campo=form.servicio %}
+        {% include 'partes/campo.html' with campo=form.monto %}
+      </div>
+      {% include 'partes/campo.html' with campo=form.descripcion_servicio %}
+
+      <h3>3. Detalle</h3>
+      <fieldset class="metodos{% if form.tipo.errors %} campo-con-error{% endif %}">
+        <legend>Tipo</legend>
+        {% for opcion in form.tipo %}
+          <label class="metodo">{{ opcion.tag }} <span>{{ opcion.choice_label }}</span></label>
+        {% endfor %}
+      </fieldset>
+      {% for error in form.tipo.errors %}<p class="campo-error" role="alert">{{ error }}</p>{% endfor %}
+      {% include 'partes/campo.html' with campo=form.detalle %}
+      {% include 'partes/campo.html' with campo=form.pedido %}
+
+      <div class="campo{% if form.acepto.errors %} campo-con-error{% endif %}">
+        <label class="casilla">{{ form.acepto }} <span>{{ form.acepto.label }}</span></label>
+        {% for error in form.acepto.errors %}<p class="campo-error" role="alert">{{ error }}</p>{% endfor %}
+      </div>
+
+      <div class="fila-botones">
+        <button class="boton" type="submit">Enviar hoja de reclamación</button>
+        <button class="boton boton-borde" type="button" data-datos-prueba-reclamo>Completar con datos de prueba</button>
+      </div>
+      <p class="nota">La presentación de esta hoja no impide acudir a otras vías de solución de controversias ni es requisito previo para interponer una denuncia ante el INDECOPI.</p>
+    </form>
+  </section>
+{% endif %}
+{% endblock %}

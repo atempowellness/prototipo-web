@@ -149,6 +149,21 @@ def reserva_cancelada_por_estudio(reserva, devuelto):
     notificar(reserva.usuario, Notificacion.CLASE_CANCELADA, texto, reverse('horarios'), reserva=reserva)
 
 
+def reclamacion_recibida(reclamacion):
+    from legal.models import DIAS_HABILES_PARA_RESPONDER
+    notificar(reclamacion.usuario, Notificacion.RECLAMACION,
+              f'Recibimos tu {reclamacion.get_tipo_display().lower()} (hoja N.° {reclamacion.numero}). '
+              f'Te responderemos en un plazo máximo de {DIAS_HABILES_PARA_RESPONDER} días hábiles.',
+              reverse('cuenta') + '#reclamos')
+
+
+def reclamacion_respondida(reclamacion):
+    notificar(reclamacion.usuario, Notificacion.RECLAMACION,
+              f'Respondimos tu {reclamacion.get_tipo_display().lower()} (hoja N.° {reclamacion.numero}). '
+              f'Puedes verla en Mi cuenta. También te la enviamos a {reclamacion.email}.',
+              reverse('cuenta') + '#reclamos')
+
+
 def clase_cancelada(reserva, credito_devuelto):
     clase = reserva.clase
     dia = date_format(timezone.localtime(clase.inicio), 'l j \\d\\e F')

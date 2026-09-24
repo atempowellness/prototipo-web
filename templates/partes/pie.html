@@ -4,7 +4,7 @@
       <div>
         <h2>Contacto</h2>
         <p>{{ direccion_estudio }}<br><span class="apagado">(dirección de ejemplo)</span></p>
-        <p>WhatsApp: +51 900 000 000<br>hola@atempo.pe</p>
+        <p>WhatsApp: {{ whatsapp_estudio }}<br>{{ correo_estudio }}</p>
       </div>
       <div>
         <h2>Horario del estudio</h2>
@@ -29,7 +29,17 @@
         <ul>
           <li><a href="{% url 'privacidad' %}">Política de privacidad</a></li>
           <li><a href="{% url 'terminos' %}">Términos y condiciones</a></li>
-          <li><a href="{% url 'reclamaciones' %}">Libro de reclamaciones</a></li>
+          <li>
+            <a class="enlace-libro" href="{% url 'reclamaciones' %}">
+              {# Ícono de libro, como se identifica el Libro de Reclamaciones en las webs peruanas #}
+              <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
+                <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5v-15Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+                <path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+                <path d="M9 8h7M9 11.5h7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+              </svg>
+              Libro de reclamaciones
+            </a>
+          </li>
         </ul>
       </div>
     </div>

@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% comment %}
+Formato común de las páginas legales: título, fecha de actualización, aviso de texto
+de ejemplo, índice con enlaces a cada sección y el texto.
+{% endcomment %}
+{% block contenido %}
+<section class="contenedor cabecera-pagina">
+  <p class="etiqueta-seccion">Información legal</p>
+  <h1>{{ titulo }}</h1>
+  <p class="apagado">Última actualización: {{ actualizado|date:"j \d\e F \d\e Y" }}</p>
+  <p class="aviso-advertencia texto-legal-ancho"><strong>Texto de ejemplo para el prototipo.</strong> Antes de publicarse, debe revisarlo un abogado.</p>
+</section>
+
+<section class="contenedor">
+  <div class="texto-legal">
+    <nav class="indice" aria-label="Índice">
+      <p class="etiqueta-seccion">Contenido</p>
+      <ol>{% block indice %}{% endblock %}</ol>
+    </nav>
+    <div class="texto-legal-cuerpo">
+      {% block texto %}{% endblock %}
+    </div>
+  </div>
+</section>
+{% endblock %}

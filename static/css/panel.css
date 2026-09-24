@@ -1,0 +1,30 @@
+/* =========================================================
+   Ajustes visuales del panel de administración.
+   Usa los mismos colores de la paleta de la web
+   (--exito #3F6B4E y --error #A33A2B en static/css/atempo.css).
+   ========================================================= */
+:root {
+  --panel-exito: #3F6B4E;
+  --panel-error: #A33A2B;
+}
+
+/* Indicador de estado (por ejemplo, en el Libro de reclamaciones) */
+.estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  color: #FFFFFF;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.estado::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #FFFFFF;
+}
+.estado-pendiente { background: var(--panel-error); }
+.estado-respondida { background: var(--panel-exito); }

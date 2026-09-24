@@ -23,7 +23,9 @@ class Notificacion(models.Model):
     CITA_CONFIRMADA = 'cita_confirmada'
     CITA_RECORDATORIO = 'cita_recordatorio'
     CITA_CANCELADA = 'cita_cancelada'
+    RECLAMACION = 'reclamacion'
     TIPOS = [
+        (RECLAMACION, 'Libro de reclamaciones'),
         (CITA_CONFIRMADA, 'Cita de nutrición o masajes confirmada'),
         (CITA_RECORDATORIO, 'Recordatorio de cita'),
         (CITA_CANCELADA, 'Cita cancelada por el estudio'),
