@@ -13,7 +13,8 @@
     {# Resumen de la compra #}
     <aside class="pago-resumen tarjeta" aria-label="Resumen de tu compra">
       <h2>Tu compra</h2>
-      <p class="pago-resumen-linea"><strong class="nombre-marca">{{ paquete.nombre }}</strong><span class="cifra">{{ paquete.precio|soles }}</span></p>
+      <p class="pago-resumen-linea"><strong class="nombre-marca">{{ paquete.nombre }}</strong><span class="cifra">{% if paquete.precio_referencia %}<s class="precio-tachado">{{ paquete.precio_referencia|soles }}</s> {% endif %}{{ paquete.precio|soles }}</span></p>
+      {% if paquete.es_founding %}<p class="nota">Descuento por Founding Member: precio especial de preventa en tu primera compra.</p>{% endif %}
       <p class="apagado">{{ paquete.creditos|creditos }}, válido por {{ paquete.vigencia_meses|meses }} desde hoy.</p>
       <ul class="pago-resumen-beneficios">
         {% for beneficio in paquete.beneficios %}<li>{{ beneficio|marca }}</li>{% endfor %}
@@ -42,6 +43,17 @@
             {% endif %}
           </p>
           <a class="boton boton-borde" href="{% url 'comprar' paquete_minimo.slug %}">Ver {{ paquete_minimo.nombre }}</a>
+        </div>
+      {% endif %}
+      {# Aviso: su primera compra todavía puede ser Founding Members #}
+      {% if founding %}
+        <div class="aviso-vencimiento aviso-referida" role="note">
+          <p>
+            <strong>Tu primera compra puede ser Founding Members.</strong>
+            Es la preventa para las primeras {{ founding.ventas_maximas }} socias (quedan {{ founding.quedan }}) y solo
+            está disponible como primera compra: si compras <strong class="nombre-marca">{{ paquete.nombre }}</strong>, ya no podrás acceder a ella.
+          </p>
+          <a class="boton boton-borde" href="{% url 'comprar' founding.slug %}">Ver Founding Members</a>
         </div>
       {% endif %}
       {% for error in form.non_field_errors %}<p class="aviso-error" role="alert">{{ error }}</p>{% endfor %}

@@ -12,6 +12,38 @@
   </p>
 </section>
 
+{# 1b. Preventa Founding Members: aparte, solo mientras queden ventas #}
+{% if founding %}
+<section class="contenedor">
+  <article class="founding">
+    <div class="founding-texto">
+      <span class="etiqueta-seccion">Preventa · Edición limitada</span>
+      <h2 class="cifra">{{ founding.nombre }}</h2>
+      <p>Sé parte de las primeras {{ founding.ventas_maximas }} socias de <strong class="nombre-marca">Atempo</strong>. Disponible solo en tu primera compra, y tu cuenta llevará la insignia de Founding Member.</p>
+      <p class="founding-quedan">Quedan <strong class="cifra">{{ founding.quedan }}</strong> de {{ founding.ventas_maximas }} cupos</p>
+      <div class="founding-barra" aria-hidden="true"><span style="width: {% widthratio founding.vendidos founding.ventas_maximas 100 %}%"></span></div>
+    </div>
+    <div class="founding-oferta">
+      <p class="paquete-creditos">{{ founding.creditos|creditos }}</p>
+      <p class="paquete-precio cifra">{% if founding.precio_referencia %}<s class="precio-tachado">{{ founding.precio_referencia|soles }}</s> {% endif %}{{ founding.precio|soles }}</p>
+      <p class="paquete-por-clase">Precio Founding Member · Vigencia: {{ founding.vigencia_meses|meses }}</p>
+      <ul class="paquete-beneficios">
+        {% for beneficio in founding.beneficios %}<li>{{ beneficio|marca }}</li>{% endfor %}
+        <li>Insignia de Founding Member en tu cuenta</li>
+      </ul>
+      {% url 'comprar' founding.slug as url_founding %}
+      {% if not puede_founding %}
+        <p class="nota">Solo disponible como primera compra.</p>
+      {% elif user.is_authenticated %}
+        <a class="boton" href="{{ url_founding }}">Quiero ser Founding Member</a>
+      {% else %}
+        <a class="boton" href="{% url 'ingresar' %}?next={{ url_founding|urlencode }}">Quiero ser Founding Member</a>
+      {% endif %}
+    </div>
+  </article>
+</section>
+{% endif %}
+
 {# 2. Tarjetas de paquetes (datos del panel de administración) #}
 <section class="contenedor">
   <div class="paquetes">

@@ -44,8 +44,8 @@ def servicio_valido(servicio):
 def condiciones_del_servicio(servicio):
     """Textos de qué paquetes lo incluyen y cuánto cuesta la sesión adicional (salen del panel)."""
     total, _ = CAMPO_INCLUIDAS[servicio]
-    incluido_desde = Paquete.objects.filter(activo=True, **{f'{total}__gt': 0}).order_by('creditos').first()
-    con_adicional = Paquete.objects.filter(activo=True, **{f'{CAMPO_COSTO[servicio]}__isnull': False}) \
+    incluido_desde = Paquete.objects.filter(activo=True, es_founding=False, **{f'{total}__gt': 0}).order_by('creditos').first()
+    con_adicional = Paquete.objects.filter(activo=True, es_founding=False, **{f'{CAMPO_COSTO[servicio]}__isnull': False}) \
         .order_by('creditos').first()
     return {
         'incluido_desde': incluido_desde.nombre if incluido_desde else '',

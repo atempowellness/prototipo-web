@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.views.generic import DetailView, FormView
 
 from notificaciones import avisos
-from paquetes.models import paquetes_activos
+from paquetes.models import Paquete, paquete_founding, paquetes_activos, puede_comprar_founding
 
 from .forms import PagoForm
 from .models import compras_pagadas, creditos_disponibles, registrar_compra
@@ -18,7 +18,15 @@ class ComprarView(LoginRequiredMixin, FormView):
     form_class = PagoForm
 
     def dispatch(self, request, *args, **kwargs):
-        self.paquete = get_object_or_404(paquetes_activos(), slug=kwargs['slug'])
+        self.paquete = get_object_or_404(Paquete.objects.filter(activo=True), slug=kwargs['slug'])
+        if self.paquete.es_founding and request.user.is_authenticated:
+            # Founding Members: solo mientras queden ventas y como primera compra
+            if paquete_founding() is None:
+                messages.info(request, 'La preventa Founding Members ya se agotó. ¡Gracias por tu interés!')
+                return redirect('paquetes')
+            if not puede_comprar_founding(request.user):
+                messages.info(request, 'El paquete Founding Members es solo para la primera compra.')
+                return redirect('paquetes')
         return super().dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self):
@@ -36,6 +44,10 @@ class ComprarView(LoginRequiredMixin, FormView):
         # Si compra Atempo 1, se le recuerda que el punto extra se activa desde Atempo 5
         contexto['aviso_paquete_menor'] = aviso_paquete_menor(self.request.user, self.paquete)
         contexto['paquete_minimo'] = paquetes_activos().filter(creditos__gte=CREDITOS_MINIMOS).first()
+        # Si todavía puede ser Founding Member, se le avisa antes de gastar su primera compra en otro paquete
+        founding = paquete_founding()
+        if founding and not self.paquete.es_founding and puede_comprar_founding(self.request.user):
+            contexto['founding'] = founding
         return contexto
 
     def form_valid(self, form):

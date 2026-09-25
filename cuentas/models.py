@@ -97,6 +97,24 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
         return f'{self.nombre} {self.apellido}'
 
     @property
+    def compra_founding(self):
+        """Su compra del paquete Founding Members, o None."""
+        return self.compras.filter(tipo='compra', paquete__es_founding=True).first()
+
+    @property
+    def es_founding(self):
+        return self.compra_founding is not None
+
+    @property
+    def numero_founding(self):
+        """Su número de fundadora: 1 = la primera en comprar Founding Members."""
+        compra = self.compra_founding
+        if compra is None:
+            return None
+        anteriores = compra.paquete.compras.filter(tipo='compra', fecha__lt=compra.fecha).count()
+        return anteriores + 1
+
+    @property
     def es_demostracion(self):
         """¿Es la cuenta de demostración del prototipo? (ver cuentas/demostracion.py)."""
         from .demostracion import CORREO_DEMO

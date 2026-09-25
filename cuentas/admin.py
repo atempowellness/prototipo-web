@@ -141,14 +141,14 @@ class UsuarioAdmin(UserAdmin):
     add_form = UsuarioCreacionForm
     inlines = [CreditosEnLinea]
     ordering = ['-date_joined']
-    list_display = ['email', 'nombre', 'apellido', 'celular', 'dni', 'creditos', 'codigo_referida',
+    list_display = ['email', 'nombre', 'apellido', 'celular', 'dni', 'creditos', 'founding', 'codigo_referida',
                     'referida_por', 'date_joined', 'is_staff']
     search_fields = ['email', 'nombre', 'apellido', 'celular', 'dni', 'codigo_referida']
-    readonly_fields = ['date_joined', 'last_login', 'acepto_privacidad', 'codigo_referida', 'creditos']
+    readonly_fields = ['date_joined', 'last_login', 'acepto_privacidad', 'codigo_referida', 'creditos', 'founding']
     autocomplete_fields = ['referida_por']
     fieldsets = [
         (None, {'fields': ['email', 'password']}),
-        ('Datos personales', {'fields': ['nombre', 'apellido', 'celular', 'dni', 'acepto_privacidad']}),
+        ('Datos personales', {'fields': ['nombre', 'apellido', 'celular', 'dni', 'acepto_privacidad', 'founding']}),
         ('Puntos', {'fields': ['creditos', 'ajuste_creditos', 'ajuste_vence', 'ajuste_motivo']}),
         ('Programa de referidas', {'fields': ['codigo_referida', 'referida_por']}),
         ('Permisos', {'fields': ['is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions']}),
@@ -161,6 +161,11 @@ class UsuarioAdmin(UserAdmin):
     @admin.display(description='puntos disponibles')
     def creditos(self, usuario):
         return creditos_disponibles(usuario)
+
+    @admin.display(description='Founding Member')
+    def founding(self, usuario):
+        numero = usuario.numero_founding
+        return f'✦ N.° {numero}' if numero else '—'
 
     def save_model(self, request, usuario, form, change):
         super().save_model(request, usuario, form, change)

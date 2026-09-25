@@ -5,6 +5,22 @@
 {% with u=request.user %}
 <section class="contenedor cabecera-pagina">
   <h1>¡Hola, {{ u.nombre }}!</h1>
+  {# Tarjeta de fundadora (Founding Members) #}
+  {% if u.es_founding %}
+    {% with compra=u.compra_founding %}
+    <div class="tarjeta-founding">
+      <div class="sello-founding" aria-hidden="true">
+        <span class="sello-founding-icono">✦</span>
+        <span class="sello-founding-numero cifra">{{ u.numero_founding }}</span>
+      </div>
+      <div>
+        <p class="tarjeta-founding-titulo">Founding Member</p>
+        <p class="tarjeta-founding-dato">Socia fundadora <span class="cifra">N.° {{ u.numero_founding }} de {{ compra.paquete.ventas_maximas }}</span> · desde el <span class="cifra">{{ compra.fecha|date:"d/m/Y" }}</span></p>
+        <p class="apagado">Gracias por creer en <strong class="nombre-marca">Atempo</strong> desde el inicio.</p>
+      </div>
+    </div>
+    {% endwith %}
+  {% endif %}
   <p class="entrada">Aquí verás tus puntos, tus reservas y tus beneficios de bienestar.</p>
 
   {# Aviso: puntos que vencen en 7 días o menos (y correo simulado) #}

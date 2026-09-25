@@ -42,6 +42,17 @@ class Paquete(models.Model):
     orden = models.PositiveSmallIntegerField(default=0, help_text='Orden en la página (de menor a mayor).')
     activo = models.BooleanField(default=True, help_text='Desmárcalo para ocultarlo de la web.')
 
+    # Preventa Founding Members: un paquete aparte, solo para la primera compra y con ventas limitadas
+    es_founding = models.BooleanField(
+        'paquete Founding Members', default=False,
+        help_text='Se muestra aparte, solo lo pueden comprar cuentas sin compras anteriores y desaparece al '
+                  'llegar al máximo de ventas. Quien lo compra lleva la insignia de Founding Member.')
+    ventas_maximas = models.PositiveSmallIntegerField(
+        'ventas máximas', null=True, blank=True, help_text='Solo para Founding Members (por ejemplo 100).')
+    precio_referencia = models.DecimalField(
+        'precio de referencia (S/)', max_digits=8, decimal_places=2, null=True, blank=True,
+        help_text='Solo para Founding Members: el precio normal, que se muestra tachado junto al precio especial.')
+
     class Meta:
         ordering = ['orden', 'creditos']
 
@@ -75,14 +86,35 @@ class Paquete(models.Model):
             lista.append('Actividades de Atempo Circle')
         return lista
 
+    # --- Founding Members ---
+    @property
+    def vendidos(self):
+        return self.compras.filter(tipo='compra').count()
+
+    @property
+    def quedan(self):
+        return max((self.ventas_maximas or 0) - self.vendidos, 0)
+
 
 def paquetes_activos():
-    return Paquete.objects.filter(activo=True)
+    """Los paquetes de siempre (sin Founding Members, que se muestra aparte y no cuenta para precios ni ahorros)."""
+    return Paquete.objects.filter(activo=True, es_founding=False)
+
+
+def paquete_founding():
+    """El paquete Founding Members si está activo y le quedan ventas; si no, None."""
+    paquete = Paquete.objects.filter(activo=True, es_founding=True).first()
+    return paquete if paquete and paquete.quedan > 0 else None
+
+
+def puede_comprar_founding(usuario):
+    """Solo como primera compra: cuentas sin compras pagadas anteriores."""
+    return not usuario.is_authenticated or not usuario.compras.filter(tipo='compra').exists()
 
 
 def precio_clase_suelta():
     """El precio de la clase suelta es el del paquete de 1 punto (Atempo 1)."""
-    suelta = Paquete.objects.filter(activo=True, creditos=1).first()
+    suelta = Paquete.objects.filter(activo=True, es_founding=False, creditos=1).first()
     return suelta.precio if suelta else Decimal(65)
 
 

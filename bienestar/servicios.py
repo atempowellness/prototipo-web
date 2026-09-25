@@ -52,7 +52,7 @@ def sesiones_incluidas_disponibles(usuario, servicio, fecha=None):
 
 
 def paquete_minimo_para_adicional(servicio):
-    filtro = {f'{CAMPO_COSTO[servicio]}__isnull': False, 'activo': True}
+    filtro = {f'{CAMPO_COSTO[servicio]}__isnull': False, 'activo': True, 'es_founding': False}
     paquete = Paquete.objects.filter(**filtro).order_by('creditos').first()
     return paquete.nombre if paquete else ''
 
