@@ -1,0 +1,51 @@
+{% extends "admin/base_site.html" %}
+{% comment %}Resumen de ocupación y asistencia de las clases terminadas (ver clases/asistencia.py).{% endcomment %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">Inicio</a> &rsaquo; <a href="{% url 'admin:recepcion' %}">Recepción</a>
+  &rsaquo; Resumen de asistencia
+</div>
+{% endblock %}
+
+{% block content %}
+<p class="asistencia-intro">
+  Clases que ya terminaron en los últimos
+  {% for p in periodos %}{% if p == dias %}<strong>{{ p }} días</strong>{% else %}<a href="?dias={{ p }}">{{ p }} días</a>{% endif %}{% if not forloop.last %} · {% endif %}{% endfor %}.
+  <strong>Ocupación</strong> = personas que asistieron ÷ capacidad de las clases.
+  <strong>Asistencia</strong> = asistieron ÷ reservaron.
+  <a href="{% url 'admin:clases_asistencia' %}">← Asistencia de hoy</a>
+</p>
+
+{% if total %}
+  <div class="resumen-cifras">
+    <div><span class="resumen-numero">{{ total.clases }}</span> clases</div>
+    <div><span class="resumen-numero">{{ total.reservas }}</span> reservas</div>
+    <div><span class="resumen-numero">{{ total.asistencias }}</span> asistencias</div>
+    <div><span class="resumen-numero">{{ total.ocupacion|default_if_none:"—" }}{% if total.ocupacion is not None %}%{% endif %}</span> ocupación</div>
+    <div><span class="resumen-numero">{{ total.asistencia|default_if_none:"—" }}{% if total.asistencia is not None %}%{% endif %}</span> asistencia</div>
+  </div>
+
+  {% include 'admin/clases/_tabla_resumen.html' with titulo='Por disciplina' filas=por_disciplina %}
+  {% include 'admin/clases/_tabla_resumen.html' with titulo='Por franja horaria' filas=por_franja %}
+  {% include 'admin/clases/_tabla_resumen.html' with titulo='Por sala' filas=por_sala %}
+
+  <div class="module">
+    <h2>Socias con más inasistencias</h2>
+    {% if mas_faltas %}
+      <table>
+        <thead><tr><th>Socia</th><th>DNI</th><th>Inasistencias</th></tr></thead>
+        <tbody>
+          {% for usuaria, faltas in mas_faltas %}
+            <tr><td><a href="{% url 'admin:cuentas_usuario_change' usuaria.pk %}">{{ usuaria.get_full_name }}</a></td><td>{{ usuaria.dni|default:"—" }}</td><td>{{ faltas }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="asistencia-vacio">Nadie faltó en este periodo.</p>
+    {% endif %}
+  </div>
+{% else %}
+  <p>Todavía no hay clases terminadas con control de asistencia en este periodo.</p>
+{% endif %}
+{% endblock %}

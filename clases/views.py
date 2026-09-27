@@ -153,7 +153,8 @@ class ReservarView(LoginRequiredMixin, View):
         origen = reserva.compra.origen if reserva.compra else 'de tus puntos'
         messages.success(request, f'¡Listo! Reservaste {clase.disciplina.nombre} el '
                                   f'{date_format(inicio, "l j \\d\\e F")} a las {inicio:%H:%M} en {clase.sala.nombre}. '
-                                  f'Se usó 1 punto {origen}.')
+                                  f'Se usó 1 punto {origen}. Te enviamos un correo de confirmación: '
+                                  f'al llegar, presenta tu DNI en recepción.')
         return redirect(destino)
 
 

@@ -1,0 +1,18 @@
+{% comment %}Una tabla del resumen de asistencia. Recibe "titulo" y "filas".{% endcomment %}
+<div class="module">
+  <h2>{{ titulo }}</h2>
+  <table>
+    <thead><tr><th></th><th>Clases</th><th>Reservas</th><th>Asistieron</th><th>No asistieron</th><th>Ocupación</th><th>Asistencia</th></tr></thead>
+    <tbody>
+      {% for f in filas %}
+        <tr>
+          <td><strong>{{ f.nombre }}</strong></td>
+          <td>{{ f.clases }}</td><td>{{ f.reservas }}</td><td>{{ f.asistencias }}</td><td>{{ f.inasistencias }}</td>
+          <td>{{ f.ocupacion|default_if_none:"—" }}{% if f.ocupacion is not None %}%{% endif %}
+            <span class="resumen-barra" aria-hidden="true"><span style="width: {{ f.ocupacion|default:0 }}%"></span></span></td>
+          <td>{{ f.asistencia|default_if_none:"—" }}{% if f.asistencia is not None %}%{% endif %}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

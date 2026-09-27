@@ -31,7 +31,9 @@ class Notificacion(models.Model):
     ESPERA_OFERTA = 'espera_oferta'
     ESPERA_VENCIDA = 'espera_vencida'
     ESPERA_FIN = 'espera_fin'
+    INASISTENCIAS = 'inasistencias'
     TIPOS = [
+        (INASISTENCIAS, 'Aviso amable por inasistencias'),
         (ESPERA_OFERTA, 'Lista de espera: se liberó un cupo para ti'),
         (ESPERA_VENCIDA, 'Lista de espera: venció el plazo para confirmar'),
         (ESPERA_FIN, 'Lista de espera: se cerró, se saltó o se canceló la clase'),

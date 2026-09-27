@@ -1387,6 +1387,8 @@ main { min-height: 50vh; }
 }
 .proxima-hora { font-size: 1.3rem; }
 .proxima-compacta { grid-template-columns: 1fr auto; }
+.proxima > .correo-reserva { grid-column: 2 / -1; margin: -8px 0 0; font-size: .92rem; }
+.correo-reserva .lista-datos { margin-bottom: 12px; }
 .dia-agrupado,
 .subtitulo-tarjeta { margin: 20px 0 0; font-size: 1.1rem; color: var(--texto-acento); }
 .subtitulo-tarjeta + .proximas-lista { margin-top: 4px; }

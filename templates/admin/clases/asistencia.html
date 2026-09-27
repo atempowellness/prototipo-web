@@ -1,0 +1,69 @@
+{% extends "admin/base_site.html" %}
+{% comment %}Recepción: asistencia de hoy (ver clases/asistencia.py).{% endcomment %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">Inicio</a> &rsaquo; <a href="{% url 'admin:recepcion' %}">Recepción</a>
+  &rsaquo; Asistencia de hoy
+</div>
+{% endblock %}
+
+{% block content %}
+<p class="asistencia-intro">
+  <strong>{{ hoy|date:"l j \d\e F"|capfirst }}.</strong>
+  Pide el DNI a la socia, búscala aquí, revisa que su reserva siga activa y marca "Asistió".
+  Al terminar cada clase, las reservas sin marcar quedan como "No asistió". Se puede corregir durante el día.
+  <a href="{% url 'admin:clases_resumen' %}">Ver el resumen de asistencia →</a>
+</p>
+
+<form method="get" class="asistencia-buscar">
+  <label for="buscar-dni">DNI (o nombre)</label>
+  <input type="search" id="buscar-dni" name="q" value="{{ buscado }}" autofocus placeholder="Por ejemplo 45678912">
+  <button type="submit" class="button default">Buscar</button>
+  {% if buscado %}<a href="{% url 'admin:clases_asistencia' %}">Limpiar</a>{% endif %}
+</form>
+
+{% if encontradas is not None %}
+  <div class="module asistencia-resultado">
+    <h2>Resultado para "{{ buscado }}"</h2>
+    {% if encontradas %}
+      <table>
+        <thead><tr><th>Socia</th><th>DNI</th><th>Clase de hoy</th><th>Asistencia</th></tr></thead>
+        <tbody>
+          {% for r in encontradas %}
+            <tr>
+              <td>{{ r.usuario.get_full_name }}</td>
+              <td>{{ r.usuario.dni|default:"—" }}</td>
+              <td>{{ r.clase.inicio|date:"H:i" }} · {{ r.clase.disciplina.nombre }} · {{ r.clase.sala.nombre }}</td>
+              <td>{% include 'admin/clases/_boton_asistencia.html' with volver=request.get_full_path %}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="asistencia-vacio">No hay reservas para hoy con ese DNI o nombre. Revisa el número o pídele que muestre su correo de confirmación.</p>
+    {% endif %}
+  </div>
+{% endif %}
+
+<h2 class="asistencia-subtitulo">Clases de hoy</h2>
+{% for c in clases %}
+  <div class="module">
+    <h2>{{ c.clase.inicio|date:"H:i" }} · {{ c.clase.disciplina.nombre }} ({{ c.clase.get_nivel_display }}) · {{ c.clase.sala.nombre }} · con {{ c.clase.instructor.nombre }}
+      <span class="asistencia-conteo">{{ c.asistieron }} de {{ c.reservas|length }} asistieron</span></h2>
+    <table>
+      <tbody>
+        {% for r in c.reservas %}
+          <tr>
+            <td>{{ r.usuario.get_full_name }}</td>
+            <td>DNI {{ r.usuario.dni|default:"—" }}</td>
+            <td>{% include 'admin/clases/_boton_asistencia.html' with volver=request.get_full_path %}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% empty %}
+  <p>Hoy no hay clases con reservas.</p>
+{% endfor %}
+{% endblock %}

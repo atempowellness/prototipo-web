@@ -242,5 +242,5 @@ class PaginasTests(TestCase):
         self.assertContains(inicio, 'Pilates')
         nosotros = self.client.get(reverse('nosotros'))
         for nombre in ['Karol G', 'Wisin', 'Becky G', 'J Balvin', 'Lic. María Becerra', 'Lic. Nicki Nicole',
-                       'De La Rose']:
+                       'Young Miko']:
             self.assertContains(nosotros, nombre)

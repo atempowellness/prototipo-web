@@ -187,6 +187,27 @@
                 {% else %}
                   <a class="boton boton-borde boton-chico" href="{% url 'cancelar_reserva' r.pk %}?next={{ request.get_full_path|urlencode }}" data-dialogo>Cancelar</a>
                 {% endif %}
+                {# Correo de confirmación (simulado): en recepción se valida con el DNI #}
+                <details class="ayuda-desplegable correo-reserva">
+                  <summary>Ver el correo de confirmación</summary>
+                  <div class="correo-simulado">
+                    <p class="correo-simulado-aviso">Simulación del prototipo: así se vería el correo de confirmación</p>
+                    <div class="correo-simulado-cuerpo">
+                      <p class="correo-simulado-asunto"><strong>Asunto:</strong> Reserva confirmada: {{ r.clase.disciplina.nombre }}, {{ r.clase.inicio|date:"l j \d\e F" }}, {{ r.clase.inicio|date:"H:i" }}</p>
+                      <p>Hola, {{ u.nombre }}:</p>
+                      <p>Tu clase está reservada.</p>
+                      <dl class="lista-datos">
+                        <dt>Clase</dt><dd>{{ r.clase.disciplina.nombre }} · {{ r.clase.get_nivel_display }}</dd>
+                        <dt>Cuándo</dt><dd>{{ r.clase.inicio|date:"l j \d\e F"|capfirst }}, {{ r.clase.inicio|date:"H:i" }}</dd>
+                        <dt>Dónde</dt><dd>{{ r.clase.sala.nombre }}</dd>
+                        <dt>Con</dt><dd>{{ r.clase.instructor.nombre }}</dd>
+                      </dl>
+                      <p><strong>Al llegar, presenta tu DNI en recepción.</strong> Te recomendamos llegar unos minutos antes.</p>
+                      <p>Si no puedes venir, cancela desde Mi cuenta: con 12 horas o más de anticipación recuperas tu punto.</p>
+                      <p class="apagado">Con cariño,<br>el equipo de <strong class="nombre-marca">Atempo</strong></p>
+                    </div>
+                  </div>
+                </details>
               </li>
             {% endfor %}
           </ul>

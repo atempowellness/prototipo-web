@@ -162,7 +162,7 @@ class PaginasTests(TestCase):
 
     def test_bienestar_y_submenu(self):
         respuesta = self.client.get(reverse('bienestar'))
-        for texto in ['Bienestar', 'Nutrición', 'Masajes', 'Lic. María Becerra', 'De La Rose',
+        for texto in ['Bienestar', 'Nutrición', 'Masajes', 'Lic. María Becerra', 'Young Miko',
                       'Incluida en los paquetes desde', 'Sesión adicional: 1 punto',
                       reverse('bienestar_servicio', args=['nutricion']), reverse('bienestar_servicio', args=['masajes'])]:
             self.assertContains(respuesta, texto)

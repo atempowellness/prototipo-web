@@ -1,0 +1,17 @@
+{% comment %}Botón para marcar (o desmarcar) la asistencia de una reserva de hoy. Recibe "r" y "volver".{% endcomment %}
+{% if r.cancelada %}
+  <span class="estado estado-pendiente">Reserva cancelada</span>
+{% else %}
+  <form method="post" action="{% url 'admin:clases_asistencia_marcar' r.pk %}" class="asistencia-form">
+    {% csrf_token %}<input type="hidden" name="volver" value="{{ volver }}">
+    {% if r.asistencia == 'asistio' %}
+      <span class="estado estado-respondida">Asistió</span>
+      <input type="hidden" name="asistio" value="0">
+      <button type="submit" class="button asistencia-desmarcar">Desmarcar</button>
+    {% else %}
+      {% if r.asistencia == 'no_asistio' %}<span class="estado estado-pendiente">No asistió</span>{% endif %}
+      <input type="hidden" name="asistio" value="1">
+      <button type="submit" class="button default">Marcar asistió</button>
+    {% endif %}
+  </form>
+{% endif %}

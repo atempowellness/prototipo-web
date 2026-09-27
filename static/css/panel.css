@@ -6,6 +6,8 @@
 :root {
   --panel-exito: #3F6B4E;
   --panel-error: #A33A2B;
+  --panel-acento: #7D6440;          /* champagne oscuro */
+  --panel-acento-suave: #EBD3CB;    /* nude */
 }
 
 /* Indicador de estado (por ejemplo, en el Libro de reclamaciones) */
@@ -28,3 +30,17 @@
 }
 .estado-pendiente { background: var(--panel-error); }
 .estado-respondida { background: var(--panel-exito); }
+
+/* Recepción: asistencia de hoy y resumen (templates/admin/clases/) */
+.asistencia-intro { max-width: 900px; font-size: 14px; line-height: 1.6; }
+.asistencia-buscar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 16px 0 20px; }
+.asistencia-buscar label { font-weight: 600; font-size: 15px; }
+.asistencia-buscar input[type="search"] { font-size: 18px; padding: 8px 10px; min-width: 260px; }
+.asistencia-subtitulo { margin-top: 28px; }
+.asistencia-conteo { float: right; font-weight: 400; }
+.asistencia-form { display: inline-flex; align-items: center; gap: 10px; margin: 0; }
+.asistencia-vacio { padding: 10px 12px; }
+.resumen-cifras { display: flex; flex-wrap: wrap; gap: 12px 32px; margin: 16px 0 24px; font-size: 14px; }
+.resumen-numero { display: block; font-size: 28px; font-weight: 600; line-height: 1.2; }
+.resumen-barra { display: block; width: 120px; height: 6px; margin-top: 4px; border-radius: 3px; background: var(--panel-acento-suave); overflow: hidden; }
+.resumen-barra span { display: block; height: 100%; background: var(--panel-acento); }

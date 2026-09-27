@@ -163,6 +163,17 @@ class Reserva(models.Model):
     cancelada_en = models.DateTimeField(null=True, blank=True)
     credito_devuelto = models.BooleanField(default=False)
 
+    # Asistencia (la marca recepción; si al terminar la clase no está marcada, queda "No asistió")
+    POR_REGISTRAR, ASISTIO, NO_ASISTIO, SIN_REGISTRO = '', 'asistio', 'no_asistio', 'sin_registro'
+    ASISTENCIAS = [
+        (POR_REGISTRAR, 'Por registrar'),
+        (ASISTIO, 'Asistió'),
+        (NO_ASISTIO, 'No asistió'),
+        (SIN_REGISTRO, 'Sin registro (antes del control de asistencia)'),
+    ]
+    asistencia = models.CharField(max_length=12, choices=ASISTENCIAS, default=POR_REGISTRAR, blank=True)
+    asistencia_marcada_en = models.DateTimeField('asistencia marcada el', null=True, blank=True)
+
     class Meta:
         ordering = ['clase__inicio']
         verbose_name, verbose_name_plural = 'cupo reservado', 'cupos reservados'

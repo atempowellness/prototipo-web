@@ -86,8 +86,17 @@ def reserva_confirmada(reserva):
     dia = date_format(timezone.localtime(clase.inicio), 'l j \\d\\e F')
     notificar(reserva.usuario, Notificacion.RESERVA_CONFIRMADA,
               f'Reserva confirmada: {_clase_texto(clase)}, el {dia}. '
-              f'Puedes cancelar sin perder el punto hasta 12 horas antes.',
+              f'Te enviamos un correo de confirmación: presenta tu DNI en recepción.',
               reverse('cuenta'), reserva=reserva)
+
+
+def inasistencias(usuaria):
+    """Aviso amable (una vez por mes) tras varias clases reservadas a las que no pudo venir."""
+    from clases.asistencia import INASISTENCIAS_PARA_AVISO
+    notificar(usuaria, Notificacion.INASISTENCIAS,
+              f'Notamos que este mes no pudiste venir a {INASISTENCIAS_PARA_AVISO} clases que reservaste. '
+              f'Si no puedes asistir, cancela antes: liberas tu cupo para otra socia y, con 12 horas o más, '
+              f'recuperas tu punto.', reverse('cuenta'))
 
 
 def _clase_con_dia(clase):
