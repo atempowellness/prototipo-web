@@ -17,6 +17,16 @@ def socia(n=1):
 PAGO = {'metodo': 'yape', 'yape_celular': '987654321', 'yape_codigo': '123456'}
 
 
+class TandasTests(TestCase):
+    def test_diez_tandas_parejas_y_minimo_dos(self):
+        from core.views import repartir_en_tandas
+        self.assertEqual([len(t) for t in repartir_en_tandas(list(range(63)))], [7, 7, 7, 6, 6, 6, 6, 6, 6, 6])
+        self.assertEqual([len(t) for t in repartir_en_tandas(list(range(100)))], [10] * 10)
+        self.assertEqual([len(t) for t in repartir_en_tandas(list(range(5)))], [3, 2])
+        self.assertEqual([len(t) for t in repartir_en_tandas(list(range(1)))], [1])
+        self.assertEqual(repartir_en_tandas([]), [])
+
+
 class FoundingMembersTests(TestCase):
     def setUp(self):
         self.founding = Paquete.objects.get(slug='founding-members')
@@ -68,6 +78,40 @@ class FoundingMembersTests(TestCase):
         otro = Paquete.objects.get(slug='atempo-10')
         self.assertNotContains(self.client.get(f'/admin/paquetes/paquete/{otro.pk}/change/'), 'name="ventas_maximas"')
         self.assertContains(self.client.get('/admin/paquetes/paquete/'), '0 de 100 (quedan 100)')
+
+    def test_permiso_para_el_agradecimiento_al_comprar(self):
+        ana = socia()
+        self.client.force_login(ana)
+        pago = self.client.get(reverse('comprar', args=['founding-members']))
+        self.assertContains(pago, 'name="aparece_en_muro"')
+        self.assertNotContains(pago, 'name="aparece_en_muro" checked')        # desmarcada: lo decide ella
+        self.assertNotContains(self.client.get(reverse('comprar', args=['atempo-10'])), 'name="aparece_en_muro"')
+        datos = {'metodo': 'tarjeta', 'tarjeta_numero': '4242 4242 4242 4242', 'tarjeta_vence': '12/30',
+                 'tarjeta_cvv': '123', 'aparece_en_muro': 'on'}
+        self.client.post(reverse('comprar', args=['founding-members']), datos)
+        ana.refresh_from_db()
+        self.assertTrue(ana.es_founding and ana.aparece_en_muro)
+        # Puede quitarlo (y volver a ponerlo) desde Mi cuenta
+        self.client.post(reverse('muro_fundadoras'))
+        ana.refresh_from_db()
+        self.assertFalse(ana.aparece_en_muro)
+
+    def test_agradecimiento_en_nosotros_solo_con_permiso(self):
+        self.assertNotContains(self.client.get(reverse('nosotros')), 'Gracias, fundadoras')
+        for n in range(1, 26):
+            usuaria = socia(n)
+            usuaria.aparece_en_muro = n != 3
+            usuaria.save()
+            registrar_compra(usuaria, self.founding, 'yape', '')
+        respuesta = self.client.get(reverse('nosotros'))
+        self.assertContains(respuesta, 'Gracias, fundadoras')
+        self.assertContains(respuesta, 'N.° 1</span> Socia1 P.')
+        self.assertNotContains(respuesta, 'Socia3 P.')                        # no dio permiso
+        self.assertContains(respuesta, 'N.° 4</span> Socia4 P.')              # su número no cambia
+        self.assertEqual(respuesta.content.decode().count('class="muro-tanda'), 10)
+        # El total cuenta a todas (cuadra con los números); se aclara que una no quiso aparecer
+        self.assertContains(respuesta, '<span class="cifra">25</span> fundadoras.')
+        self.assertContains(respuesta, 'Una prefirió no mostrar su nombre.')
 
     def test_desaparece_al_agotarse(self):
         Paquete.objects.filter(pk=self.founding.pk).update(ventas_maximas=1)

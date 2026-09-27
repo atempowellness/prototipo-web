@@ -104,6 +104,13 @@
         <p class="nota-destacada">Con esta compra se aplica el código de <strong>{{ beneficio_referida.nombre }}</strong>: las dos recibirán 1 punto extra.</p>
       {% endif %}
 
+      {# Founding Members: permiso para aparecer en el agradecimiento (Nosotros) #}
+      {% if form.aparece_en_muro %}
+        <div class="campo">
+          <label class="casilla">{{ form.aparece_en_muro }}<span>{{ form.aparece_en_muro.label }}</span></label>
+        </div>
+      {% endif %}
+
       <div class="fila-botones pago-botones">
         <button class="boton" type="submit">Pagar <span class="cifra">{{ paquete.precio|soles }}</span></button>
         <button class="boton boton-borde" type="button" data-datos-prueba>Completar con datos de prueba</button>

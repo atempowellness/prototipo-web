@@ -64,6 +64,11 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
         'self', verbose_name='invitada por', null=True, blank=True, on_delete=models.SET_NULL,
         related_name='invitadas', help_text='Quién la invitó. Cada cuenta puede usar un solo código.')
 
+    # Founding Members: su nombre ("Ana P.") en el agradecimiento de Nosotros, solo con su permiso
+    aparece_en_muro = models.BooleanField(
+        'aparece en el agradecimiento a las fundadoras', default=False,
+        help_text='Solo si lo aceptó (al comprar Founding Members o desde Mi cuenta). Se muestra su nombre e inicial.')
+
     is_active = models.BooleanField('activa', default=True)
     is_staff = models.BooleanField('acceso al panel de administración', default=False)
     date_joined = models.DateTimeField('fecha de registro', default=timezone.now)

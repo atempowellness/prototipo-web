@@ -215,9 +215,17 @@ class CuentaDemostracionTests(TestCase):
         self.assertGreaterEqual(nicole.notificaciones.filter(leida=False).count(), 4)
         self.assertTrue(nicole.notificaciones.filter(tipo='vencimiento').exists())
 
-        for texto in ['Atempo 20', 'Tu punto está por vencer', 'Ana Paula', 'Sofia', 'Encuentros de',
+        self.assertTrue(nicole.es_founding and nicole.aparece_en_muro)
+        for texto in ['Founding Members', 'class="tarjeta-founding"', 'Tu punto está por vencer', 'Ana Paula', 'Sofia', 'Encuentros de',
                       'Volver a empezar la demostración']:
             self.assertContains(respuesta, texto)
+
+    def test_la_ultima_fundadora_de_ejemplo_aparece_en_el_muro(self):
+        from paquetes.models import fundadoras_del_muro
+        self.client.post(reverse('demostracion'))
+        total, visibles = fundadoras_del_muro()
+        self.assertEqual(visibles[-1][0], total)     # el muro termina en el número del total
+        self.assertEqual(total - len(visibles), 5)   # 5 de ejemplo no dieron permiso
 
     def test_vuelve_a_empezar_sin_acumular(self):
         self.client.post(reverse('demostracion'))
@@ -229,4 +237,6 @@ class CuentaDemostracionTests(TestCase):
         self.assertEqual(nicole.codigo_referida, codigo)
         self.assertEqual(nicole.reservas.count(), 2)
         self.assertEqual(nicole.compras.count(), 2)      # su Atempo 20 y el punto de regalo
-        self.assertEqual(Usuario.objects.filter(email__endswith='.demo@atempo.pe').count(), 2)
+        # 2 amigas + las fundadoras de ejemplo, sin acumularse
+        from cuentas.demostracion import FUNDADORAS_DE_EJEMPLO
+        self.assertEqual(Usuario.objects.filter(email__endswith='.demo@atempo.pe').count(), 2 + len(FUNDADORAS_DE_EJEMPLO))

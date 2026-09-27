@@ -86,12 +86,37 @@ class InicioView(TemplateView):
         return contexto
 
 
+TANDAS_DEL_MURO = 10          # el agradecimiento a las fundadoras rota en 10 tandas iguales
+MINIMO_POR_TANDA = 2          # con pocas fundadoras, nunca de a una
+
+
+def repartir_en_tandas(nombres, tandas=TANDAS_DEL_MURO, minimo=MINIMO_POR_TANDA):
+    """Reparte en tandas lo más parejas posible: 63 nombres -> 3 tandas de 7 y 7 de 6."""
+    if not nombres:
+        return []
+    cantidad = max(1, min(tandas, len(nombres) // minimo))
+    base, sobran = divmod(len(nombres), cantidad)
+    resultado, inicio = [], 0
+    for i in range(cantidad):
+        fin = inicio + base + (1 if i < sobran else 0)
+        resultado.append(nombres[inicio:fin])
+        inicio = fin
+    return resultado
+
+
 class NosotrosView(TemplateView):
     template_name = 'paginas/nosotros.html'
 
     def get_context_data(self, **kwargs):
+        from paquetes.models import fundadoras_del_muro
+
         contexto = super().get_context_data(**kwargs)
         contexto['titulo'] = 'Sobre nosotros'
         contexto['equipo'] = Profesional.objects.filter(activo=True)
         contexto['fundadores'] = FUNDADORES
+        # Agradecimiento a las Founding Members (solo las que aceptaron aparecer)
+        total, visibles = fundadoras_del_muro()
+        contexto['fundadoras_total'] = total                        # todas, aparezcan o no
+        contexto['fundadoras_ocultas'] = total - len(visibles)
+        contexto['tandas_fundadoras'] = repartir_en_tandas(visibles)
         return contexto

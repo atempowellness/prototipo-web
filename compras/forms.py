@@ -46,6 +46,13 @@ class PagoForm(forms.Form):
         from .referidas import puede_ingresar_codigo_al_pagar
 
         self.usuario = usuario
+        # Founding Members: permiso para aparecer en el agradecimiento a las fundadoras (Nosotros)
+        if paquete is not None and paquete.es_founding:
+            # Desmarcada: el permiso debe darlo ella (Ley N.° 29733)
+            self.fields['aparece_en_muro'] = forms.BooleanField(
+                required=False,
+                label='Quiero que mi nombre aparezca en el agradecimiento a las fundadoras, en la página '
+                      'Sobre nosotros (solo tu nombre y la inicial de tu apellido). Puedes cambiarlo cuando quieras.')
         # El código de referida solo aparece si esta compra puede activar el beneficio
         if usuario is not None and puede_ingresar_codigo_al_pagar(usuario, paquete):
             self.fields['codigo_referida'] = forms.CharField(

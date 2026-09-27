@@ -17,6 +17,16 @@
         <p class="tarjeta-founding-titulo">Founding Member</p>
         <p class="tarjeta-founding-dato">Socia fundadora <span class="cifra">N.° {{ u.numero_founding }} de {{ compra.paquete.ventas_maximas }}</span> · desde el <span class="cifra">{{ compra.fecha|date:"d/m/Y" }}</span></p>
         <p class="apagado">Gracias por creer en <strong class="nombre-marca">Atempo</strong> desde el inicio.</p>
+        <form method="post" action="{% url 'muro_fundadoras' %}" class="tarjeta-founding-muro">
+          {% csrf_token %}
+          {% if u.aparece_en_muro %}
+            <span>Tu nombre ({{ u.nombre_corto }}) aparece en el <a href="{% url 'nosotros' %}#fundadoras">agradecimiento a las fundadoras</a>.</span>
+            <button type="submit" class="campanita-accion">Quitar mi nombre</button>
+          {% else %}
+            <span>Tu nombre no aparece en el <a href="{% url 'nosotros' %}#fundadoras">agradecimiento a las fundadoras</a>.</span>
+            <button type="submit" class="campanita-accion">Mostrar mi nombre</button>
+          {% endif %}
+        </form>
       </div>
     </div>
     {% endwith %}

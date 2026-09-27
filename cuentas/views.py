@@ -86,6 +86,22 @@ class DemostracionView(View):
         return redirect('cuenta')
 
 
+class MuroFundadorasView(LoginRequiredMixin, View):
+    """Founding Members: aparecer o no en el agradecimiento de Sobre nosotros."""
+
+    def post(self, request):
+        usuario = request.user
+        if usuario.es_founding:
+            usuario.aparece_en_muro = not usuario.aparece_en_muro
+            usuario.save(update_fields=['aparece_en_muro'])
+            if usuario.aparece_en_muro:
+                messages.success(request, f'Listo: tu nombre ({usuario.nombre_corto}) aparecerá en el agradecimiento '
+                                          'a las fundadoras, en Sobre nosotros.')
+            else:
+                messages.info(request, 'Listo: tu nombre ya no aparecerá en el agradecimiento a las fundadoras.')
+        return redirect('cuenta')
+
+
 class MiCuentaView(LoginRequiredMixin, TemplateView):
     template_name = 'cuentas/mi_cuenta.html'
     extra_context = {'titulo': 'Mi cuenta'}

@@ -76,6 +76,37 @@
 {# 7. Franja de imagen #}
 {% include 'partes/franja_imagen.html' with etiqueta='La comunidad' %}
 
+{# 7b. Agradecimiento a las Founding Members: los nombres rotan en tandas (ver atempo.js) #}
+{% if tandas_fundadoras %}
+<section class="contenedor bloque fundadoras" id="fundadoras" aria-labelledby="titulo-fundadoras">
+  <h2 id="titulo-fundadoras">Gracias, fundadoras</h2>
+  <p class="entrada">Las primeras socias que creyeron en <strong class="nombre-marca">Atempo</strong> desde el inicio.</p>
+  <div class="muro" data-muro>
+    {% for tanda in tandas_fundadoras %}
+      <ul class="muro-tanda{% if forloop.first %} activa{% endif %}" aria-label="Fundadoras, grupo {{ forloop.counter }}">
+        {% for numero, nombre in tanda %}
+          <li><span class="muro-numero cifra">N.° {{ numero }}</span> {{ nombre }}</li>
+        {% endfor %}
+      </ul>
+    {% endfor %}
+  </div>
+  <div class="muro-pie">
+    {% if tandas_fundadoras|length > 1 %}
+      <div class="muro-controles" hidden data-muro-controles>
+        {% for tanda in tandas_fundadoras %}
+          <button class="muro-punto" type="button" aria-label="Ver grupo {{ forloop.counter }}"{% if forloop.first %} aria-current="true"{% endif %}></button>
+        {% endfor %}
+        <button class="muro-pausa campanita-accion" type="button">Pausar</button>
+      </div>
+    {% endif %}
+    <p class="apagado">
+      <span class="cifra">{{ fundadoras_total }}</span> {% if fundadoras_total == 1 %}fundadora{% else %}fundadoras{% endif %}.
+      {% if fundadoras_ocultas %}{% if fundadoras_ocultas == 1 %}Una prefirió{% else %}Algunas prefirieron{% endif %} no mostrar su nombre.{% endif %}
+    </p>
+  </div>
+</section>
+{% endif %}
+
 {# 8. Misión, visión y propósito (textos de la tesis) #}
 <section class="contenedor bloque">
   <div class="tres-tarjetas">

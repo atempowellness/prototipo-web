@@ -107,6 +107,20 @@ def paquete_founding():
     return paquete if paquete and paquete.quedan > 0 else None
 
 
+def fundadoras_del_muro():
+    """
+    Devuelve (total de fundadoras, [(número, 'Ana P.'), ...]). La lista trae solo a las que
+    aceptaron aparecer; el número de cada una es su orden de compra entre TODAS las fundadoras.
+    """
+    from compras.models import Compra
+
+    compras = list(Compra.objects.filter(tipo='compra', paquete__es_founding=True)
+                   .select_related('usuario').order_by('fecha'))
+    visibles = [(numero, c.usuario.nombre_corto) for numero, c in enumerate(compras, start=1)
+                if c.usuario.aparece_en_muro]
+    return len(compras), visibles
+
+
 def puede_comprar_founding(usuario):
     """Solo como primera compra: cuentas sin compras pagadas anteriores."""
     return not usuario.is_authenticated or not usuario.compras.filter(tipo='compra').exists()

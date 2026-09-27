@@ -326,6 +326,60 @@ document.querySelectorAll('[data-copiar]').forEach(function (boton) {
   if (reducirMovimiento) detener(); else iniciar();
 })();
 
+/* ---------- Nosotros: agradecimiento a las fundadoras ----------
+   Los nombres rotan en tandas con un fundido. El intervalo sale de
+   --intervalo-muro (atempo.css). Puntos para elegir tanda y botón "Pausar".
+   Con "reducir movimiento" no cambian solas. Sin JavaScript se ven todas. */
+(function () {
+  var muro = document.querySelector('[data-muro]');
+  if (!muro) return;
+  var tandas = muro.querySelectorAll('.muro-tanda');
+  var controles = document.querySelector('[data-muro-controles]');
+  if (tandas.length < 2 || !controles) return;
+
+  var puntos = controles.querySelectorAll('.muro-punto');
+  var pausa = controles.querySelector('.muro-pausa');
+  var intervalo = parseFloat(getComputedStyle(document.documentElement)
+    .getPropertyValue('--intervalo-muro')) || 6000;
+  var actual = 0;
+  var temporizador = null;
+
+  muro.classList.add('muro-animado');
+  controles.hidden = false;
+
+  function mostrar(n) {
+    tandas[actual].classList.remove('activa');
+    puntos[actual].removeAttribute('aria-current');
+    actual = (n + tandas.length) % tandas.length;
+    tandas[actual].classList.add('activa');
+    puntos[actual].setAttribute('aria-current', 'true');
+  }
+
+  function iniciar() {
+    detener();
+    temporizador = setInterval(function () { mostrar(actual + 1); }, intervalo);
+    pausa.textContent = 'Pausar';
+  }
+
+  function detener() {
+    clearInterval(temporizador);
+    temporizador = null;
+    pausa.textContent = 'Reanudar';
+  }
+
+  puntos.forEach(function (punto, i) {
+    punto.addEventListener('click', function () {
+      mostrar(i);
+      if (temporizador) iniciar();
+    });
+  });
+  pausa.addEventListener('click', function () {
+    if (temporizador) detener(); else iniciar();
+  });
+
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) detener(); else iniciar();
+})();
+
 /* ---------- Desplegables que se abren y cierran suavemente ----------
    Preguntas frecuentes, "Ver detalles" de paquetes, reclamos y ayudas.
    La duración sale de --duracion-desplegable (atempo.css). La campanita no

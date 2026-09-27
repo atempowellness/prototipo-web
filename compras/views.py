@@ -58,6 +58,9 @@ class ComprarView(LoginRequiredMixin, FormView):
             usuario.save(update_fields=['referida_por'])
 
         compra = registrar_compra(usuario, self.paquete, datos['metodo'], datos['detalle_pago'])
+        if self.paquete.es_founding:
+            usuario.aparece_en_muro = bool(datos.get('aparece_en_muro'))
+            usuario.save(update_fields=['aparece_en_muro'])
         avisos.creditos_activados(compra)
 
         resultado = aplicar_beneficio(compra)

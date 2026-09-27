@@ -45,6 +45,8 @@
 
   /* Movimiento */
   --duracion-desplegable: 300ms;  /* abrir y cerrar preguntas y "Ver detalles" */
+  --intervalo-muro: 6000ms;       /* cada cuánto cambia la tanda de fundadoras (Nosotros) */
+  --fundido-muro: 900ms;          /* fundido entre tandas */
 
   /* Usos de color en el TEMA CLARO */
   --fondo: var(--marfil);
@@ -862,6 +864,60 @@ main { min-height: 50vh; }
   .founding { grid-template-columns: 1fr; padding: 24px; }
 }
 
+/* Nosotros: agradecimiento a las fundadoras (los nombres rotan en tandas; sin JavaScript se ven todos) */
+.fundadoras { text-align: center; }
+.fundadoras .entrada { margin: 0 auto; }
+.muro { margin: 32px auto 0; max-width: 980px; }
+.muro-tanda {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px 24px;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+}
+.muro-tanda li {
+  padding: 14px 8px 10px;
+  border-top: 1px solid var(--decorativo);
+  font-size: 1.15rem;
+  font-weight: var(--peso-enfasis);
+}
+.muro-numero {
+  display: block;
+  margin-bottom: 2px;
+  font-size: .78rem;
+  font-weight: 400;
+  letter-spacing: var(--espaciado-etiquetas);
+  color: var(--texto-secundario);
+}
+/* Con JavaScript: las tandas se superponen y solo se ve la activa (la altura no salta) */
+.muro-animado { display: grid; }
+.muro-animado .muro-tanda {
+  grid-area: 1 / 1;
+  align-content: start;
+  margin: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--fundido-muro) ease, visibility 0s linear var(--fundido-muro);
+}
+.muro-animado .muro-tanda.activa { opacity: 1; visibility: visible; transition-delay: 0s; }
+.muro-pie { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 24px; }
+.muro-controles { display: flex; align-items: center; gap: 10px; }
+.muro-punto {
+  width: 14px;
+  height: 14px;
+  padding: 0;
+  border: 2px solid var(--texto-secundario);
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+.muro-punto[aria-current="true"] { background: var(--texto-secundario); }
+.muro-pausa { margin-left: 8px; }
+@media (prefers-reduced-motion: reduce) {
+  .muro-animado .muro-tanda { transition: none; }
+}
+
 /* Founding Member: tarjeta de fundadora en Mi cuenta */
 .tarjeta-founding {
   display: flex;
@@ -899,6 +955,8 @@ main { min-height: 50vh; }
   text-transform: uppercase;
 }
 .tarjeta-founding-dato { margin: 4px 0 6px !important; font-weight: var(--peso-enfasis); }
+.tarjeta-founding-muro { margin-top: 10px; font-size: .92rem; }
+.tarjeta-founding-muro .campanita-accion { margin-left: 6px; }
 @media (max-width: 560px) {
   .tarjeta-founding { flex-direction: column; align-items: flex-start; padding: 20px; }
 }

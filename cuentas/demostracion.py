@@ -7,11 +7,15 @@ Se arma con las mismas reglas de la web (compra, reservas, cita, encuentro y ref
 así que todo es coherente: puntos descontados, cupos ocupados, avisos en la campanita.
 
 Nicole tiene:
-- Atempo 20 comprado hace 20 días, con 6 clases ya tomadas.
+- Founding Members (N.° ~20, con su nombre en el agradecimiento de Nosotros) comprado hace
+  20 días, con 6 clases ya tomadas. Si ese paquete no existe, Atempo 20.
 - 2 clases reservadas para los próximos días y 1 cita de nutrición (sesión incluida).
 - 1 encuentro de Atempo Circle confirmado y "Recordarme" en otro que aún no abre.
 - 2 amigas invitadas: Ana Paula ya compró (Nicole recibió 1 punto de regalo, que vence
   en 5 días, así se ve el aviso de puntos por vencer) y Sofia solo se registró.
+
+Además se crean FUNDADORAS_DE_EJEMPLO socias de ejemplo con Founding Members, para que se vean
+el contador de Paquetes y el agradecimiento de Nosotros (algunas sin permiso para aparecer).
 """
 import datetime
 
@@ -30,6 +34,18 @@ AMIGAS = [
 CLASES_TOMADAS = 6           # clases "del pasado" (solo se descuentan los puntos)
 DIAS_DESDE_LA_COMPRA = 20
 DIAS_REGALO_POR_VENCER = 5
+FUNDADORAS_DE_EJEMPLO = [   # (nombre, apellido) — nombres inventados
+    ('Ana', 'Pardo'), ('Lucía', 'Reátegui'), ('Carmen', 'Tello'), ('Rosa', 'Málaga'), ('Patricia', 'Vidal'),
+    ('Elena', 'Garay'), ('Mónica', 'Salinas'), ('Claudia', 'Benavides'), ('Gabriela', 'Ortiz'), ('Teresa', 'Luna'),
+    ('Silvia', 'Cáceres'), ('Verónica', 'Delgado'), ('Mariela', 'Cornejo'), ('Cecilia', 'Aguirre'), ('Liliana', 'Ferrer'),
+    ('Pilar', 'Noriega'), ('Rocío', 'Herrera'), ('Milagros', 'Quiroz'), ('Jimena', 'Barrios'), ('Fiorella', 'Ugarte'),
+    ('Adriana', 'Castañeda'), ('Beatriz', 'Olaechea'), ('Carolina', 'Prado'), ('Daniela', 'Ríos'), ('Esther', 'Valdivia'),
+    ('Fabiola', 'Mendoza'), ('Gisela', 'Arana'), ('Inés', 'Zevallos'), ('Julia', 'Palacios'), ('Karina', 'Espinoza'),
+    ('Lorena', 'Tamayo'), ('María José', 'Beltrán'), ('Natalia', 'Chávez'), ('Olga', 'Rospigliosi'), ('Paola', 'Gallardo'),
+    ('Raquel', 'Iturri'), ('Susana', 'León'), ('Úrsula', 'Morales'), ('Vanessa', 'Cárdenas'), ('Ximena', 'Solari'),
+]
+SIN_PERMISO_CADA = 8          # 1 de cada 8 fundadoras de ejemplo no aceptó aparecer en el agradecimiento
+# (las 4.ª, 12.ª, 20.ª...: siempre al medio, nunca la última, para que el muro termine en el total)
 
 
 def _clase_para(dia, disciplinas):
@@ -101,6 +117,23 @@ def _encuentros(nicole):
             break
 
 
+def _fundadoras_de_ejemplo(founding):
+    """Crea las fundadoras de ejemplo (se borran y recrean en cada entrada a la demostración)."""
+    from compras.models import registrar_compra, sumar_meses
+
+    Usuario = get_user_model()
+    ahora = timezone.now()
+    for n, (nombre, apellido) in enumerate(FUNDADORAS_DE_EJEMPLO, start=1):
+        socia = Usuario.objects.create_user(
+            f'fundadora{n}.demo@atempo.pe', None, nombre=nombre, apellido=apellido,
+            celular=f'9001{n:05d}', dni=f'1001{n:04d}', aparece_en_muro=(n % SIN_PERMISO_CADA != 4))
+        compra = registrar_compra(socia, founding, 'yape', '')
+        # Una cada día, de hace 40 días en adelante (Nicole queda al medio, hace 20 días)
+        compra.fecha = ahora - datetime.timedelta(days=41 - n, hours=n % 5)
+        compra.vence = sumar_meses(timezone.localtime(compra.fecha).date(), founding.vigencia_meses)
+        compra.save(update_fields=['fecha', 'vence'])
+
+
 @transaction.atomic
 def preparar_cuenta_demo():
     """Deja la cuenta de demostración en su estado inicial y la devuelve."""
@@ -127,15 +160,22 @@ def preparar_cuenta_demo():
     nicole.save()
     Usuario.objects.filter(email__endswith='.demo@atempo.pe').delete()   # amigas de ejemplo (también las antiguas)
 
-    # 2. Su Atempo 20, comprado hace 20 días, con 6 clases ya tomadas
-    compra = registrar_compra(nicole, Paquete.objects.get(slug='atempo-20'), 'tarjeta', 'Visa •••• 4242')
+    # 2. Fundadoras de ejemplo (compras repartidas en los últimos 40 días)
+    founding = Paquete.objects.filter(es_founding=True).first()
+    if founding:
+        _fundadoras_de_ejemplo(founding)
+
+    # 3. Su paquete (Founding Members, o Atempo 20), comprado hace 20 días, con 6 clases ya tomadas
+    compra = registrar_compra(nicole, founding or Paquete.objects.get(slug='atempo-20'), 'tarjeta', 'Visa •••• 4242')
+    nicole.aparece_en_muro = founding is not None
+    nicole.save(update_fields=['aparece_en_muro'])
     compra.fecha = ahora - datetime.timedelta(days=DIAS_DESDE_LA_COMPRA)
     compra.vence = sumar_meses(timezone.localtime(compra.fecha).date(), 3)
     compra.creditos_usados = CLASES_TOMADAS
     compra.save()
     avisos.creditos_activados(compra)
 
-    # 3. Clases, cita y encuentros (con las reglas de siempre)
+    # 4. Clases, cita y encuentros (con las reglas de siempre)
     from clases.views import asegurar_clases
     asegurar_clases()
     _reservar(nicole, [1, 2, 3], ['pilates', 'yoga'])
@@ -143,7 +183,7 @@ def preparar_cuenta_demo():
     _cita_de_nutricion(nicole)
     _encuentros(nicole)
 
-    # 4. Amigas invitadas: Ana Paula compró (punto de regalo para Nicole) y Sofia solo se registró
+    # 5. Amigas invitadas: Ana Paula compró (punto de regalo para Nicole) y Sofia solo se registró
     for datos in AMIGAS:
         amiga = Usuario.objects.create_user(datos['email'], None, nombre=datos['nombre'], apellido=datos['apellido'],
                                             celular=datos['celular'], dni=datos['dni'], referida_por=nicole)
@@ -157,7 +197,7 @@ def preparar_cuenta_demo():
                                                                      datetime.time(10, 0)))
         regalo.save()
 
-    # 5. Campanita: lo antiguo como leído; quedan sin leer los 3 avisos más recientes
+    # 6. Campanita: lo antiguo como leído; quedan sin leer los 3 avisos más recientes
     recientes = list(nicole.notificaciones.values_list('pk', flat=True)[:3])
     nicole.notificaciones.exclude(pk__in=recientes).update(leida=True)
     return nicole
