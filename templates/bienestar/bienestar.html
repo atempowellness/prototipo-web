@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block contenido %}
 <section class="contenedor cabecera-pagina">
@@ -10,8 +11,8 @@
   <div class="servicios">
     {% for s in servicios %}
       <article class="servicio-tarjeta">
-        <div class="servicio-imagen marcador-imagen" role="img" aria-label="{{ s.imagen }}">
-          <span class="marcador-etiqueta">Imagen: {{ s.imagen }}</span>
+        <div class="servicio-imagen marcador-imagen" role="img" aria-label="{{ s.imagen }}"{% if s.foto %} style="background-image:url('{% static s.foto %}')"{% endif %}>
+          {% if not s.foto %}<span class="marcador-etiqueta">Imagen: {{ s.imagen }}</span>{% endif %}
         </div>
         <div class="servicio-texto">
           <h2>{{ s.titulo }}</h2>

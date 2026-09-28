@@ -25,12 +25,14 @@ TEXTOS = {
         'descripcion': 'Evaluación de tus hábitos y un plan de alimentación realista, pensado para acompañar '
                        'tu entrenamiento y los cambios de esta etapa.',
         'imagen': 'Asesoría nutricional',
+        'foto': 'img/fotos/asesoria-nutricional.jpg',
     },
     MASAJES: {
         'titulo': 'Masajes',
         'descripcion': 'Descarga muscular para recuperarte después de entrenar, o una sesión relajante para '
                        'desconectar del ritmo de la semana.',
         'imagen': 'Sala de masajes',
+        'foto': 'img/fotos/sala-de-masajes.jpg',
     },
 }
 

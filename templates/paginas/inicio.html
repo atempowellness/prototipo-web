@@ -1,15 +1,13 @@
 {% extends 'base.html' %}
-{% load formato %}
+{% load formato static %}
 
 {% block contenido %}
 
 {# 1. Portada principal: imágenes que cambian solas, con el texto encima #}
 <section class="portada" aria-label="Presentación">
   <div class="portada-diapos">
-    {% for etiqueta in portada %}
-      <div class="portada-diapo marcador-imagen{% if forloop.first %} activa{% endif %}" role="img" aria-label="{{ etiqueta }}">
-        <span class="marcador-etiqueta">Imagen: {{ etiqueta }}</span>
-      </div>
+    {% for etiqueta, foto in portada %}
+      <div class="portada-diapo marcador-imagen{% if forloop.first %} activa{% endif %}" role="img" aria-label="{{ etiqueta }}" style="background-image:url('{% static foto %}')"></div>
     {% endfor %}
   </div>
 
@@ -28,7 +26,7 @@
   </div>
 
   <div class="portada-controles">
-    {% for etiqueta in portada %}
+    {% for etiqueta, foto in portada %}
       <button class="portada-punto" type="button" aria-label="Ver imagen {{ forloop.counter }}: {{ etiqueta }}"{% if forloop.first %} aria-current="true"{% endif %}></button>
     {% endfor %}
     <button class="portada-pausa" type="button">Pausar</button>
@@ -86,8 +84,8 @@
   <div class="disciplinas">
     {% for disciplina in disciplinas %}
       <article class="disciplina">
-        <div class="disciplina-imagen marcador-imagen" role="img" aria-label="{{ disciplina.nombre }}">
-          <span class="marcador-etiqueta">Imagen: {{ disciplina.nombre }}</span>
+        <div class="disciplina-imagen marcador-imagen" role="img" aria-label="{{ disciplina.nombre }}"{% if disciplina.foto %} style="background-image:url('{% static disciplina.foto %}')"{% endif %}>
+          {% if not disciplina.foto %}<span class="marcador-etiqueta">Imagen: {{ disciplina.nombre }}</span>{% endif %}
         </div>
         <div class="disciplina-texto">
           <h3>{{ disciplina.nombre }}</h3>
@@ -104,7 +102,7 @@
 </section>
 
 {# 4. Franja de imagen #}
-{% include 'partes/franja_imagen.html' with etiqueta='Una clase en grupo' %}
+{% include 'partes/franja_imagen.html' with etiqueta='Una clase en grupo' imagen='img/fotos/una-clase-en-grupo.jpg' %}
 
 {# 5. Cómo funciona #}
 <section class="contenedor bloque">
@@ -141,9 +139,7 @@
 {# 7. Atempo Circle #}
 <section class="contenedor bloque">
   <div class="dos-columnas circle">
-    <div class="circle-imagen marcador-imagen" role="img" aria-label="Encuentro de Atempo Circle">
-      <span class="marcador-etiqueta">Imagen: Encuentro de Atempo Circle</span>
-    </div>
+    <div class="circle-imagen marcador-imagen" role="img" aria-label="Encuentro de Atempo Circle" style="background-image:url('{% static 'img/fotos/encuentro-atempo-circle.jpg' %}')"></div>
     <div>
       <h2>Atempo Circle</h2>
       <p class="entrada">Más que un estudio, una comunidad.</p>

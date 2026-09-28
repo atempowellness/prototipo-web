@@ -40,8 +40,16 @@ FUNDADORES = [
 for persona in FUNDADORES:
     persona['iniciales'] = iniciales(persona['nombre'])
 
-# Imágenes de la portada principal, que cambian solas.
-PORTADA = ['Clase de Pilates', 'Encuentro de Atempo Circle', 'El estudio']
+# Imágenes de la portada principal, que cambian solas: (descripción, archivo en static/).
+# Las fotos originales están en referencias/Imágenes; aquí se usan copias optimizadas en JPG.
+PORTADA = [
+    ('Clase de Pilates', 'img/fotos/portada-pilates.jpg'),
+    ('Encuentro de Atempo Circle', 'img/fotos/portada-circle.jpg'),
+    ('El estudio', 'img/fotos/el-estudio.jpg'),
+]
+# Foto de cada disciplina en Inicio (según su dirección web en el panel). Sin foto, se ve el recuadro provisional.
+FOTOS_DISCIPLINAS = {'pilates': 'img/fotos/disciplina-pilates.jpg', 'yoga': 'img/fotos/disciplina-yoga.jpg',
+                     'pesas': 'img/fotos/disciplina-pesas.jpg', 'zumba': 'img/fotos/disciplina-zumba.jpg'}
 
 
 def proximas_clases_con_cupo(cantidad=PROXIMAS_CLASES_EN_INICIO):
@@ -75,7 +83,9 @@ class InicioView(TemplateView):
         contexto['vigencias'] = sorted(vigencias.items())
         # Disciplinas y próximas clases salen del panel (Clases y horarios)
         asegurar_clases()
-        contexto['disciplinas'] = Disciplina.objects.select_related('sala')
+        contexto['disciplinas'] = list(Disciplina.objects.select_related('sala'))
+        for disciplina in contexto['disciplinas']:
+            disciplina.foto = FOTOS_DISCIPLINAS.get(disciplina.slug)
         contexto['niveles'] = [nombre for _, nombre in NIVELES]
         contexto['proximas_clases'] = proximas_clases_con_cupo()
         # Próximos encuentros de Atempo Circle (panel → Comunidad)
