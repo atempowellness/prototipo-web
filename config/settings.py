@@ -10,22 +10,39 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
+
+from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
+# --- Laptop (desarrollo) o servidor (publicado) ---
+# En la laptop no hace falta configurar nada: se usa el modo de desarrollo.
+# En el servidor (PythonAnywhere) se definen estas variables en el archivo WSGI
+# (ver despliegue/wsgi_pythonanywhere.py):
+#   DJANGO_DEBUG=0, DJANGO_SECRET_KEY=<clave secreta>, DJANGO_ALLOWED_HOSTS=<dirección de la web>
+DEBUG = os.environ.get('DJANGO_DEBUG', '1') == '1'
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-(2%((m(&td7%tkq+vm3=gz+$^f6e0=o3rm7ah+mp&e5*k_-0-1'
+# Clave secreta: la del servidor nunca se escribe en el código ni se sube a GitHub
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '')
+if not SECRET_KEY:
+    if not DEBUG:
+        raise ImproperlyConfigured('Falta DJANGO_SECRET_KEY en el servidor.')
+    SECRET_KEY = 'django-insecure-solo-para-la-laptop'   # solo desarrollo
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Direcciones desde las que se puede entrar (separadas por comas)
+ALLOWED_HOSTS = [h.strip() for h in os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',') if h.strip()]
 
-ALLOWED_HOSTS = []
+if not DEBUG:
+    # El servidor atiende por https: las cookies de sesión solo viajan cifradas
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_SSL_REDIRECT = True   # si alguien entra por http, se le lleva a https
+    CSRF_TRUSTED_ORIGINS = [f'https://{h}' for h in ALLOWED_HOSTS]
 
 
 # Application definition
@@ -139,6 +156,8 @@ STATIC_URL = 'static/'
 
 # Estilos, scripts e imágenes compartidos por todo el sitio
 STATICFILES_DIRS = [BASE_DIR / 'static']
+# En el servidor, "collectstatic" junta aquí todos los archivos de diseño para servirlos rápido
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

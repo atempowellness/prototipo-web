@@ -13,3 +13,9 @@ __pycache__/
 
 # Material de la tesis: solo local, no se sube al repositorio
 referencias/
+
+# Archivos de diseño reunidos para el servidor (se generan con collectstatic)
+staticfiles/
+
+# Reglas y notas internas del proyecto: solo local (el repositorio es público)
+CLAUDE.md

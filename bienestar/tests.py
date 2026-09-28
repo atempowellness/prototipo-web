@@ -26,10 +26,13 @@ def comprar(usuario, slug):
     return registrar_compra(usuario, Paquete.objects.get(slug=slug), 'yape', '')
 
 
-def proximo(dia_semana):
-    """El próximo día de la semana indicado (0 = lunes), al menos 2 días desde hoy."""
+def dia_de_atencion():
+    """
+    Un martes, miércoles o jueves (atienden las dos nutricionistas y la masajista) entre 2 y 7
+    días desde hoy: así se puede agendar (hasta 7 días antes) sea cual sea el día en que se prueba.
+    """
     dia = timezone.localdate() + datetime.timedelta(days=2)
-    while dia.weekday() != dia_semana:
+    while dia.weekday() not in (1, 2, 3):
         dia += datetime.timedelta(days=1)
     return dia
 
@@ -42,16 +45,16 @@ class DatosInicialesTests(TestCase):
     def test_tipos_y_horarios(self):
         self.assertEqual(TipoSesion.objects.filter(servicio=NUTRICION).count(), 2)
         self.assertEqual(TipoSesion.objects.filter(servicio=MASAJES).count(), 2)
-        martes = proximo(1)
+        dia = dia_de_atencion()
         evaluacion = TipoSesion.objects.get(nombre__startswith='Evaluación')
-        quienes = {p.nombre for _, p in horas_libres(NUTRICION, evaluacion, martes)}
+        quienes = {p.nombre for _, p in horas_libres(NUTRICION, evaluacion, dia)}
         self.assertEqual(quienes, {'Lic. María Becerra', 'Lic. Nicki Nicole'})
 
 
 class PlanDePagoTests(TestCase):
     def setUp(self):
         self.maria = cuenta()
-        self.dia = proximo(1)
+        self.dia = dia_de_atencion()
         self.evaluacion = TipoSesion.objects.get(nombre__startswith='Evaluación')
         self.descarga = TipoSesion.objects.get(nombre='Descarga muscular')
 
@@ -99,7 +102,7 @@ class HorasLibresTests(TestCase):
     def setUp(self):
         self.maria = cuenta()
         comprar(self.maria, 'atempo-20')
-        self.dia = proximo(1)
+        self.dia = dia_de_atencion()
         self.seguimiento = TipoSesion.objects.get(nombre='Seguimiento')
 
     def test_una_hora_tomada_ya_no_aparece(self):
@@ -132,7 +135,7 @@ class CancelarTests(TestCase):
         self.seguimiento = TipoSesion.objects.get(nombre='Seguimiento')
 
     def test_con_12_horas_devuelve_la_sesion(self):
-        dia = proximo(1)
+        dia = dia_de_atencion()
         inicio, nutri = primera_hora(NUTRICION, self.seguimiento, dia)
         cita = agendar(self.maria, nutri, self.seguimiento, inicio)
         self.assertTrue(cancelar_cita(cita))
@@ -149,7 +152,7 @@ class CancelarTests(TestCase):
         self.assertEqual(sesiones_incluidas_disponibles(self.maria, NUTRICION), 0)
 
     def test_el_estudio_cancela_y_avisa(self):
-        dia = proximo(1)
+        dia = dia_de_atencion()
         inicio, nutri = primera_hora(NUTRICION, self.seguimiento, dia)
         cita = agendar(self.maria, nutri, self.seguimiento, inicio)
         self.assertTrue(cancelar_cita(cita, por_el_estudio=True))
@@ -170,7 +173,7 @@ class PaginasTests(TestCase):
 
     def test_pagina_de_servicio_con_agenda(self):
         respuesta = self.client.get(reverse('bienestar_servicio', args=['nutricion']),
-                                    {'dia': proximo(1).isoformat()})
+                                    {'dia': dia_de_atencion().isoformat()})
         for texto in ['Agenda tu cita', 'Me da igual', 'Evaluación y plan personalizado · 45 min', 'Quién te atiende',
                       'hora-libre']:
             self.assertContains(respuesta, texto)
@@ -188,7 +191,7 @@ class PaginasTests(TestCase):
         comprar(self.maria, 'atempo-5')
         self.client.force_login(self.maria)
         evaluacion = TipoSesion.objects.get(nombre__startswith='Evaluación')
-        url, datos = self.agendar_url(evaluacion, proximo(1))
+        url, datos = self.agendar_url(evaluacion, dia_de_atencion())
         confirmacion = self.client.get(url, {**datos, 'parcial': 1})
         self.assertContains(confirmacion, 'Antes de tu evaluación')
         self.assertContains(confirmacion, 'Autorizo a Atempo')
@@ -204,14 +207,14 @@ class PaginasTests(TestCase):
     def test_seguimiento_no_pide_ficha(self):
         comprar(self.maria, 'atempo-5')
         self.client.force_login(self.maria)
-        url, datos = self.agendar_url(TipoSesion.objects.get(nombre='Seguimiento'), proximo(1))
+        url, datos = self.agendar_url(TipoSesion.objects.get(nombre='Seguimiento'), dia_de_atencion())
         self.assertNotContains(self.client.get(url, {**datos, 'parcial': 1}), 'Antes de tu evaluación')
         respuesta = self.client.post(url, datos, follow=True)
         self.assertContains(respuesta, '¡Listo! Agendaste seguimiento')
 
     def test_sin_paquete_explica_y_ofrece_paquetes(self):
         self.client.force_login(self.maria)
-        url, datos = self.agendar_url(TipoSesion.objects.get(nombre='Descarga muscular'), proximo(1))
+        url, datos = self.agendar_url(TipoSesion.objects.get(nombre='Descarga muscular'), dia_de_atencion())
         respuesta = self.client.get(url, {**datos, 'parcial': 1})
         self.assertContains(respuesta, 'se habilitan desde')
         self.assertContains(respuesta, 'Atempo 20')

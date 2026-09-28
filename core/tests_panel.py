@@ -31,8 +31,9 @@ class AccionesDelPanelTests(TestCase):
         clase = Clase.objects.create(inicio=inicio, sala=base.sala, disciplina=base.disciplina,
                                      instructor=base.instructor, nivel='suave')
         self.reserva = reservar(self.maria, clase)
+        # Un martes, miércoles o jueves entre 2 y 7 días desde hoy (se puede agendar cualquier día que se pruebe)
         dia = timezone.localdate() + datetime.timedelta(days=2)
-        while dia.weekday() != 1:
+        while dia.weekday() not in (1, 2, 3):
             dia += datetime.timedelta(days=1)
         tipo = TipoSesion.objects.get(nombre='Seguimiento')
         inicio, nutri = horas_libres('nutricion', tipo, dia, usuario=self.maria)[0]
